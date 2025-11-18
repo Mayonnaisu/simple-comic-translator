@@ -1,0 +1,1 @@
+# simple-comic-translator
