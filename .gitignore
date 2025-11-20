@@ -1,8 +1,8 @@
 # Components
+draft/
 models/
 result/
-output_visuals/
-test/local
+test/local/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
