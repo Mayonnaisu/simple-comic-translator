@@ -58,5 +58,6 @@ def overlay_translated_texts(text_info_list, font_size, font_path, image_path, o
         os.makedirs(output_path, exist_ok=True)
         full_output_path = f"{output_path}/{name}.{extension}"
         img_pil.save(full_output_path, quality=100)
+        img_pil.close()
 
     print(f"Translated images saved to {output_path}")
