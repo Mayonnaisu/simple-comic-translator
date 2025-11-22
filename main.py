@@ -12,7 +12,7 @@ from collections import Counter
 from colorama import Fore, Back, Style, init
 
 from app.core.config import load_config
-from app.core.model import download_model, download_repo_snapshot
+from app.core.model import download_repo_snapshot
 from app.core.image_utils import merge_images_vertically, split_image_safely
 from app.core.detection import detect_text_areas
 from app.core.ocr import process_region_with_ocr, merge_nearby_boxes
@@ -73,22 +73,15 @@ if not os.path.exists(args.input):
     raise Exception(Fore.RED + f"{args.input} does not exist!")
 
 # Download models if not exist
-repo_id="ogkalu/comic-text-and-bubble-detector"
-file_name="detector.onnx"
+repo_id="ogkalu/comic-speech-bubble-detector-yolov8m"
+file_name="comic-speech-bubble-detector.pt"
 model_path=f"./models/detection/{repo_id}"
 
-if not os.path.exists(f"{model_path}/{file_name}"):
-    download_model(
+if not os.path.exists(f"{model_path}/repo"):
+    download_repo_snapshot(
         repo_id=repo_id,
-        file_name=file_name,
-        local_dir=model_path
+        local_dir=f"{model_path}/repo"
     )
-
-# if not os.path.exists(f"{model_path}/repo"):
-#     download_repo_snapshot(
-#         repo_id=repo_id,
-#         local_dir=f"{model_path}/repo"
-#     )
 
 # Iterate through all directories using os.walk
 for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
@@ -154,10 +147,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
     detection = detect_text_areas(merged_image, image_width, slice_height, export_visuals, output_dir, args.gpu)
 
     # --- Stage 3: Split Image Safely on Non-Text Areas ---
-    chunks = split_image_safely(merged_image, image_width, image_height, detection, max_height)
-
-    image_chunks = chunks[0]
-    chunks_number = chunks[1]
+    image_chunks, chunks_number = split_image_safely(merged_image, image_width, image_height, detection, max_height)
 
     # --- Stage 4: Extract Text with PaddleOCR ---
     ocr_results = process_region_with_ocr(image_chunks, ocr_language, ocr_slice, args.gpu)
