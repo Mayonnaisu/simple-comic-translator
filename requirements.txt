@@ -6,10 +6,6 @@ sahi==0.11.36
 paddleocr==2.10.0
 paddlepaddle==2.6.2
 google-genai==1.50.1
-onnx
-onnxruntime
-huggingface_hub
 python-dotenv
-pillow
 natsort
 colorama
