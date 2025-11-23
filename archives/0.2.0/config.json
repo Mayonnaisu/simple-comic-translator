@@ -1,0 +1,25 @@
+{
+  "IMAGE_MERGE": {
+    "enable": true
+  },
+  "DETECTION": {
+    "slice_height": 2500,
+    "export_visuals": false
+  },
+  "IMAGE_SPLIT": {
+    "max_height": 2500
+  },
+  "OCR": {
+    "language": "korean",
+    "use_slice": false,
+    "merge_y_threshold": 17
+  },
+  "TRANSLATION": {
+    "target_language": "en",
+    "gemini_model": "gemini-2.5-flash"
+  },
+  "OVERLAY": {
+    "font_size": 40,
+    "font_path": "./fonts/FiraCodeNerdFont-Bold.ttf"
+  }
+}
