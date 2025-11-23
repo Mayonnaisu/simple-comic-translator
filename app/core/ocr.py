@@ -16,7 +16,9 @@ def process_region_with_ocr(chunks, ocr_lang, slice, gpu_mode):
         use_angle_cls=True,
         lang=ocr_lang,
         use_gpu=gpu_mode,
-        show_log=False
+        show_log=False,
+        det_db_thresh=0.3,
+        det_db_box_thresh=0.6
     )
 
     kwargs = {
