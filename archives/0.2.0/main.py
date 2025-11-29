@@ -53,7 +53,7 @@ if config:
     max_height = config['IMAGE_SPLIT']['max_height']
     # For OCR
     ocr_language = config['OCR']['language']
-    ocr_slice = config['OCR']['language']
+    ocr_slice = config['OCR']['use_slice']
     merge_y_threshold = config['OCR']['merge_y_threshold'] # Max vertical distance in pixels to consider for merging
     # For translation
     target_language = config['TRANSLATION']['target_language']
