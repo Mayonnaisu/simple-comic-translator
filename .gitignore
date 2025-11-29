@@ -3,6 +3,7 @@ draft/
 models/
 result/
 test/local/
+temp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
