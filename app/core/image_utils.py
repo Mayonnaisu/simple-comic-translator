@@ -1,5 +1,3 @@
-import os
-import cv2
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = None
 from collections import Counter
