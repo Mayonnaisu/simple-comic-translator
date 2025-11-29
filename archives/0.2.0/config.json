@@ -7,12 +7,12 @@
     "export_visuals": false
   },
   "IMAGE_SPLIT": {
-    "max_height": 2500
+    "max_height": 10000
   },
   "OCR": {
     "language": "korean",
     "use_slice": false,
-    "merge_y_threshold": 17
+    "merge_y_threshold": 20
   },
   "TRANSLATION": {
     "target_language": "en",
