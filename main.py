@@ -5,6 +5,7 @@ import re
 import time
 import logging
 import argparse
+import itertools
 from PIL import Image
 from pathlib import Path
 from natsort import natsorted
@@ -12,10 +13,8 @@ from collections import Counter
 from colorama import Fore, Back, Style, init
 
 from app.core.config import load_config
-from app.core.model import download_repo_snapshot
-from app.core.image_utils import merge_images_vertically, split_image_safely
-from app.core.detection import detect_text_areas
-from app.core.ocr import process_region_with_ocr, merge_nearby_boxes
+from app.core.image_utils import merge_images_vertically, slice_image_horizontally, split_image_safely
+from app.core.ocr import run_ocr_on_slices, deduplicate_results, merge_nearby_boxes
 from app.core.translation import translate_texts_with_gemini
 from app.core.overlay import overlay_translated_texts
 # from app.core.inpainting import 
@@ -37,8 +36,8 @@ parser.add_argument("--gpu", type=bool, default=False, help="Using GPU or not")
 
 args = parser.parse_args()
 
-INPUT_PATH = args.input
-output_path = args.output if args.output else f"{INPUT_PATH}-translated"
+input_path = args.input
+output_path = args.output if args.output else f"{input_path}-translated"
 
 # Read configurations from config.json
 # Load the configuration
@@ -47,22 +46,28 @@ config = load_config('config.json')
 # Access configuration values
 if config:
     # For merging images
-    image_merge = config['IMAGE_MERGE']['enable']
+    merge_images = config['IMAGE_MERGE']['enable']
     # For text-area detection
+    source_language = config['DETECTION']['source_language']
     slice_height = config['DETECTION']['slice_height']
-    export_visuals = config['DETECTION']['export_visuals']
+    ocr_overlap = int(slice_height * config['DETECTION']['ocr_overlap'])
+    det_y_threshold = config['DETECTION']['merge_y_threshold']
+    det_x_threshold = config['DETECTION']['merge_x_threshold'] 
     # For splitting image
     max_height = config['IMAGE_SPLIT']['max_height']
     # For OCR
-    ocr_language = config['OCR']['language']
-    ocr_slice = config['OCR']['language']
-    merge_y_threshold = config['OCR']['merge_y_threshold'] # Max vertical distance in pixels to consider for merging
+    ocr_y_threshold = config['OCR']['merge_y_threshold']
+    ocr_x_threshold = config['OCR']['merge_x_threshold']
+    use_slicer = config['OCR']['slicer']['enable']
+    h_stride = config['OCR']['slicer']['horizontal_stride']
+    v_stride = config['OCR']['slicer']['vertical_stride']
     # For translation
     target_language = config['TRANSLATION']['target_language']
     gemini_model = config['TRANSLATION']['gemini_model']
     # For overlay
-    font_size = config['OVERLAY']['font_size']
-    font_path = config['OVERLAY']['font_path']
+    font_min = config['OVERLAY']['min_size']
+    font_max = config['OVERLAY']['max_size']
+    font_path = config['OVERLAY']['path']
 
 # --- Main Execution ---
 
@@ -71,17 +76,6 @@ image_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')
 # Check if input path exists
 if not os.path.exists(args.input):
     raise Exception(Fore.RED + f"{args.input} does not exist!")
-
-# Download models if not exist
-repo_id="ogkalu/comic-speech-bubble-detector-yolov8m"
-file_name="comic-speech-bubble-detector.pt"
-model_path=f"./models/detection/{repo_id}"
-
-if not os.path.exists(f"{model_path}/repo"):
-    download_repo_snapshot(
-        repo_id=repo_id,
-        local_dir=f"{model_path}/repo"
-    )
 
 # Iterate through all directories using os.walk
 for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
@@ -138,29 +132,49 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
         original_extension_counts = Counter(original_extensions)
         common_original_extension, counts = original_extension_counts.most_common(1)[0]
 
-    # --- Stage 1: Merge images into one ---
-    merged_image = merge_images_vertically(images)
+    
+    if merge_images:
+        # --- Stage 1: Merge images into one ---
+        merged_image = merge_images_vertically(images)
 
-    image_width, image_height = merged_image.size
+        image_width, image_height = merged_image.size
 
-    # --- Stage 2: Detect Text Areas with ogkalu/comic-speech-bubble-detector-yolov8m + SAHI ---
-    detection = detect_text_areas(merged_image, image_width, slice_height, export_visuals, output_dir, args.gpu)
+        # --- Stage 2: Detect Text Areas PaddleOCR
+        image_slices = slice_image_horizontally(
+            [merged_image, image_width, image_height], slice_height, ocr_overlap
+        )
+        detections = run_ocr_on_slices(image_slices, source_language, args.gpu, [use_slicer, h_stride, v_stride], process="detection")
 
-    # --- Stage 3: Split Image Safely on Non-Text Areas ---
-    image_chunks, chunks_number = split_image_safely(merged_image, image_width, image_height, detection, max_height)
+        unique_detections = deduplicate_results(detections, iou_threshold=0.6)
+
+        merged_detections = merge_nearby_boxes(unique_detections, det_y_threshold, det_x_threshold, process="detection")
+
+        # --- Stage 3: Split Image Safely on Non-Text Areas ---
+        image_chunks, chunks_number = split_image_safely([merged_image, image_width, image_height], merged_detections, max_height)
+    else:
+        image_chunks = images
+        chunks_number = range(len(image_chunks))
 
     # --- Stage 4: Extract Text with PaddleOCR ---
-    ocr_results = process_region_with_ocr(image_chunks, ocr_language, ocr_slice, args.gpu)
+    ocr_results = run_ocr_on_slices(image_chunks, source_language, args.gpu, [use_slicer, h_stride, v_stride], process="ocr")
 
-    # --- Stage 5: Merge Nearby Boxes from OCR Results ---
-    merged_text_data = (merge_nearby_boxes(ocr_results, merge_y_threshold, chunks_number))
+    merged_ocr = []
+    for i in chunks_number:
+        detected_items = []
+        chunk_name = f"image_{i:02d}"
+        for item in ocr_results:
+            if item["image_name"] == chunk_name:
+                detected_items.append(item)
 
-    # --- Stage 6: Translate Extracted Text with Gemini ---
-    translated_text_data = translate_texts_with_gemini(
-    merged_text_data, target_language, gemini_model)
+        merged_ocr.append(merge_nearby_boxes(detected_items, ocr_y_threshold, ocr_x_threshold, process="ocr"))
 
-    # --- Stage 7: Whiten/Inpaint Text Areas & Overlay Translated Text to Split Images ---
-    overlay_translated_texts(translated_text_data, font_size, font_path, image_chunks, output_dir, common_original_extension)
+    merged_ocr_results = list(itertools.chain.from_iterable(merged_ocr))
+
+    # --- Stage 5: Translate Extracted Text with Gemini ---
+    translated_text_data = translate_texts_with_gemini(merged_ocr_results, target_language, gemini_model, output_dir)
+
+    # --- Stage 6: Whiten/Inpaint (TODO) Text Areas & Overlay Translated Texts to Split Images ---
+    overlay_translated_texts(image_chunks, translated_text_data, [font_min, font_max, font_path], common_original_extension, output_dir)
 
 print(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_path}'.")
 

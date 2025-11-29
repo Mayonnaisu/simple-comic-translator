@@ -3,23 +3,31 @@
     "enable": true
   },
   "DETECTION": {
-    "slice_height": 2500,
-    "export_visuals": false
+    "source_language": "ch",
+    "slice_height": 2000,
+    "ocr_overlap": 0.2,
+    "merge_y_threshold": 20,
+    "merge_x_threshold": 40
   },
   "IMAGE_SPLIT": {
-    "max_height": 2500
+    "max_height": 2000
   },
   "OCR": {
-    "language": "korean",
-    "use_slice": false,
-    "merge_y_threshold": 17
+    "merge_y_threshold": 20,
+    "merge_x_threshold": 40,
+    "slicer": {
+      "enable": false,
+      "horizontal_stride": 1200,
+      "vertical_stride": 400
+    }
   },
   "TRANSLATION": {
     "target_language": "en",
     "gemini_model": "gemini-2.5-flash"
   },
   "OVERLAY": {
-    "font_size": 40,
-    "font_path": "./fonts/FiraCodeNerdFont-Bold.ttf"
+    "min_size": 11,
+    "max_size": 40,
+    "path": "fonts/JetBrainsMonoNerdFont-Bold.ttf"
   }
 }

@@ -6,7 +6,7 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
-def translate_texts_with_gemini(text_info_list, target_lang, model, output_folder, summarize):
+def translate_texts_with_gemini(text_info_list, target_lang, model, output_dir):
     if not text_info_list:
         return text_info_list
     
@@ -39,7 +39,7 @@ def translate_texts_with_gemini(text_info_list, target_lang, model, output_folde
         response_schema=response_schema
     )
 
-    previous_summary_path = f"{output_folder}/summary.txt"
+    previous_summary_path = f"{output_dir}/summary.txt"
     if os.path.exists(previous_summary_path):
         prev_summary_list = []
         with open(previous_summary_path, "r", encoding="utf-8") as summary:
@@ -119,13 +119,13 @@ Input List:
             original_text = info["original_text"]
             translated_text = info["translated_text"]
             print(f"[{model}] {original_text} ==> {translated_text}")
-            with open(f"{output_folder}/translation.txt", "a", encoding="utf-8") as translation:
+            with open(f"{output_dir}/translation.txt", "a", encoding="utf-8") as translation:
                 translation.write(f"{original_text} ==> {translated_text}\n")
 
         summary_text = f"""{data_dict['Summary']}"""
 
         print(f"\nSUMMARY:\n{summary_text}\n")
-        with open(f"{output_folder}/summary.txt", "w", encoding="utf-8") as summary:
+        with open(f"{output_dir}/summary.txt", "w", encoding="utf-8") as summary:
             summary.write(summary_text)
 
     except Exception as e:

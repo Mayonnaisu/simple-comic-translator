@@ -54,36 +54,29 @@ This is just a simple app for translating comic in batch with Gemini. It can tra
 However, if you insist on using my app, then proceed to the next section. You've been warned! Just don't expect much cuz it's intended to be "simpler" than those better alternatives or other programs not mentioned here (go search them on your own).
 
 ## WORKFLOW
-### 1. Download Necessary Models
+### 1. Merge images into One
 
-
-### 2. Merge images into One
-
-### 3. Detect Text Areas with [YOLOv8](https://github.com/ultralytics/ultralytics) + [SAHI](https://github.com/obss/sahi)
-Model: [ogkalu/comic-speech-bubble-detector-yolov8m](https://huggingface.co/ogkalu/comic-speech-bubble-detector-yolov8m)
-
-### 4. Split Image Safely on Non-Text Areas
-
-### 5. Extract Texts with [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
+### 2. Detect Text Areas with [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 You may be wondering why I chose older version of PaddleOCR. It is because this version still has built-in slicing feature that's useful for extracting smaller texts.
 
-### 6. Merge Nearby Boxes from OCR Results
+### 3. Split Image Safely on Non-Text Areas
 
-### 7. Translate Extracted Texts with [Gemini](https://github.com/googleapis/python-genai)
+### 4. Extract Texts with [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
+
+### 5. Translate and Summarize Extracted Texts with [Gemini](https://github.com/googleapis/python-genai)
 This stage is crucial as I designed it to send all extracted texts from one entire chapter to Gemini instead of the texts from only one page at a time. This is expected to make Gemini yield a better and more contextual translations.
 
 This stage also requests Gemini to summarize the texts so that my app can send it back as additional context when translating the next chapter.
 
-### 8. Redact Text Areas
+### 6. Redact Text Areas
 #### Whitening (default)
 Whitening is used by default because it's simpler and lighter, thus faster compared to inpainting. It also results in better readability as it overlays white box to speech bubble outlines and its surrounding background, in case the translated texts overflow from their speech bubbles. The downside is that it doesn't look as pretty and clean as inpainting.
 
 #### Inpainting
-Model: [ogkalu/aot-inpainting](https://huggingface.co/ogkalu/aot-inpainting)
 
-### 9 Overlay Translated Texts
+### 7 Overlay Translated Texts
 
-### 10. Save to Corresponding Output Folders
+### 8. Save to Corresponding Output Folders
 
 ## INSTALLATION
 ### Method 1: Download Zip
