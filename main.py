@@ -30,9 +30,9 @@ init(autoreset=True)
 
 # Define arguments with argparse
 parser = argparse.ArgumentParser(description="Arguments for Simple Comic Translator.")
-parser.add_argument("--input", type=str, help="Path to a folder containing comic")
-parser.add_argument("--output", type=str, help="Path to output folder to save translated comic")
-parser.add_argument("--gpu", type=bool, default=False, help="Using GPU or not")
+parser.add_argument("--input", type=str, help="path to your comic folder")
+parser.add_argument("--output", type=str, help="path to output folder")
+parser.add_argument("--gpu", type=bool, default=False, help="whether to use GPU or not")
 
 args = parser.parse_args()
 
