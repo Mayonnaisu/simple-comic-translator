@@ -75,7 +75,6 @@ image_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')
 if not os.path.exists(args.input):
     raise Exception(Fore.RED + f"{args.input} does not exist!")
 
-prev_summary_path = ""
 # Iterate through all directories using os.walk
 for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
@@ -170,12 +169,11 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
     merged_ocr_results = list(itertools.chain.from_iterable(merged_ocr))
 
     # --- Stage 5: Translate Extracted Text with Gemini ---
-    translated_text_data = translate_texts_with_gemini(merged_ocr_results, target_language, gemini_model, output_dir, prev_summary_path)
+    translated_text_data = translate_texts_with_gemini(merged_ocr_results, target_language, gemini_model, output_dir)
 
     # --- Stage 6: Whiten Text Areas & Overlay Translated Texts to Split Images ---
     overlay_translated_texts(image_chunks, translated_text_data, [font_min, font_max, font_path], common_original_extension, output_dir)
 
-    prev_summary_path = output_dir
 print(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_path}'.")
 
 # --- End of Execution ---

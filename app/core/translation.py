@@ -3,10 +3,26 @@ import re
 import json
 import warnings
 from google import genai
+from pathlib import Path
 from google.genai import types
 from dotenv import load_dotenv
 
-def translate_texts_with_gemini(text_info_list, target_lang, model, output_dir, prev_summary_path):
+def subtract_one(match):
+    # Get the found number (group 0 is the entire match)
+    num_str = match.group(0)
+    # Get the length (an integer)
+    width = len(num_str)
+
+    # Convert to integer, subtract one
+    num = int(num_str)
+    subtracted_number = num - 1
+    # Convert back to string and use zfill to pad with zeros to the original width
+    # zfill handles the sign if the number becomes negative
+    new_string = str(subtracted_number).zfill(width)
+
+    return new_string
+
+def translate_texts_with_gemini(text_info_list, target_lang, model, output_dir):
     if not text_info_list:
         return text_info_list
     
@@ -39,7 +55,13 @@ def translate_texts_with_gemini(text_info_list, target_lang, model, output_dir, 
         response_schema=response_schema
     )
 
-    previous_summary_path = f"{prev_summary_path}/summary.txt"
+    full_path = Path(output_dir)
+    parent_path = full_path.parent
+    last_folder = full_path.name
+
+    previous_folder = re.sub(r'\d+', subtract_one, last_folder)
+
+    previous_summary_path = f"{parent_path}/{previous_folder}/summary.txt"
     if os.path.exists(previous_summary_path):
         prev_summary_list = []
         with open(previous_summary_path, "r", encoding="utf-8") as summary:
