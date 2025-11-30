@@ -5,10 +5,16 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/Mayonnaisu/page-downloader/blob/main/LICENSE">
-  <img src="https://img.shields.io/github/license/Mayonnaisu/page-downloader"/></a>
+<a href="https://github.com/Mayonnaisu/simple-comic-translator/blob/main/LICENSE">
+  <img src="https://img.shields.io/github/license/Mayonnaisu/simple-comic-translator"/></a>
 
 </p>
+
+## STATUS
+> [!WARNING]
+> - Under construction 🛠️
+> - Unstable ⚠️
+> - Not thoroughly tested yet ⁉️
 
 ## DIRECTORY
 *   [NOTICE](#notice)
@@ -63,12 +69,12 @@ Read:<br>
 -> Shitty 💩
 
 <p align="center">
-	<img width=350 alt="Tasteless T-Rex Meme"
-title="Tasteless T-Rex Meme" src="https://github.com/Mayonnaisu/simple-comic-translator/blob/main/assets/images/stand-up-dinosaur.jpg?raw=true" />
+	<img width=200 alt="Tasteless T-Rex Meme"
+title="Tasteless T-Rex Meme" src="assets/images/stand-up-dinosaur.jpg" />
 </p>
 
 ### Background
-This is just a ~~shitty~~ simple app for translating comic in batch with Gemini. It can translate comic images in a folder recursively and save them to the corresponding output folder with its [limitations](https://github.com/Mayonnaisu/simple-comic-translator?tab=readme-ov-file#limitations). Don't use this janky app! Instead, use these:
+This is just a ~~shitty~~ simple app for translating comic in batch with Gemini. It can translate comic images in a folder recursively and save them to the corresponding output folder with its [limitations](#limitations). Don't use this janky app! Instead, use these:
 
 - [Manga Image Translator](https://github.com/zyddnys/manga-image-translator)
 - [Manga Image Translator Rust](https://github.com/frederik-uni/manga-image-translator-rust)
@@ -79,10 +85,10 @@ This is just a ~~shitty~~ simple app for translating comic in batch with Gemini.
 However, if you insist on using my app, then proceed to the next section. You've been warned! Just don't expect much cuz it's intended to be "simpler" than those better alternatives or other programs not mentioned here (go search them on your own).
 
 ## WORKFLOW
-Go to [here](https://github.com/Mayonnaisu/simple-comic-translator/blob/main/docs/workflow.md)
+Go to [here](docs/workflow.md)
 
 ## DEMO
-Go to [here](https://github.com/Mayonnaisu/simple-comic-translator/blob/main/docs/workflow.md)
+Go to [here](docs/demo.md)
 
 ## DOWNLOAD
 ### Method 1: Download Zip
@@ -146,7 +152,7 @@ pip install -r requirements.txt
 > [!NOTE]
 > Create **.env** file manually if you didn't use the installer.
 1. Open **.env** file with text/code editor (Notepad, VS Code, etc).
-2. Paste your [Gemini API key](https://github.com/Mayonnaisu/simple-comic-translator?tab=readme-ov-file#how-to-get-gemini-api-key) between the quotation marks.
+2. Paste your [Gemini API key](#how-to-get-gemini-api-key) between the quotation marks.
 3. Save.
 
 ### Optional
@@ -154,7 +160,7 @@ pip install -r requirements.txt
 2. Change the settings as you see fit.
 3. Save.
 
-For more info, see [config options](https://github.com/Mayonnaisu/simple-comic-translator/blob/main/docs/config.md).
+For more info, see [config options](docs/config.md).
 
 ## USAGE
 ### Method 1: Launcher
@@ -195,6 +201,7 @@ git pull
 
 ## LIMITATIONS
 1. Currently, it can't properly recognize vertical texts, which is usually found in manga.
+2. Some sound effects (onomatopoeia) and watermark texts are also detected and recognized, making the result riddled with unnecessary white rectangles.
 
 ## EXTRA INFO
 ### How to Get Gemini API Key
@@ -222,7 +229,7 @@ git pull
 		<summary>View image</summary>
 			<p align="center">
 				<img alt="Gemini Free Tier Quota"
-	title="Gemini Free Tier Quota" src="https://github.com/user-attachments/assets/ad6d62e8-41da-4ac4-b6ab-4d893cf2f18b" />
+	title="Gemini Free Tier Quota" src="assets/images/gemini-quota.png" />
 			</p>
 	</details>
 
