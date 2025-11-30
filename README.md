@@ -1,39 +1,37 @@
 <p align="center">
   <img width="256" height="256" alt="Simple Comic Translator" title="Simple Comic Translator" src="" />
-    <h1 align="center">Simple Comic Translator</h2>
+    <h1 align="center">Simple Comic Translator 💩</h2>
     <p align="center">Translate comic and manga/hwa/hua in batch.</p>
 </p>
 
 <p align="center">
 <a href="https://github.com/Mayonnaisu/page-downloader/blob/main/LICENSE">
   <img src="https://img.shields.io/github/license/Mayonnaisu/page-downloader"/></a>
+
 </p>
 
 ## 📂 Directory
 *   [NOTICE](#notice)
 *   [ABOUT](#about)
-    *   [Full Name](#full-name)
-    *   [Background](#background)
+*   [WORKFLOW](#workflow)
+*   [DEMO](#demo)
 *   [DOWNLOAD](#download)
-    *   [Download Zip](#method-1-download-zip)
-    *   [Clone Repo](#method-2-clone-repo)
 *   [INSTALLATION](#installation)
-    *   [Installer](#installer)
-    *   [CLI](#cli)
 *   [CONFIGURATION](#configuration)
-    *   [Required](#required)
-    *   [Optional](#optional)
-*   [USAGE (CPU MODE)](#usage-cpu-mode)
-*   [USAGE (GPU MODE)](#usage-gpu-mode)
+*   [USAGE](#usage)
 *   [UPDATE](#update)
+*	[LIMITATIONS](#limitations)
 *   [EXTRA INFO](extra-info)
+
+## NOTICE
+
 
 ## ABOUT
 ### Full Name
-***THAT TIME I GOT REINCARNATED AS A SCRIPT KIDDY FOR THE SAKE OF CREATING THIS NOT-SO-[SIMPLE COMIC TRANSLATOR](https://github.com/Mayonnaisu/simple-comic-translator) WITH THE HELP OF MY UNRELIABLE SYSTEM (GEMINI)*** 😂
+***THAT TIME I GOT REINCARNATED AS A SCRIPT KIDDIE FOR THE SAKE OF CREATING THIS NOT-SO-[SIMPLE COMIC TRANSLATOR](https://github.com/Mayonnaisu/simple-comic-translator) WITH THE HELP OF MY UNRELIABLE SYSTEM (GEMINI)*** 😂
 
 > *Me: "System, how to extract text from image with PaddleOCR?"<br>*
-> *System: "To extract text from image with PaddleOCR... Oops, something went wrong with this response."*<br>
+> *System: "To extract text from image with PaddleOCR- Oops, something went wrong with this response."*<br>
 > *Me: "...."*<br>
 > 
 > *\*\*A few moments later\*\**
@@ -42,8 +40,20 @@
 > *System: ["503 UNAVAILABLE. {'error': {'code': 503, 'message': 'The model is overloaded. Please try again later.', 'status': 'UNAVAILABLE'}}"](https://github.com/google-gemini/gemini-cli/issues/4360)*<br>
 > *Me: "WTF!"*
 
+### Shorter Names
+***SCT***<br>
+Read:<br>
+-> "S-C-T"<br>
+-> "ess-see-tee"<br>
+-> Shitty 💩
+
+<p align="center">
+	<img width=350 alt="Tasteless T-Rex Meme"
+title="Tasteless T-Rex Meme" src="https://github.com/Mayonnaisu/simple-comic-translator/blob/main/assets/images/stand-up-dinosaur.jpg?raw=true" />
+</p>
+
 ### Background
-This is just a simple app for translating comic in batch with Gemini. It can translate comic images in a folder recursively and save them to the corresponding output folder. Don't use this janky app! Instead, use these:
+This is just a ~~shitty~~ simple app for translating comic in batch with Gemini. It can translate comic images in a folder recursively and save them to the corresponding output folder. Don't use this janky app! Instead, use these:
 
 - [Manga Image Translator](https://github.com/zyddnys/manga-image-translator)
 - [Manga Image Translator Rust](https://github.com/frederik-uni/manga-image-translator-rust)
@@ -54,36 +64,39 @@ This is just a simple app for translating comic in batch with Gemini. It can tra
 However, if you insist on using my app, then proceed to the next section. You've been warned! Just don't expect much cuz it's intended to be "simpler" than those better alternatives or other programs not mentioned here (go search them on your own).
 
 ## WORKFLOW
-### 1. Merge images into One
+Go to [here](https://github.com/Mayonnaisu/simple-comic-translator/blob/main/docs/workflow.md)
 
-### 2. Detect Text Areas with [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
-You may be wondering why I chose older version of PaddleOCR. It is because this version still has built-in slicing feature that's useful for extracting smaller texts.
+## DEMO
+Go to [here](https://github.com/Mayonnaisu/simple-comic-translator/blob/main/docs/workflow.md)
 
-### 3. Split Image Safely on Non-Text Areas
-
-### 4. Extract Texts with [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
-
-### 5. Translate and Summarize Extracted Texts with [Gemini](https://github.com/googleapis/python-genai)
-This stage is crucial as I designed it to send all extracted texts from one entire chapter to Gemini instead of the texts from only one page at a time. This is expected to make Gemini yield a better and more contextual translations.
-
-This stage also requests Gemini to summarize the texts so that my app can send it back as additional context when translating the next chapter.
-
-### 6. Redact Text Areas
-#### Whitening (default)
-Whitening is used by default because it's simpler and lighter, thus faster compared to inpainting. It also results in better readability as it overlays white box to speech bubble outlines and its surrounding background, in case the translated texts overflow from their speech bubbles. The downside is that it doesn't look as pretty and clean as inpainting.
-
-#### Inpainting
-
-### 7 Overlay Translated Texts
-
-### 8. Save to Corresponding Output Folders
-
-## INSTALLATION
+## DOWNLOAD
 ### Method 1: Download Zip
+1. Click on the green button on the top.
+2. Select "Download ZIP".
+3. Right click on the downloaded .zip file.
+4. Select "Extract Here" with WinRAR or 7-Zip.
+
 ### Method 2: Clone Repo
+**Prerequisites:**
+- Git
+
+```powershell
+git clone "https://github.com/Mayonnaisu/simple-comic-translator"
+```
 
 ## INSTALLATION
 ### Method 1: Installer
+1. Open PowerShell as Administrator.
+2. Change PowerShell execution policy by entering the command below:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
+```
+3. Enter y or yes.
+4. Close the PowerShell.
+5. Right click on **installer.ps1**.
+6. Select "Run with PowerShell".
+7. Select "Yes" if UAC prompt pops up.
+8. Wait until you get ${{\color{lightgreen}{\textsf{INSTALLATION COMPLETED!}}}}\$ message.
 > [!TIP]
 > If you get a warning when opening the installer, uncheck the option, then Open. If you don't do this, the script won't be able to run properly.
 	<details>
@@ -95,6 +108,10 @@ Whitening is used by default because it's simpler and lighter, thus faster compa
 	</details>
 
 ### Method 2: CLI
+**Prerequisites:**
+- Python 3.11.0
+- Microsoft C++ Build Tools (for Windows)
+
 ```powershell
 # Create virtual environment
 python -m venv venv
@@ -109,16 +126,87 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## CONFIGURATION
+### Required
+> [!NOTE]
+> Create **.env** file manually if you didn't use the installer.
+1. Open **.env** file with text/code editor (Notepad, VS Code, etc).
+2. Paste your [Gemini API key](https://github.com/Mayonnaisu/simple-comic-translator?tab=readme-ov-file#how-to-get-gemini-api-key) between the quotation marks.
+3. Save.
+
+### Optional
+1. Open **config.json** with text/code editor.
+2. Change the settings as you see fit.
+3. Save.
+
+For more info, see [config options](https://github.com/Mayonnaisu/simple-comic-translator/blob/main/docs/config.md).
+
 ## USAGE
 ### Method 1: Launcher
 1. Right click on **launcher.ps1**.
 2. Select "Run with PowerShell".
 3. Select a folder containing your manga/hwa/hua.
 
-
 ### Method 2: CLI
 ```powershell
-python main.py --input "YOUR/MANGA/FOLDER/PATH"
+# Activate venv
+## For Windows
+venv/Scripts/activate
+## For Linux
+source venv/bin/activate
+
+# Run with only required arg
+python main.py --input "YOUR/COMIC/FOLDER/PATH"
+
+# For more info
+python main.py --help
 ```
 
+## UPDATE
+### Method 1: Updater
+> [!WARNING]
+> This updater will replace the old files with the newer ones, so make sure to back up the files you want to keep first. For more info, see [here](https://github.com/Mayonnaisu/manga-image-translator?tab=changelog).
+
+1. Right click on **updater.ps1** > Run with PowerShell.
+2. Wait until you get ${{\color{lightgreen}{\textsf{UPDATE COMPLETED!}}}}\$ message.
+
+### Method 2: CLI
+**Prerequisites:**
+- Git
+
+```powershell
+git pull
+```
+
+## EXTRA INFO
+### How to Get Gemini API Key
+1. Visit https://aistudio.google.com/app/apikey.
+2. Accept the Terms and Conditions.
+3. Click "Create API key".
+4. Name your key.
+5. Choose project > Create project.
+6. Select the newly created project.
+7. Click "Create key".
+8. Click the code in the "Key" column.
+9. Click "Copy key".
+> [!TIP]
+> Gemini API Free Tier has rate limits, see: https://ai.google.dev/gemini-api/docs/rate-limits#current-rate-limits.
+>
+> **To check your quota:**
+> 1. Visit https://aistudio.google.com/app/usage
+> 2. Make sure you are on the right account & project.
+> 2. Click "Open in Cloud Console" on the bottom.
+> 3. Scroll down > Click "Quotas & System Limits".
+> 4. Scroll down > You will see your model quota usage on the top result. If you don't see it, use Filter to search it.
+>
+> For example: 
+	<details>
+		<summary>View image</summary>
+			<p align="center">
+				<img alt="Gemini Free Tier Quota"
+	title="Gemini Free Tier Quota" src="https://github.com/user-attachments/assets/ad6d62e8-41da-4ac4-b6ab-4d893cf2f18b" />
+			</p>
+	</details>
+
+## FAQ
 How to change detector, ocr, translator, etc, you ask? You can't, unless you modify the source code yourself. Or just use the aforementioned alternatives.
