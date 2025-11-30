@@ -230,9 +230,7 @@ try {
 
             [Environment]::SetEnvironmentVariable('Path', "$pathToadd;$userPath", 'User')
 
-            $id = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-            $p = New-Object System.Security.Principal.WindowsPrincipal($id)
-            $isAdmin = $p.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
+            $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
             if ($isAdmin) {
                 $systemPath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
