@@ -3,7 +3,7 @@
     "enable": true
   },
   "DETECTION": {
-    "source_language": "ch",
+    "source_language": "korean",
     "slice_height": 2000,
     "ocr_overlap": 0.2,
     "merge_y_threshold": 20,
