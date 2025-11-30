@@ -17,7 +17,6 @@ from app.core.image_utils import merge_images_vertically, slice_image_horizontal
 from app.core.ocr import run_ocr_on_slices, deduplicate_results, merge_nearby_boxes
 from app.core.translation import translate_texts_with_gemini
 from app.core.overlay import overlay_translated_texts
-# from app.core.inpainting import 
 
 
 # Set the environment variables
@@ -70,7 +69,6 @@ if config:
     font_path = config['OVERLAY']['path']
 
 # --- Main Execution ---
-
 image_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')
 
 # Check if input path exists
