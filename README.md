@@ -176,7 +176,7 @@ venv/Scripts/activate
 ## For Linux
 source venv/bin/activate
 
-# Run with only required arg
+# Run with only required argument
 python main.py --input "YOUR/COMIC/FOLDER/PATH"
 
 # For more info
@@ -233,5 +233,6 @@ git pull
 			</p>
 	</details>
 
-## FAQ
-How to change detector, ocr, translator, etc, you ask? You can't, unless you modify the source code yourself. Or just use the aforementioned alternatives.
+### FAQ
+1. **How to change detector, ocr, translator, etc, you ask?**<br>
+    You can't, unless you modify the source code yourself. Or just use the aforementioned alternatives. You can change [Gemini model](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions#gemini-auto-updated) in **config.json** tho.
