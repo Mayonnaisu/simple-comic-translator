@@ -181,4 +181,4 @@ print(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_pa
 # --- End of Execution ---
 end_time = time.perf_counter()
 elapsed_time = end_time - start_time
-print(f"Time taken: {elapsed_time:.2f} seconds")
+print(f"\nTime taken: {elapsed_time:.2f} seconds")
