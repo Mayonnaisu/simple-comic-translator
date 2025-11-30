@@ -10,21 +10,36 @@
 
 </p>
 
-## 📂 Directory
+## DIRECTORY
 *   [NOTICE](#notice)
 *   [ABOUT](#about)
+    *   [Full Name](#full-name)
+    *   [Shorter Names](#shorter-names)
+    *   [Background](#background)
 *   [WORKFLOW](#workflow)
 *   [DEMO](#demo)
 *   [DOWNLOAD](#download)
+    *   [Download Zip](#method-1-download-zip)
+    *   [Clone Repo](#method-2-clone-repo)
 *   [INSTALLATION](#installation)
+    *   [Installer](#method-1-installer)
+    *   [CLI](#method-2-cli)
 *   [CONFIGURATION](#configuration)
+    *   [Required](#required)
+    *   [Optional](#optional)
 *   [USAGE](#usage)
+    *   [Launcher](#method-1-launcher)
+    *   [CLI](#method-2-cli)
 *   [UPDATE](#update)
-*	[LIMITATIONS](#limitations)
+    *   [Updater](#method-1-updater)
+    *   [CLI](#method-2-cli)
+*   [LIMITATIONS](#limitations)
 *   [EXTRA INFO](extra-info)
+    *   [How to Get Gemini API Key](#how-to-get-gemini-api-key)
+    *   [FAQ](#faq)
 
 ## NOTICE
-
+N/A
 
 ## ABOUT
 ### Full Name
