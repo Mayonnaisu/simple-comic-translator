@@ -37,7 +37,7 @@ parser.add_argument("--gpu", type=bool, default=False, help="whether to use GPU 
 args = parser.parse_args()
 
 input_path = args.input
-output_path = args.output if args.output else f"{input_path}-translated"
+output_path = args.output if args.output else f"{input_path}-shitted"
 
 # Read configurations from config.json
 # Load the configuration
