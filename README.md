@@ -53,7 +53,7 @@ title="Tasteless T-Rex Meme" src="https://github.com/Mayonnaisu/simple-comic-tra
 </p>
 
 ### Background
-This is just a ~~shitty~~ simple app for translating comic in batch with Gemini. It can translate comic images in a folder recursively and save them to the corresponding output folder. Don't use this janky app! Instead, use these:
+This is just a ~~shitty~~ simple app for translating comic in batch with Gemini. It can translate comic images in a folder recursively and save them to the corresponding output folder with its [limitations](https://github.com/Mayonnaisu/simple-comic-translator?tab=readme-ov-file#limitations). Don't use this janky app! Instead, use these:
 
 - [Manga Image Translator](https://github.com/zyddnys/manga-image-translator)
 - [Manga Image Translator Rust](https://github.com/frederik-uni/manga-image-translator-rust)
@@ -177,6 +177,9 @@ python main.py --help
 ```powershell
 git pull
 ```
+
+## LIMITATIONS
+1. Currently, it can't properly recognize vertical texts, which is usually found in manga.
 
 ## EXTRA INFO
 ### How to Get Gemini API Key
