@@ -41,6 +41,9 @@ try {
     # Display PowerShell version
     Write-Host "PowerShell $((Get-Host).Version.ToString())"
 
+    # Show launching message
+    Write-Host "`nLaunching..." -ForegroundColor Yellow
+
     # Create temp folder
     New-Item -Path $TempFolder -ItemType Directory -Force | Out-Null
 
