@@ -71,12 +71,12 @@ try {
 
         if ($LASTEXITCODE -ne 0) {
             Throw "Simple Comic Translator Ran into Exception!`nEXIT CODE: $LASTEXITCODE."
-        } else {
-            Write-Host "`nLauncher Ran Successfully." -ForegroundColor Green
         }
     } catch {
         Throw "`nERROR: $($_.Exception.Message)"
     }
+
+    Write-Host "`nLauncher Ran Successfully." -ForegroundColor Green
 } catch {
     Write-Host "`n$($_.Exception.Message)`n`nLauncher Ran into Error!" -ForegroundColor Red
 }
