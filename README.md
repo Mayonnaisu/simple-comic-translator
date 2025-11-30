@@ -49,7 +49,7 @@ N/A
 
 ## ABOUT
 ### Full Name
-***THAT TIME I GOT REINCARNATED AS A SCRIPT KIDDIE FOR THE SAKE OF CREATING THIS NOT-SO-[SIMPLE COMIC TRANSLATOR](https://github.com/Mayonnaisu/simple-comic-translator) WITH THE HELP OF MY UNRELIABLE SYSTEM (GEMINI)*** 😂
+[***THAT TIME I GOT REINCARNATED AS A SCRIPT KIDDIE FOR THE SAKE OF CREATING THIS NOT-SO-SIMPLE COMIC TRANSLATOR WITH THE HELP OF MY UNRELIABLE SYSTEM (GEMINI)***](https://github.com/Mayonnaisu/simple-comic-translator) 😂
 
 > *Me: "System, how to extract text from image with PaddleOCR?"<br>*
 > *System: "To extract text from image with PaddleOCR- Oops, something went wrong with this response."*<br>
@@ -62,7 +62,7 @@ N/A
 > *Me: "WTF!"*
 
 ### Shorter Names
-***SCT***<br>
+[***SCT***]()<br>
 Read:<br>
 -> "S-C-T"<br>
 -> "ess-see-tee"<br>
