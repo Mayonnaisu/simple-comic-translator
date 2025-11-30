@@ -6,7 +6,7 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
-def translate_texts_with_gemini(text_info_list, target_lang, model, output_dir):
+def translate_texts_with_gemini(text_info_list, target_lang, model, output_dir, prev_summary_path):
     if not text_info_list:
         return text_info_list
     
@@ -39,7 +39,7 @@ def translate_texts_with_gemini(text_info_list, target_lang, model, output_dir):
         response_schema=response_schema
     )
 
-    previous_summary_path = f"{output_dir}/summary.txt"
+    previous_summary_path = f"{prev_summary_path}/summary.txt"
     if os.path.exists(previous_summary_path):
         prev_summary_list = []
         with open(previous_summary_path, "r", encoding="utf-8") as summary:
