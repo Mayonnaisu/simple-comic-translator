@@ -81,6 +81,8 @@ Input List:
 {enumerated_input}
 """
 
+    print(f"\nPROMPT:\n{prompt}")
+
     try:
         response = client.models.generate_content(
             model=model,
@@ -104,7 +106,7 @@ Input List:
             translated_text = match.group(2).strip()
             translated_map[item_index] = translated_text
 
-        print("TRANSLATION:")
+        print("\nTRANSLATION:")
         for i, info in enumerate(text_info_list):
             if i in translated_map:
                 text_info_list[i]["translated_text"] = translated_map[i]
