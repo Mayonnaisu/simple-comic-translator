@@ -45,7 +45,7 @@
     *   [FAQ](#faq)
 
 ## NOTICE
-N/A
+### <mark>All PowerShell scripts (.ps1) are only tested on Windows and may not be compatible with PowerShell Core run *directly* on other OSes.</mark>
 
 ## ABOUT
 ### Full Name
@@ -107,6 +107,7 @@ git clone "https://github.com/Mayonnaisu/simple-comic-translator"
 
 ## INSTALLATION
 ### Method 1: Installer
+> **The installer only supports Windows 10 & 11.**
 1. Open PowerShell as Administrator.
 2. Change PowerShell execution policy by entering the command below:
 ```powershell
