@@ -9,7 +9,7 @@ N/A
 ## v0.4.0
 1. Remove ultralytics, sahi, & huggingface_hub from dependencies
 2. Downgrade Python version from 3.12.0 to 3.11.0
-3. Downgrade torch, torchvision, numpy versions
+3. Downgrade torch, torchvision, & numpy versions
 4. Use PaddleOCR for detection instead of YOLO
 5. Add installer, launcher, & updater
 6. Add extra module/s
