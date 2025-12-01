@@ -26,8 +26,10 @@
     "gemini_model": "gemini-2.5-flash"
   },
   "OVERLAY": {
-    "min_size": 11,
-    "max_size": 40,
-    "path": "fonts/JetBrainsMonoNerdFont-Bold.ttf"
+    "font": {
+      "min_size": 11,
+      "max_size": 40,
+      "path": "fonts/JetBrainsMonoNerdFont-Bold.ttf"
+    }
   }
 }

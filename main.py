@@ -64,9 +64,9 @@ if config:
     target_language = config['TRANSLATION']['target_language']
     gemini_model = config['TRANSLATION']['gemini_model']
     # For overlay
-    font_min = config['OVERLAY']['min_size']
-    font_max = config['OVERLAY']['max_size']
-    font_path = config['OVERLAY']['path']
+    font_min = config['OVERLAY']['font']['min_size']
+    font_max = config['OVERLAY']['font']['max_size']
+    font_path = config['OVERLAY']['font']['path']
 
 # --- Main Execution ---
 image_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')
