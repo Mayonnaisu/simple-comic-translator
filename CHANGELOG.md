@@ -19,6 +19,7 @@ N/A
 10. Add more content to documentations (in progress)
 
 ### TODO
+0. Add demo
 1. Add logging
 2. Improve comments
 3. Add testing with GitHub Actions
