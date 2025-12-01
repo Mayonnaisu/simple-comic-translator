@@ -109,7 +109,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
         continue
 
     # Sort files to ensure consistent merging order
-    natsorted(image_files)
+    image_files = natsorted(image_files)
 
     images = []
     try:
