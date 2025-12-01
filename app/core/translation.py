@@ -129,6 +129,7 @@ Input List:
             translated_map[item_index] = translated_text
 
         print("\nTRANSLATION:")
+        translation_text_list = []
         for i, info in enumerate(text_info_list):
             if i in translated_map:
                 text_info_list[i]["translated_text"] = translated_map[i]
@@ -143,8 +144,10 @@ Input List:
             original_text = info["original_text"]
             translated_text = info["translated_text"]
             print(f"[{model}] {original_text} ==> {translated_text}")
-            with open(f"{output_dir}/translation.txt", "a", encoding="utf-8") as translation:
-                translation.write(f"{original_text} ==> {translated_text}\n")
+            translation_text_list.append(f"{original_text} ==> {translated_text}")
+
+        with open(f"{output_dir}/translation.txt", "w", encoding="utf-8") as translation:
+            translation.write("\n".join(translation_text_list))
 
         summary_text = f"""{data_dict['Summary']}"""
 
