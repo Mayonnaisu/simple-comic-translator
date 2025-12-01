@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="256" height="256" alt="Simple Comic Translator" title="Simple Comic Translator" src="" />
+  <img width="256" height="256" alt="Simple Comic Translator" title="Simple Comic Translator" src="./assets/images/u1f609_u1f4a9.png" />
     <h1 align="center">Simple Comic Translator 💩</h2>
     <p align="center">Translate comic and manga/hwa/hua in batch.</p>
 </p>
