@@ -66,7 +66,7 @@
 Read:<br>
 -> "S-C-T"<br>
 -> "ess-see-tee"<br>
--> Shitty 💩
+-> "Shitty" 💩
 
 <p align="center">
 	<img width=200 alt="Tasteless T-Rex Meme"
