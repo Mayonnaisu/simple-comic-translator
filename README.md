@@ -62,7 +62,7 @@
 > *Me: "WTF!"*
 
 ### Shorter Names
-[***SCT***]()<br>
+[***SCT***](#shorter-names)<br>
 Read:<br>
 -> "S-C-T"<br>
 -> "ess-see-tee"<br>
@@ -187,7 +187,7 @@ python main.py --help
 ## UPDATE
 ### Method 1: Updater
 > [!WARNING]
-> This updater will replace the old files with the newer ones, so make sure to back up the files you want to keep first. For more info, see [here](https://github.com/Mayonnaisu/manga-image-translator?tab=changelog).
+> This updater will replace the old files with the newer ones, so make sure to back up the files you want to keep first. For more info, see [here](CHANGELOG.md).
 
 1. Right click on **updater.ps1** > Run with PowerShell.
 2. Wait until you get ${{\color{lightgreen}{\textsf{UPDATE COMPLETED!}}}}\$ message.
