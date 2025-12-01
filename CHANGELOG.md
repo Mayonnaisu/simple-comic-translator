@@ -13,10 +13,12 @@ N/A
 4. Use PaddleOCR for detection instead of YOLO
 5. Add installer, launcher, & updater
 6. Add extra module/s
-7. Add filtering (in progress)
+7. Improve console output
 8. Add summarization of the translation (to be removed?)
 9. Add function to save translation & summary as text file
 10. Add more content to documentations (in progress)
+11. Improve error handling (in progress)
+12. Add filtering (in progress) 
 
 ### TODO
 0. Add demo
