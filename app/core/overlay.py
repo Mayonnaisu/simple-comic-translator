@@ -157,4 +157,4 @@ def overlay_translated_texts(non_overlap_slices, all_ocr_results, font, image_ex
         slice_img_pil.save(full_output_path, quality=100)
         slice_img_pil.close()
 
-    print(f"Translated images saved to {output_path}")
+    print(f"Translated images saved to {output_path}.")
