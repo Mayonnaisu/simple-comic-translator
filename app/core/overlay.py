@@ -6,6 +6,13 @@ from PIL import Image, ImageDraw, ImageFont
 from app.core.ocr import get_bbox_coords
 
 
+def is_string_in_file(file_path, search_string):
+    with open(file_path, 'r', encoding="utf-8") as file:
+        for line in file:
+            if search_string in line:
+                return True
+    return False
+
 def get_fitted_font_and_text(text, max_width, max_height, min_size, max_size, font_path):
     """
     Finds the largest font size and the corresponding wrapped text that fits within the specified max_width and max_height.
@@ -52,7 +59,7 @@ def get_fitted_font_and_text(text, max_width, max_height, min_size, max_size, fo
     # Return the last size and text that fit
     return fitted_size, best_wrapped_text
 
-def overlay_translated_texts(non_overlap_slices, all_ocr_results, font, image_extension, output_path):
+def overlay_translated_texts(non_overlap_slices, all_ocr_results, font, image_extension, language, output_path):
     """Maps OCR results to the correct non-overlapping slice and draws them."""
     font_min, font_max, font_path = font
 
@@ -60,6 +67,14 @@ def overlay_translated_texts(non_overlap_slices, all_ocr_results, font, image_ex
         os.makedirs(output_path)
 
     inclusion = ("I", "you", "we", "they", "he", "she", "it")
+
+    # Set filter according to source language
+    if language == "japan":
+        filter_path = "filters/manga.txt"
+    elif language == "korean":
+        filter_path = "filters/manhwa.txt"
+    elif language == "ch":
+        filter_path = "filters/manhua.txt"
 
     for i, slice_info in enumerate(non_overlap_slices):
         slice_name = f"image_{i:02d}"
@@ -73,9 +88,14 @@ def overlay_translated_texts(non_overlap_slices, all_ocr_results, font, image_ex
         for item in all_ocr_results:
             if item["image_name"] == slice_name:
                 box = item["box"]
+                original_text = item["original_text"]
                 translated_text = item["translated_text"]
-                # Skip translated text whose characters are fewer than 3 and not in inclusion list, potentially removing gibberish escaping from OCR filter
-                if len(translated_text) < 3 and translated_text not in inclusion:
+
+                # Filter for sound effects in original_text
+                if is_string_in_file(filter_path, original_text):
+                    continue
+                # Filter translated texts whose characters are fewer than 4 and not in inclusion list, potentially removing gibberish
+                if len(translated_text) < 4 and translated_text not in inclusion:
                     continue
                 # Adjust points back to be relative to the *current slice's* top edge
                 rel_min_x, rel_min_y, rel_max_x, rel_max_y, _ = get_bbox_coords(

@@ -26,6 +26,7 @@ def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process):
         use_gpu=use_gpu,
         show_log=False)
     
+    # Define additional arguments for accomodating slicer
     kwargs = {
         "cls": False,
         "det": True,
@@ -62,7 +63,6 @@ def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process):
                 confidence = line[1][1]
 
                 # Adjust coordinates to the original image's coordinate system
-
                 adjusted_points = [[p[0], p[1] + top_offset] for p in points]
                 _, _, _, _, center_y = get_bbox_coords(adjusted_points)
 

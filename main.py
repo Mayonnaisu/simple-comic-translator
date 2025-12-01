@@ -172,7 +172,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
     translated_text_data = translate_texts_with_gemini(merged_ocr_results, target_language, gemini_model, output_dir)
 
     # --- Stage 6: Whiten Text Areas & Overlay Translated Texts to Split Images ---
-    overlay_translated_texts(image_chunks, translated_text_data, [font_min, font_max, font_path], common_original_extension, output_dir)
+    overlay_translated_texts(image_chunks, translated_text_data, [font_min, font_max, font_path], common_original_extension, source_language, output_dir)
 
 print(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_path}'.")
 
