@@ -59,6 +59,8 @@ def overlay_translated_texts(non_overlap_slices, all_ocr_results, font, image_ex
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
+    inclusion = ("I", "you", "we", "they", "he", "she", "it")
+
     for i, slice_info in enumerate(non_overlap_slices):
         slice_name = f"image_{i:02d}"
         try:
@@ -72,8 +74,8 @@ def overlay_translated_texts(non_overlap_slices, all_ocr_results, font, image_ex
             if item["image_name"] == slice_name:
                 box = item["box"]
                 translated_text = item["translated_text"]
-                # Skip translated text whose characters are fewer than 3, potentially filtering sound effects
-                if len(translated_text) < 3:
+                # Skip translated text whose characters are fewer than 3 and not in inclusion list, potentially removing gibberish escaping from OCR filter
+                if len(translated_text) < 3 and translated_text not in inclusion:
                     continue
                 # Adjust points back to be relative to the *current slice's* top edge
                 rel_min_x, rel_min_y, rel_max_x, rel_max_y, _ = get_bbox_coords(
