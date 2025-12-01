@@ -202,7 +202,7 @@ git pull
 
 ## LIMITATIONS
 1. Currently, it can't properly recognize vertical texts, which is usually found in manga.
-2. Some sound effects (onomatopoeia) and watermark texts are also detected and recognized, making the result riddled with unnecessary white rectangles.
+2. Some sound effects (onomatopoeia) and watermark texts are also detected and recognized, making the result riddled with unnecessary texts and white rectangles.
 3. No automatic retry in case of error.
 
 ## EXTRA INFO
