@@ -7,19 +7,23 @@
 
 ### "DETECTION"
 ```jsonc
-"source_language": "korean",    // input language for PaddleOCR: "japan", "korean", "ch", etc.
+"source_language": "korean",    // input language for PaddleOCR: "japan", "korean", "ch", "en", etc.
 "slice_height": 2000,           // height of each slice
 "ocr_overlap": 0.2,             // overlap of each slice
 "merge_y_threshold": 50,        // maximum vertical distance to merge detections
 "merge_x_threshold": 100        // maximum horizontal distance to merge detections
 ```
 
+> [!TIP]
+> For more language codes, see https://github.com/Mushroomcat9998/PaddleOCR/blob/main/doc/doc_en/multi_languages_en.md#5-support-languages-and-abbreviations. Idk which ones aren't supported by PP-OCRv4 tho.
+
 ### "IMAGE_SPLIT"
-> [!NOTE]
-> Split & slice are basically the same thing.
 ```jsonc
 "max_height": 2000              // maximum height of each split
 ```
+
+> [!NOTE]
+> Split & slice are basically the same thing.
 
 ### "OCR"
 ```jsonc
