@@ -9,7 +9,7 @@ import itertools
 from PIL import Image
 from pathlib import Path
 from loguru import logger
-from datetime import datetime
+from datetime import datetime, timedelta
 from natsort import natsorted
 from collections import Counter
 from colorama import Fore, Back, Style, init
@@ -189,5 +189,6 @@ logger.info(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{out
 
 # --- End of Execution ---
 end_time = time.perf_counter()
-elapsed_time = end_time - start_time
-logger.info(f"\nTime taken: {elapsed_time:.2f} seconds")
+elapsed_seconds = end_time - start_time
+time_delta = timedelta(seconds=elapsed_seconds)
+logger.info(f"\nTime taken: {time_delta}")
