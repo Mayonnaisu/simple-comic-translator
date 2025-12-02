@@ -190,5 +190,6 @@ logger.info(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{out
 # --- End of Execution ---
 end_time = time.perf_counter()
 elapsed_seconds = end_time - start_time
-time_delta = timedelta(seconds=elapsed_seconds)
-logger.info(f"\nTime taken: {time_delta}")
+hours, remainder = divmod(int(elapsed_seconds), 3600)
+minutes, seconds = divmod(remainder, 60)
+logger.info(f"\nTime taken: {hours:02}:{minutes:02}:{seconds:02}")
