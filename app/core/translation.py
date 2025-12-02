@@ -4,8 +4,10 @@ import json
 import warnings
 from google import genai
 from pathlib import Path
+from loguru import logger
 from google.genai import types
 from dotenv import load_dotenv
+
 
 def subtract_one(match):
     # Get the found number (group 0 is the entire match)
@@ -22,11 +24,12 @@ def subtract_one(match):
 
     return new_string
 
+
 def translate_texts_with_gemini(text_info_list, target_lang, model, output_dir):
     if not text_info_list:
         return text_info_list
     
-    print(f"\nTranslating texts to ({target_lang.upper()}) with Gemini.")
+    logger.info(f"\nTranslating texts to ({target_lang.upper()}) with Gemini.")
 
     # Load environment variables from .env file
     load_dotenv()
@@ -103,7 +106,7 @@ Input List:
 {enumerated_input}
 """
 
-    print(f"\nPROMPT:\n{prompt}")
+    logger.info(f"\nPROMPT:\n{prompt}")
 
     try:
         response = client.models.generate_content(
@@ -128,7 +131,7 @@ Input List:
             translated_text = match.group(2).strip()
             translated_map[item_index] = translated_text
 
-        print("\nTRANSLATION:")
+        logger.info("\nTRANSLATION:")
         translation_text_list = []
         for i, info in enumerate(text_info_list):
             if i in translated_map:
@@ -143,7 +146,7 @@ Input List:
 
             original_text = info["original_text"]
             translated_text = info["translated_text"]
-            print(f"[{model}] {original_text} ==> {translated_text}")
+            logger.info(f"[{model}] {original_text} ==> {translated_text}")
             translation_text_list.append(f"{original_text} ==> {translated_text}")
 
         with open(f"{output_dir}/translation.txt", "w", encoding="utf-8") as translation:
@@ -151,7 +154,7 @@ Input List:
 
         summary_text = f"""{data_dict['Summary']}"""
 
-        print(f"\nSUMMARY:\n{summary_text}\n")
+        logger.info(f"\nSUMMARY:\n{summary_text}\n")
         with open(f"{output_dir}/summary.txt", "w", encoding="utf-8") as summary:
             summary.write(summary_text)
 

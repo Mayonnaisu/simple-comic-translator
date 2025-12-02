@@ -1,15 +1,18 @@
+import os
 from PIL import Image
+from loguru import logger
 Image.MAX_IMAGE_PIXELS = None
 from collections import Counter
 
-def merge_images_vertically(images):
+
+def merge_images_vertically(images, output_dir, log_level):
     """
     Merges all images in each subfolder into a single image and saves it 
     in the corresponding output subfolder.
     """
 
     image_count = len(images)
-    print(f"Merging {image_count} images into one.")
+    logger.info(f"Merging {image_count} images into one.")
 
     # Determine the dimensions for the combined image (vertical stacking)
     widths, heights = zip(*(i.size for i in images))
@@ -43,19 +46,20 @@ def merge_images_vertically(images):
 
         final_image = new_img.crop(cropped_region)
 
-    print("All images merged.\n")
+    logger.info("All images merged.\n")
+
+    # Save the merged image if debug mode is on
+    if log_level == "TRACE":
+        output_path = f"{output_dir}/debug"
+        os.makedirs(output_path, exist_ok=True)
+        save_path = f"{output_path}/merged_image.png"
+        final_image.save(save_path, quality=100)
+        logger.debug(f"Merged {len(images)} images and saved to {save_path}.")
+
     return final_image
-    # Define the output path
-    # output_dir = "result"
-    # output_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Save the combined image with a relevant name
-    # save_path = output_dir / "combined_image.png"
-    # final_image.save(save_path, quality=100)
-    # print(f"Merged {len(images)} images in {dirpath} and saved to {save_path}")
 
 
-def slice_image_horizontally(image, slice_height, overlap=0):
+def slice_image_horizontally(image, slice_height, overlap, output_dir, log_level):
     """Slices an image with or without overlap, returns slice info and the full image shape."""
     img, width, height = image
     slices = []
@@ -86,6 +90,16 @@ def slice_image_horizontally(image, slice_height, overlap=0):
         if bottom == height:
             break
 
+    # Save image slices if debug mode is on
+    if log_level == "TRACE":
+        output_path = f"{output_dir}/debug"
+        os.makedirs(output_path, exist_ok=True)
+        for i, slice in enumerate(slices):
+            image_slice = slice["image"]
+            save_path = f"{output_path}/slice_{i:02d}.png"
+            image_slice.save(save_path, quality=100)
+            logger.debug(f"Saved {len(slices)} image slices to {save_path}.")
+
     return slices
 
 
@@ -100,7 +114,7 @@ def split_image_safely(image, detection, max_height=10000):
 
     boxes8 = [boxes["box"] for boxes in detection]
 
-    print("\nSplitting image on non-text areas.")
+    logger.info("\nSplitting image on non-text areas.")
     while current_pos < height:
         # Determine the maximum possible safe height for the current chunk
         max_safe_y = min(current_pos + max_height, height)
@@ -149,6 +163,6 @@ def split_image_safely(image, detection, max_height=10000):
 
     chunks_total = len(chunks)
     chunks_number = range(chunks_total)
-    print(f"Image splitted into {chunks_total} parts.\n")
+    logger.info(f"Image splitted into {chunks_total} parts.\n")
 
     return chunks, chunks_number

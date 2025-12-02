@@ -2,12 +2,14 @@
 
 import os
 import re
+import sys
 import time
-import logging
 import argparse
 import itertools
 from PIL import Image
 from pathlib import Path
+from loguru import logger
+from datetime import datetime
 from natsort import natsorted
 from collections import Counter
 from colorama import Fore, Back, Style, init
@@ -24,19 +26,28 @@ start_time = time.perf_counter()
 # Set the environment variables and configurations
 os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = str(pow(2, 40))
 Image.MAX_IMAGE_PIXELS = None
-logging.basicConfig(level=logging.INFO)
-init(autoreset=True)
+init(autoreset=True, convert=True)
 
 # Define arguments with argparse
 parser = argparse.ArgumentParser(description="Arguments for Simple Comic Translator.")
-parser.add_argument("--input", type=str, help="path to your comic folder")
-parser.add_argument("--output", type=str, help="path to output folder")
-parser.add_argument("--gpu", type=bool, default=False, help="whether to use GPU or not")
+parser.add_argument("--input", type=str, help="(str): path to your comic folder")
+parser.add_argument("--output", type=str, help="(str): path to output folder")
+parser.add_argument("--gpu", action='store_true', help="use GPU")
+parser.add_argument("--debug", action='store_true', help="enable debug mode")
 
 args = parser.parse_args()
 
 input_path = args.input
 output_path = args.output if args.output else f"{input_path}-shitted"
+
+# Start logging
+logger.remove() # Remove the default handler
+
+log_level = "INFO" if args.debug == False else "TRACE"
+formatted_datetime = datetime.now().strftime("%Y-%m-%d_%H.%M")
+
+logger.add(sys.stderr, format="{message}", level=log_level)
+logger.add(f"temp/logs/{formatted_datetime}.log", format="[{level}] {message}", level=log_level)
 
 # Read configurations from config.json
 # Load the configuration
@@ -83,7 +94,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
     output_dir = Path(output_path) / relative_path
     output_dir.mkdir(parents=True, exist_ok=True) # Create output directory if it doesn't exist
 
-    print(Style.BRIGHT + Fore.YELLOW + f"\nProcessing '{dirpath}'")
+    logger.info(Style.BRIGHT + Fore.YELLOW + f"\nProcessing '{dirpath}'")
 
     # Skip if output files already exist
     already_exist = False
@@ -94,7 +105,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
         if re.match(regex_pattern, filename):
             if os.path.exists(full_path):
-                print(Fore.GREEN + f"- Files already exist in '{output_dir}'. Skipping.")
+                logger.info(Fore.GREEN + f"- Files already exist in '{output_dir}'. Skipping.")
                 already_exist = True
                 break
 
@@ -105,7 +116,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
     image_files = [os.path.join(dirpath, f) for f in filenames if f.lower().endswith(image_extensions)]
 
     if not image_files:
-        print(Fore.BLUE + f"- No image in '{dirpath}'. Skipping.")
+        logger.info(Fore.BLUE + f"- No image in '{dirpath}'. Skipping.")
         continue
 
     # Sort files to ensure consistent merging order
@@ -130,16 +141,16 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
         original_extension_counts = Counter(original_extensions)
         common_original_extension, counts = original_extension_counts.most_common(1)[0]
 
-    
+
     if merge_images:
         # --- Stage 1: Merge images into one ---
-        merged_image = merge_images_vertically(images)
+        merged_image = merge_images_vertically(images, output_dir, log_level)
 
         image_width, image_height = merged_image.size
 
         # --- Stage 2: Detect Text Areas PaddleOCR
         image_slices = slice_image_horizontally(
-            [merged_image, image_width, image_height], slice_height, ocr_overlap
+            [merged_image, image_width, image_height], slice_height, ocr_overlap, output_dir, log_level
         )
         detections = run_ocr_on_slices(image_slices, source_language, args.gpu, [use_slicer, h_stride, v_stride], process="detection")
 
@@ -174,9 +185,9 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
     # --- Stage 6: Whiten Text Areas & Overlay Translated Texts to Split Images ---
     overlay_translated_texts(image_chunks, translated_text_data, [font_min, font_max, font_path], common_original_extension, source_language, output_dir)
 
-print(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_path}'.")
+logger.info(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_path}'.")
 
 # --- End of Execution ---
 end_time = time.perf_counter()
 elapsed_time = end_time - start_time
-print(f"\nTime taken: {elapsed_time:.2f} seconds")
+logger.info(f"\nTime taken: {elapsed_time:.2f} seconds")

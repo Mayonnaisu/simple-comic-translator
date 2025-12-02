@@ -1,5 +1,7 @@
 import numpy as np
+from loguru import logger
 from paddleocr import PaddleOCR
+
 
 def get_bbox_coords(points):
     """Helper to get min/max coordinates and center from points."""
@@ -9,10 +11,11 @@ def get_bbox_coords(points):
     center_y = (min_y + max_y) / 2
     return min_x, min_y, max_x, max_y, center_y
 
+
 def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process):
     """Runs PaddleOCR on slices and adjusts coordinates to original image space."""
 
-    print("Extracting texts with PaddleOCR.") if process == "ocr" else print("Detecting text areas with PaddleOCR.")
+    logger.info("Extracting texts with PaddleOCR.") if process == "ocr" else logger.info("Detecting text areas with PaddleOCR.")
 
     all_results = []
 
@@ -79,9 +82,10 @@ def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process):
                 if process == "detection":
                     continue
                 else:
-                    print(f"({confidence:.2f}) {text} {adjusted_points}")
+                    logger.info(f"({confidence:.2f}) {text} {adjusted_points}")
 
     return all_results
+
 
 def calculate_iou_vertical(box1, box2):
     """Calculate Intersection over Union (IoU) for vertical overlap."""
@@ -104,6 +108,7 @@ def calculate_iou_vertical(box1, box2):
         return 0
 
     return intersection_area / union_area
+
 
 def deduplicate_results(results, iou_threshold=0.5):
     """
@@ -144,6 +149,7 @@ def deduplicate_results(results, iou_threshold=0.5):
 
     return unique_results
 
+
 def merge_boxes_and_text(box1, text1, box2, text2):
     """
     Merges two boxes and concatenates text.
@@ -182,6 +188,7 @@ def merge_boxes_and_text(box1, text1, box2, text2):
     # Sort text logically (top-to-bottom, left-to-right is hard with angle, generally a space works)
     new_text = f"{text1} {text2}"
     return new_box, new_text
+
 
 def merge_nearby_boxes(ocr_results, y_threshold, x_threshold, process):
     """
@@ -227,6 +234,6 @@ def merge_nearby_boxes(ocr_results, y_threshold, x_threshold, process):
     merged_list.append(current_group)
 
     if process == "detection":
-        print(f"Found {len(merged_list)} text area detections.")
+        logger.info(f"Found {len(merged_list)} text area detections.")
 
     return merged_list

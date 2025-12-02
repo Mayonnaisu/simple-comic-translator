@@ -1,6 +1,6 @@
 import os
 import textwrap
-import numpy as np
+from loguru import logger
 from PIL import Image, ImageDraw, ImageFont
 
 from app.core.ocr import get_bbox_coords
@@ -13,6 +13,7 @@ def is_string_in_file(file_path, search_string):
                 return True
     return False
 
+
 def get_fitted_font_and_text(text, max_width, max_height, min_size, max_size, font_path):
     """
     Finds the largest font size and the corresponding wrapped text that fits within the specified max_width and max_height.
@@ -24,7 +25,7 @@ def get_fitted_font_and_text(text, max_width, max_height, min_size, max_size, fo
         try:
             font = ImageFont.truetype(font_path, size)
         except IOError:
-            print(f"Font file {font_path} not found. Using default font.")
+            logger.info(f"Font file {font_path} not found. Using default font.")
             font = ImageFont.load_default()
 
         # Determine how many characters per line are needed for this font size
@@ -58,6 +59,7 @@ def get_fitted_font_and_text(text, max_width, max_height, min_size, max_size, fo
 
     # Return the last size and text that fit
     return fitted_size, best_wrapped_text
+
 
 def overlay_translated_texts(non_overlap_slices, all_ocr_results, font, image_extension, language, output_path):
     """Maps OCR results to the correct non-overlapping slice and draws them."""
@@ -157,4 +159,4 @@ def overlay_translated_texts(non_overlap_slices, all_ocr_results, font, image_ex
         slice_img_pil.save(full_output_path, quality=100)
         slice_img_pil.close()
 
-    print(f"Translated images saved to {output_path}.")
+    logger.info(f"Translated images saved to {output_path}.")
