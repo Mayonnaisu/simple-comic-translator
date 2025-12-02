@@ -26,7 +26,7 @@ start_time = time.perf_counter()
 # Set the environment variables and configurations
 os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = str(pow(2, 40))
 Image.MAX_IMAGE_PIXELS = None
-init(autoreset=True, convert=True)
+init(autoreset=True)
 
 # Define arguments with argparse
 parser = argparse.ArgumentParser(description="Arguments for Simple Comic Translator.")
