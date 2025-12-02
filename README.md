@@ -203,7 +203,11 @@ python main.py --help
 - Git
 
 ```powershell
+# update local repo
 git pull
+
+# install new dependencies
+pip install -r requirements.txt
 ```
 
 ## LIMITATIONS
