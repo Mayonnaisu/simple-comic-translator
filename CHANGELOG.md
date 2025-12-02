@@ -18,11 +18,11 @@ N/A
 9. Add function to save translation & summary as text file
 10. Add more content to documentations (in progress)
 11. Improve error handling (in progress)
-12. Add filtering (in progress) 
+12. Add filtering (in progress)
+13. Add logging
 
 ### TODO
-0. Add demo
-1. Add logging
+1. Add demo
 2. Improve comments
 3. Add testing with GitHub Actions
 4. Clean up, simplify, and optimize code
