@@ -18,13 +18,13 @@ from app.core.ocr import run_ocr_on_slices, deduplicate_results, merge_nearby_bo
 from app.core.translation import translate_texts_with_gemini
 from app.core.overlay import overlay_translated_texts
 
-
-# Set the environment variables
-Image.MAX_IMAGE_PIXELS = None
-logging.basicConfig(level=logging.INFO)
-
+# Measure time
 start_time = time.perf_counter()
 
+# Set the environment variables and configurations
+os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = str(pow(2, 40))
+Image.MAX_IMAGE_PIXELS = None
+logging.basicConfig(level=logging.INFO)
 init(autoreset=True)
 
 # Define arguments with argparse
