@@ -152,6 +152,12 @@ pip install -r requirements.txt
 ### Required
 > [!NOTE]
 > Create **.env** file manually if you didn't use the installer.
+> ```powershell
+> # .env
+> GEMINI_API_KEY=''
+> GEMINI_MODEL='gemini-2.5-flash'
+> ```
+
 1. Open **.env** file with text/code editor (Notepad, VS Code, etc).
 2. Paste your [Gemini API key](#how-to-get-gemini-api-key) between the quotation marks.
 3. Save.
