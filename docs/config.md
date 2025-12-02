@@ -26,7 +26,7 @@
 > Split & slice are basically the same thing.
 
 > [!TIP]
-> If some texts are missed by PaddleOCR because they're too small in general, lower the `"max_height"`.
+> If some texts are missed by PaddleOCR because they're too small in general, lower the `max_height` value.
 
 ### OCR
 ```jsonc
@@ -40,7 +40,7 @@
 ```
 
 > [!TIP]
-> PaddleOCR built-in slicer is useful when IMAGE_MERGE is disabled, & PaddleOCR struggles to recognize texts. For more info, see https://github.com/PaddlePaddle/PaddleOCR/blob/main/docs/version2.x/ppocr/blog/slice.en.md.
+> PaddleOCR built-in slicer is useful when `IMAGE_MERGE` is disabled, & PaddleOCR struggles to recognize texts. For more info, see https://github.com/PaddlePaddle/PaddleOCR/blob/main/docs/version2.x/ppocr/blog/slice.en.md.
 
 ### TRANSLATION
 ```jsonc
