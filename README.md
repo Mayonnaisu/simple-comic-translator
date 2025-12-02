@@ -210,6 +210,7 @@ git pull
 1. Currently, it can't properly recognize vertical texts, which is usually found in manga.
 2. Some sound effects (onomatopoeia) and watermark texts are also detected and recognized, making the result riddled with unnecessary texts and white rectangles.
 3. No automatic retry in case of error.
+4. It can't detect input language and only supports one language in each process.
 
 ## EXTRA INFO
 ### How to Get Gemini API Key
