@@ -183,7 +183,7 @@ venv/Scripts/activate
 ## For Linux
 source venv/bin/activate
 
-# Run with only required argument
+# Run with required argument only
 python main.py --input "YOUR/COMIC/FOLDER/PATH"
 
 # For more info
