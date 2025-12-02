@@ -35,10 +35,10 @@
     *   [Optional](#optional)
 *   [USAGE](#usage)
     *   [Launcher](#method-1-launcher)
-    *   [CLI](#method-2-cli)
+    *   [CLI](#method-2-cli-1)
 *   [UPDATE](#update)
     *   [Updater](#method-1-updater)
-    *   [CLI](#method-2-cli)
+    *   [CLI](#method-2-cli-2)
 *   [LIMITATIONS](#limitations)
 *   [EXTRA INFO](extra-info)
     *   [How to Get Gemini API Key](#how-to-get-gemini-api-key)
@@ -203,10 +203,10 @@ python main.py --help
 - Git
 
 ```powershell
-# update local repo
+# Update local repo
 git pull
 
-# install new dependencies
+# Install new dependencies
 pip install -r requirements.txt
 ```
 
