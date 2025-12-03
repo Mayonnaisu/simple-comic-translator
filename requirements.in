@@ -1,8 +1,0 @@
-numpy==1.26.4
-paddleocr==2.10.0
-paddlepaddle==2.6.2
-google-genai==1.50.1
-python-dotenv==1.2.1
-natsort==8.4.0
-colorama==0.4.6
-loguru==0.7.3
