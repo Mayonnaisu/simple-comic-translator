@@ -1,0 +1,116 @@
+name: Test Scripts
+
+on:
+  push:
+    branches: 
+      - main
+    paths:
+      - ".github/workflows/**"
+      - "app/**"
+      - "*.ps1"
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Modify variables for testing
+      shell: powershell
+      run: |
+        # Disable Clear-HostLine in downloader.psm1
+        $downloaderPath = ".\app\extra\downloader.psm1"
+
+        $oldString = @"
+            Clear-HostLine $Line
+        "@
+
+        $newString = @"
+            # Clear-HostLine $Line
+        "@
+
+        (Get-Content -Path $downloaderPath -Raw) -replace $oldString, $newString | Set-Content -Path $downloaderPath
+
+        # Replace folder selection with plain path string
+        $filePath = ".\launcher.ps1"
+
+        $findPattern = '\$InputPath = Select-FolderDialog'
+
+        $replaceText = '$InputPath = ".\test\remote\manhwa\RAW"'
+
+        (Get-Content -Path $filePath -Raw) -replace $findPattern, $replaceText | Set-Content -Path $filePath
+
+        # Replace the use of .env file with GitHub Secrets
+        $filePath = ".\app\core\translation.py"
+
+        $findPattern = 'api_key=api_key'
+
+        $replaceText = ''
+
+        (Get-Content -Path $filePath -Raw) -replace $findPattern, $replaceText | Set-Content -Path $filePath
+
+    - name: Run installer.ps1
+      shell: powershell
+      run: |
+        # Change Execution Policy for Pyenv Windows
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
+
+        # Check GitHub Actions Python version
+        Write-Host "$(python --version)`n"
+
+        Write-Host "$(where.exe python)`n"
+
+        # Run the installer
+        .\installer.ps1
+
+        $ErrorLogPath = ".\Temp\log_errors-install.txt"
+
+        if (Test-Path -Path $ErrorLogPath) {
+            $ErrorLog = Get-Content -Path $ErrorLogPath
+            if ($ErrorLog -match "Error") {
+                Throw "`nError Found in '$ErrorLogPath'!"
+            }
+        }
+
+    - name: Run launcher.ps1
+      env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      shell: powershell
+      run: |
+        # Change encoding to display non-ASCII chars properly
+        $OutputEncoding = [Console]::InputEncoding = [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+
+        # Check GitHub Actions Python version
+        Write-Host "$(python --version)`n"
+
+        # Run the launcher
+        $ErrorLogPath = ".\Temp\log_errors-launcher.txt"
+
+        .\launcher.ps1 > $ErrorLogPath
+        
+        if (Test-Path -Path $ErrorLogPath) {
+            $ErrorLog = Get-Content -Path $ErrorLogPath
+            if ($ErrorLog -match "Error") {
+                Throw "`nError Found in '$ErrorLogPath'!"
+            }
+        }
+
+    - name: Run updater.ps1
+      shell: powershell
+      run: |
+        # Check GitHub Actions Python version
+        Write-Host "$(python --version)`n"
+
+        # Run the updater
+        .\updater.ps1 | Out-String -Stream | Write-Host > $ErrorLogPath
+
+        $ErrorLogPath = ".\Temp\log_errors-updater.txt"
+        
+        if (Test-Path -Path $ErrorLogPath) {
+            $ErrorLog = Get-Content -Path $ErrorLogPath
+            if ($ErrorLog -match "Error") {
+                Throw "`nError Found in '$ErrorLogPath'!"
+            }
+        }
