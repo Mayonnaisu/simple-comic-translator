@@ -239,6 +239,8 @@ def merge_nearby_boxes(ocr_results, y_threshold, x_threshold, process):
     merged_list.append(current_group)
 
     if process == "detection":
-        logger.info(f"Found {len(merged_list)} text area detections.")
+        logger.success(f"Found {len(merged_list)} detections.")
+    else:
+        logger.success(f"Extracted {len(merged_list)} texts.")
 
     return merged_list
