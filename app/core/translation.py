@@ -90,7 +90,7 @@ Task 1 (Translation):
 * Translate the following enumerated list of text items to the ISO language code '{target_lang}'.
 * Each item is prefixed by its number (e.g., '1. Text').
 * You must maintain the enumeration in your response (e.g., '1. Translated Text').
-* Crucially, maintain original line breaks and spacing within each item.
+* You must maintain original line breaks and spacing within each item.
 * Do not add any introductory or concluding text, just the list.
 * Use the Summary of Previous Translation above as additional context if available.
 
