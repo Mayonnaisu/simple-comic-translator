@@ -70,7 +70,7 @@ try {
 Write-Host "`nPython Virtual Environment Created & Activated." -ForegroundColor DarkGreen
 
 # Install SCT Dependencies
-$requirementsPath = ".\requirements.txt"
+$requirementsPath = ".\requirements-lock.txt"
 
 try {
     Write-Host "`nInstalling SCT Dependencies..." -ForegroundColor Yellow

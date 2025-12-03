@@ -145,7 +145,7 @@ venv/Scripts/activate
 source venv/bin/activate
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r requirements-lock.txt
 ```
 
 ## CONFIGURATION
@@ -207,7 +207,7 @@ python main.py --help
 git pull
 
 # Install new dependencies
-pip install -r requirements.txt
+pip install -r requirements-lock.txt
 ```
 
 ## LIMITATIONS

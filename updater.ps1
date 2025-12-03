@@ -78,7 +78,7 @@ try {
         }
 
         # Install new dependencies
-        $requirementsPath = ".\requirements.txt"
+        $requirementsPath = ".\requirements-lock.txt"
 
         Write-Host "`nInstalling New Dependencies..." -ForegroundColor Yellow
 
