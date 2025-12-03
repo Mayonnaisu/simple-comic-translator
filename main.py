@@ -152,7 +152,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
         image_slices = slice_image_horizontally(
             [merged_image, image_width, image_height], slice_height, ocr_overlap, output_dir, log_level
         )
-        detections = run_ocr_on_slices(image_slices, source_language, args.gpu, [use_slicer, h_stride, v_stride], process="detection")
+        detections = run_ocr_on_slices(image_slices, source_language, args.gpu, [use_slicer, h_stride, v_stride], "detection", log_level)
 
         unique_detections = deduplicate_results(detections, iou_threshold=0.6)
 
@@ -165,7 +165,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
         chunks_number = range(len(image_chunks))
 
     # --- Stage 4: Extract Text with PaddleOCR ---
-    ocr_results = run_ocr_on_slices(image_chunks, source_language, args.gpu, [use_slicer, h_stride, v_stride], process="ocr")
+    ocr_results = run_ocr_on_slices(image_chunks, source_language, args.gpu, [use_slicer, h_stride, v_stride], "ocr", log_level)
 
     merged_ocr = []
     for i in chunks_number:
