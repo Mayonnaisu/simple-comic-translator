@@ -62,9 +62,14 @@ def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process, log_level)
         if result and result[0]:
             for line in result[0]:
                 # PaddleOCR result format: [[point1, point2, ...], (text, confidence)]
+                confidence = line[1][1]
+
+                # Filter out lower confidence
+                if confidence < 0.6:
+                    continue
+
                 points = line[0]
                 text = line[1][0]
-                confidence = line[1][1]
 
                 # Adjust coordinates to the original image's coordinate system
                 adjusted_points = [[p[0], p[1] + top_offset] for p in points]
