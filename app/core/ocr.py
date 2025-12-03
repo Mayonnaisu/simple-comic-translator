@@ -1,6 +1,7 @@
 import numpy as np
 from loguru import logger
 from paddleocr import PaddleOCR
+from tqdm import tqdm
 
 
 def get_bbox_coords(points):
@@ -12,7 +13,7 @@ def get_bbox_coords(points):
     return min_x, min_y, max_x, max_y, center_y
 
 
-def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process):
+def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process, log_level):
     """Runs PaddleOCR on slices and adjusts coordinates to original image space."""
 
     logger.info("Extracting texts with PaddleOCR.") if process == "ocr" else logger.info("Detecting text areas with PaddleOCR.")
@@ -44,7 +45,7 @@ def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process):
             "merge_y_thres": 30,
         }
 
-    for i, slice_info in enumerate(slices):
+    for i, slice_info in enumerate(tqdm(slices)):
         slice_name = f"image_{i:02d}"
         try:
             slice_img_np = slice_info["image"]
@@ -79,10 +80,9 @@ def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process):
                         "image_name": slice_name,
                     }
                 )
-                if process == "detection":
-                    continue
-                else:
-                    logger.info(f"({confidence:.2f}) {text} {adjusted_points}")
+
+                if log_level == "TRACE":
+                    logger.debug(f"({confidence:.2f}) {text} {adjusted_points}")
 
     return all_results
 
