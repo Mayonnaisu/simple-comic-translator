@@ -155,7 +155,6 @@ pip install -r requirements-lock.txt
 > ```powershell
 > # .env
 > GEMINI_API_KEY=''
-> GEMINI_MODEL='gemini-2.5-flash'
 > ```
 
 1. Open **.env** file with text/code editor (Notepad, VS Code, etc).

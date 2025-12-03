@@ -98,7 +98,6 @@ exit 0
 # Define .env file content
 $envFile = @"
 GEMINI_API_KEY=''
-GEMINI_MODEL='gemini-2.5-flash'
 "@
 
 # Start the installation
