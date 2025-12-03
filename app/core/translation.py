@@ -1,7 +1,6 @@
 import os
 import re
 import json
-import warnings
 from google import genai
 from pathlib import Path
 from loguru import logger
@@ -137,7 +136,7 @@ Input List:
             if i in translated_map:
                 text_info_list[i]["translated_text"] = translated_map[i]
             else:
-                warnings.warn(
+                logger.warning(
                     f"Warning: Missing translation for index {i}, using original text."
                 )
                 text_info_list[i]["translated_text"] = text_info_list[i][
