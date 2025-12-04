@@ -22,11 +22,12 @@ N/A
 11. Improve error handling (in progress)
 12. Add filtering (in progress)
 13. Add logging
-14. Add progress bar and only show certain results in debug mode
+14. Add progress bar and only show certain outputs in debug mode
 15. Add testing with GitHub Actions
 
 ### TODO
+0. Add manga support
 1. Add demo
 2. Improve comments
 3. Clean up, simplify, and optimize code
-4. Upgrade PaddleOCR version to support PP-OCRv5 (tried but somehow I couldn't get it to work reliably and accurately, unlike the older version. \*Sigh\*...)
+4. Upgrade PaddleOCR version to support PP-OCRv5 (tried but somehow I couldn't get it to work reliably and accurately, unlike the older version. \*Sigh\*)
