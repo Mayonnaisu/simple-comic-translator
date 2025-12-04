@@ -1,0 +1,41 @@
+name: Setup Linux
+
+inputs:
+  env:
+    required: True
+
+runs:
+  using: "composite"
+  steps:
+    - name: Modify variables for testing
+      shell: bash
+      run: |
+        # Replace the use of .env file with GitHub Secrets
+        sed -i 's/api_key=api_key//g' 'app/core/translation.py'
+
+    - name: Install Simple Comic Translator
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: |
+        # Check Python version
+        python --version
+
+        # Create virtual environment
+        python -m venv venv
+
+        # Activate it
+        source venv/bin/activate
+
+        # Install dependencies
+        pip install -r requirements-lock.txt
+
+    - name: Run Simple Comic Translator
+      env:
+          GEMINI_API_KEY: ${{ inputs.env }}
+      shell: bash
+      run: |
+        # Activate venv
+        source venv/bin/activate
+
+        # Run the app
+        python main.py --input "test/remote/manhwa/RAW"

@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest, macos-latest]
         python-version: ["3.11"]
 
     name: Setup on ${{ matrix.os }}
@@ -33,29 +33,20 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
 
-    - name: Modify variables for testing
-      shell: bash
-      run: |
-        # Replace the use of .env file with GitHub Secrets
-        sed -i 's/api_key=api_key//g' 'app/core/translation.py'
+    - name: Setup Windows
+      if: matrix.os == 'windows-latest'
+      uses: ./.github/actions/windows
+      with:
+        env: ${{ env.GEMINI_API_KEY }}
 
-    - name: Install Simple Comic Translator
-      shell: bash
-      run: |
-        # Check Python version
-        python --version
+    - name: Setup Linux
+      if: matrix.os == 'ubuntu-latest'
+      uses: ./.github/actions/linux
+      with:
+        env: ${{ env.GEMINI_API_KEY }}
 
-        # Create virtual environment
-        python -m venv venv
-
-        # Activate it
-        source venv/bin/activate
-
-        # Install dependencies
-        pip install -r requirements-lock.txt
-
-    - name: Run Simple Comic Translator
-      shell: bash
-      run: |
-        # Run the app
-        python main.py --input "test/remote/manhwa/RAW"
+    - name: Setup macOS
+      if: matrix.os == 'macos-latest'
+      uses: ./.github/actions/macos
+      with:
+        env: ${{ env.GEMINI_API_KEY }}

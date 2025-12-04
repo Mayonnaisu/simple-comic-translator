@@ -1,0 +1,46 @@
+name: Setup Windows
+
+inputs:
+  env:
+    required: True
+
+runs:
+  using: "composite"
+  steps:
+    - name: Modify variables for testing
+      shell: powershell
+      run: |
+        # Replace the use of .env file with GitHub Secrets
+        $filePath = ".\app\core\translation.py"
+
+        $findPattern = 'api_key=api_key'
+        $replaceText = ''
+
+        (Get-Content -Path $filePath -Raw) -replace $findPattern, $replaceText | Set-Content -Path ".\app\core\translation.py"
+
+    - name: Install Simple Comic Translator
+      if: matrix.os == 'windows-latest'
+      shell: powershell
+      run: |
+        # Check Python version
+        python --version
+
+        # Create virtual environment
+        python -m venv venv
+
+        # Activate it
+        venv/Scripts/activate
+
+        # Install dependencies
+        pip install -r requirements-lock.txt
+
+    - name: Run Simple Comic Translator
+      env:
+          GEMINI_API_KEY: ${{ inputs.env }}
+      shell: powershell
+      run: |
+        # Activate venv
+        venv/Scripts/activate
+
+        # Run the app
+        python main.py --input "test/remote/manhwa/RAW"
