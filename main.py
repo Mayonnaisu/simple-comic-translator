@@ -179,6 +179,8 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
     merged_ocr_results = list(itertools.chain.from_iterable(merged_ocr))
 
+    logger.success(f"Extracted {len(merged_ocr_results)} texts.")
+
     # --- Stage 5: Translate Extracted Text with Gemini ---
     translated_text_data = translate_texts_with_gemini(merged_ocr_results, target_language, gemini_model, output_dir)
 
