@@ -10,6 +10,7 @@
 </p>
 
 [![Test Scripts](https://github.com/Mayonnaisu/simple-comic-translator/actions/workflows/test-scripts.yml/badge.svg)](https://github.com/Mayonnaisu/simple-comic-translator/actions/workflows/test-scripts.yml)
+[![Test App](https://github.com/Mayonnaisu/simple-comic-translator/actions/workflows/test-app.yml/badge.svg)](https://github.com/Mayonnaisu/simple-comic-translator/actions/workflows/test-app.yml)
 
 ## STATUS
 > [!WARNING]
