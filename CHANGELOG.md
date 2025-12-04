@@ -2,11 +2,13 @@
 N/A
 
 ## v0.2.0
+20/11/2025
 1. Download repo snapshot instead of only model file
 2. Remove onnx & onnxruntime from dependencies
 3. Documentation is still a draft
 
 ## v0.4.0
+23/11/2025
 1. Remove ultralytics, sahi, & huggingface_hub from dependencies
 2. Downgrade Python version from 3.12.0 to 3.11.0
 3. Downgrade torch, torchvision, & numpy versions
