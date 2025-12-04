@@ -19,7 +19,6 @@ runs:
         (Get-Content -Path $filePath -Raw) -replace $findPattern, $replaceText | Set-Content -Path ".\app\core\translation.py"
 
     - name: Install Simple Comic Translator
-      if: matrix.os == 'windows-latest'
       shell: powershell
       run: |
         # Check Python version
