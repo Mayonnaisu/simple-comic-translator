@@ -1,7 +1,7 @@
 <p align="center">
   <img width="256" height="256" alt="Simple Comic Translator" title="Simple Comic Translator" src="./assets/images/u1f609_u1f4a9.png" />
     <h1 align="center">Simple Comic Translator 💩</h2>
-    <p align="center">Translate comic and man<s>ga</s>/hwa/hua in batch.</p>
+    <p align="center">Translate comic and manhwa/hua in batch.</p>
 </p>
 
 <p align="center">
@@ -251,6 +251,6 @@ pip install -r requirements-lock.txt
     You can't, unless you modify the source code yourself. Or just use the aforementioned alternatives. You can change [Gemini model](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions#gemini-auto-updated) in **config.json** tho.
 
 2. **Is the app vibe coded?**
-    Yeah, mostly. I still review, modify, fix, and assemble the scripts manually to the best of my abilities as someone with basic programming skills tho. Also, I didn't use any agent. Instead, I search for the functions I need on Google and then check out the AI Overview or AI Mode when necessary. I also didn't one-shot it, but built it gradually.
+    Yeah, mostly. I still review, modify, fix, and assemble the scripts manually to the best of my abilities as someone with basic programming skills tho. Also, I didn't use any agent. Instead, I search for the functions I need on Google and then check out the AI Overview or AI Mode when necessary. I also didn't one-shot it, but built it gradually on different occasions.
 
     Honestly, I'm interested in coding agents, but I haven't had a chance to try them yet. Idk, I just don't feel like completely leaving all the coding to such tool yet. Not to mention that they seem not so reliable (yet) anyway. Relying too much on such tool will just rob me of the learning opportunity I need at my current level. Either way, I don't think it's a good idea to blindly trust LLMs, which are prone to hallucination. You have to review the code they generated, but if you don't have any programming skills, how can you?
