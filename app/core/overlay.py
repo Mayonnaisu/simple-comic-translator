@@ -97,7 +97,7 @@ def overlay_translated_texts(non_overlap_slices, all_ocr_results, font, image_ex
                 if is_string_in_file(filter_path, original_text):
                     continue
                 # Filter translated texts whose characters are fewer than 4 and not in inclusion list, potentially removing gibberish
-                if len(translated_text) < 4 and translated_text not in inclusion:
+                if len(translated_text) < 3 and translated_text not in inclusion:
                     continue
                 # Adjust points back to be relative to the *current slice's* top edge
                 rel_min_x, rel_min_y, rel_max_x, rel_max_y, _ = get_bbox_coords(
