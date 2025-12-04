@@ -9,7 +9,6 @@
   <img src="https://img.shields.io/github/license/Mayonnaisu/simple-comic-translator"/></a>
 </p>
 
-[![Test App](https://github.com/Mayonnaisu/simple-comic-translator/actions/workflows/test-app.yml/badge.svg)](https://github.com/Mayonnaisu/simple-comic-translator/actions/workflows/test-app.yml)
 [![Test Scripts](https://github.com/Mayonnaisu/simple-comic-translator/actions/workflows/test-scripts.yml/badge.svg)](https://github.com/Mayonnaisu/simple-comic-translator/actions/workflows/test-scripts.yml)
 
 ## STATUS
