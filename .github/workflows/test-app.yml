@@ -5,10 +5,8 @@ on:
     branches: 
       - main
     paths:
-      - ".github/actions/**"
-      - ".github/workflows/**"
       - "app/**"
-      - "test/**"
+      - "*.ps1"
 
 jobs:
   build:
