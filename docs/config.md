@@ -9,7 +9,7 @@
 ```jsonc
 "source_language": "korean",    // input language for PaddleOCR: "japan", "korean", "ch", "en", etc.
 "slice_height": 2000,           // height of each slice
-"ocr_overlap": 0.2,             // overlap of each slice
+"det_overlap": 0.2,             // overlap of each slice
 "merge_y_threshold": 50,        // maximum vertical distance to merge detections
 "merge_x_threshold": 100        // maximum horizontal distance to merge detections
 ```
