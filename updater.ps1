@@ -44,7 +44,10 @@ try {
         $extractedContentPath = Get-ChildItem -Path $extractPath
 
         $filesToExclude = @(
-            "config.json"
+            "config.json",
+            "filter/manga.txt",
+            "filter/manhwa.txt",
+            "filter/manhua.txt"
         )
 
         foreach ($item in $filesToExclude) {
