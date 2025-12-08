@@ -1,0 +1,36 @@
+{
+  "IMAGE_MERGE": {
+    "enable": true
+  },
+  "DETECTION": {
+    "source_language": "korean",
+    "slice_height": 640,
+    "slice_width": 640,
+    "det_overlap": 0.2,
+    "merge_y_threshold": 50,
+    "merge_x_threshold": 100
+  },
+  "IMAGE_SPLIT": {
+    "max_height": 2000
+  },
+  "OCR": {
+    "merge_y_threshold": 50,
+    "merge_x_threshold": 100,
+    "slicer": {
+      "enable": false,
+      "horizontal_stride": 1200,
+      "vertical_stride": 400
+    }
+  },
+  "TRANSLATION": {
+    "target_language": "en",
+    "gemini_model": "gemini-2.5-flash"
+  },
+  "OVERLAY": {
+    "font": {
+      "min_size": 11,
+      "max_size": 40,
+      "path": "fonts/JetBrainsMonoNerdFont-Bold.ttf"
+    }
+  }
+}
