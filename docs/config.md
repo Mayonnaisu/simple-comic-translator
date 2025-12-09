@@ -10,7 +10,7 @@
 "source_language": "korean",    // input language for PaddleOCR: "japan", "korean", "ch", "en", etc.
 "slice_height": 2000,           // height of each slice
 "det_overlap": 0.2,             // overlap of each slice
-"merge_y_threshold": 50,        // maximum vertical distance to merge detections
+"merge_y_threshold": 30,        // maximum vertical distance to merge detections
 "merge_x_threshold": 100        // maximum horizontal distance to merge detections
 ```
 
@@ -30,12 +30,12 @@
 
 ### OCR
 ```jsonc
-"merge_y_threshold": 50,        // maximum vertical distance to merge ocr results
+"merge_y_threshold": 30,        // maximum vertical distance to merge ocr results
 "merge_x_threshold": 100,       // maximum horizontal distance to merge ocr results
 "slicer": {
     "enable": false,            // use PaddleOCR built-in slicer
-    "horizontal_stride": 1200,  // horizontal step size of the sliding window
-    "vertical_stride": 400      // vertical step size of the sliding window
+    "horizontal_stride": "original",  // horizontal step size of the sliding window: "original" (width) or number
+    "vertical_stride": 1200      // vertical step size of the sliding window
 }
 ```
 
