@@ -133,4 +133,4 @@ pip install numpy==1.26.4 opencv-python-headless opencv-contrib-python-headless
     </tbody>
 </table>
 
-My phone sure is slow haha. Well, the program was run inside a container with an emulator after all. The overhead is to be expected.
+My phone sure is slow haha. Well, the program was run inside a container within an emulator after all. The overhead is to be expected.
