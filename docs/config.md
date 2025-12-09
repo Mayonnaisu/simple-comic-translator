@@ -19,7 +19,7 @@
 
 ### IMAGE_SPLIT
 ```jsonc
-"max_height": 2000              // maximum height of each split
+"max_height": 1200              // maximum height of each split
 ```
 
 > [!NOTE]
@@ -35,7 +35,7 @@
 "slicer": {
     "enable": false,            // use PaddleOCR built-in slicer
     "horizontal_stride": "original",  // horizontal step size of the sliding window: "original" (width) or number
-    "vertical_stride": 1200      // vertical step size of the sliding window
+    "vertical_stride": 640      // vertical step size of the sliding window
 }
 ```
 

@@ -6,19 +6,19 @@
     "source_language": "korean",
     "slice_height": 2000,
     "ocr_overlap": 0.2,
-    "merge_y_threshold": 25,
+    "merge_y_threshold": 30,
     "merge_x_threshold": 100
   },
   "IMAGE_SPLIT": {
     "max_height": 1200
   },
   "OCR": {
-    "merge_y_threshold": 25,
+    "merge_y_threshold": 30,
     "merge_x_threshold": 100,
     "slicer": {
       "enable": false,
       "horizontal_stride": "original",
-      "vertical_stride": 1200
+      "vertical_stride": 640
     }
   },
   "TRANSLATION": {
