@@ -31,16 +31,3 @@ N/A
 2. Improve comments
 3. Clean up, simplify, and optimize code
 4. Upgrade PaddleOCR version to support PP-OCRv5 (tried but somehow I couldn't get it to work reliably and accurately, unlike the older version. \*Sigh\*)
-
-## v0.5.0 (cancelled)
-20/11/2025
-> [!NOTE]
-    <details>
-        <summary>Why?</summary>
-            <p>I intended to imitate PaddleOCR's built-in slicer so that I could just skip the detection stage and go straight to OCR. It did work, but there was a big problem. The problem was when deduplicating the overlapping OCR texts, the results were riddled with wrong texts from the split areas. It's because even though I had designed it to only use the text with the highest confidence among its duplicates, it still didn't guarantee that the text was not from the split area.</p>
-            <p>That's when I started to check the PaddleOCR's built-in slicer code. It turned out that the way it works is similar to the v0.4.0 lol: detection on overlapping slices -> safe splitting original image -> text recoginition. The difference is that instead of just splitting the image horizontally like v0.4.0, PaddleOCR cuts the text areas out of the image.</p>
-            <p>Someone with better programming skills probably can write a function to properly deduplicate the overlapping texts. But as of I'm now, I can't. That's why, after days of trying, I decided to just cancell it. Who knows, maybe someday I will be able to implement it.</p>
-    </details>
-1. Replace horizontal-slicing-with-overlap function with tiling-with-overlap function.
-2. Improve deduplication to also calculate horizontal IoU
-3. Still in trial (draft) stage basically
