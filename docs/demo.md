@@ -57,12 +57,12 @@
                 <table align="center">
                     <tr align="center">
                         <td>
-                            <img width=150 alt="" title="" src="../assets/images/demo-1-2a-shitted.webp"/>
+                            <img width=250 alt="" title="" src="../assets/images/demo-1-2a-shitted.webp"/>
                         </td>
                     </tr>
                     <tr align="center">
                         <td>
-                            <img width=150 alt="" title="" src="../assets/images/demo-1-2b-shitted.webp"/>
+                            <img width=250 alt="" title="" src="../assets/images/demo-1-2b-shitted.webp"/>
                         </td>
                     </tr>
                 </table>
