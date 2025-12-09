@@ -18,7 +18,7 @@ SCT splits the merged image into the specified height without overlap while avoi
 SCT extracts texts from each split image.
 
 > [!NOTE]
-> You may be wondering why I chose the older version of PaddleOCR. It is because this version still has a built-in slicing feature that's useful for extracting smaller texts. The feature has annoying limitation tho. It will throw error if [the input image resolution is larger than 32k pixels](https://github.com/opencv/opencv/issues/7544) because it uses OpenCV, which is known for being unable to handle large images gracefully (as of now).
+> You may be wondering why I chose the older version of PaddleOCR. It is because this version still has a built-in slicing feature that's useful for extracting smaller texts. The feature has annoying limitation tho. It will throw error if [the input image resolution is larger than 32k pixels](https://github.com/opencv/opencv/issues/7544) because it uses OpenCV, which is known for being unable to handle large images gracefully in some cases (as of now).
 > 
 > Besides the accuracy issue mentioned above, this is also why I decided to make the program split the merged image before OCR although PadlleOCR itself has a built-in slicer.
 
@@ -49,7 +49,7 @@ SCT overlays translated texts to the padded whitened areas while attempting to a
 >
 > There was one critical issue tho. Usually, the original images have some areas where the texts are split (talking about long-strip comic). This caused the overlaid text to also get split because the program tried to overlay the text to the non-existent part of area which only exists on the next image.
 
-### 8. Save to Corresponding Output Folders with [Pillow](https://github.com/python-pillow/Pillow)
+### 8. Save to Corresponding Output Folders with [os.walk](https://docs.python.org/3.11/library/os.html#os.walk) + [pathlib.Path](https://docs.python.org/3.11/library/pathlib.html#pathlib.Path)
 Save the translated images to the corresponding output subfolders, maintaining the directory structure from the original directory.
 
 > [!NOTE]
