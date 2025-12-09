@@ -4,8 +4,6 @@
 >
 > Tested on:
 > - [Windows 11 25H2](#windows-11-25h2)
-> - [Windows 11 22H2 in VirtualBox](#windows-11-22h2-in-virtualbox)
-> - [Ubuntu 24 in WSL2](#ubuntu-24-in-wsl2)
 > - [Ubuntu 25.10 (proot-distro) in Termux](#ubuntu-2510-proot-distro-in-termux)
 
 ### Windows 11 25H2
@@ -74,12 +72,6 @@
 </table>
 
 Lol, the name is wrong, which is quite usual for machine translation. Then again, I only translated 1 chapter for demo purpose.
-
-### Windows 11 22H2 in VirtualBox (TODO)
-N/A
-
-### Ubuntu 24 in WSL2 (TODO)
-N/A
 
 ### Ubuntu 25.10 (proot-distro) in Termux
 #### Post-installation
