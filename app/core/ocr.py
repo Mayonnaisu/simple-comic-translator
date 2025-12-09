@@ -54,7 +54,8 @@ def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process, log_level)
             slice_img_np = slice_info
             top_offset = 0
 
-        kwargs["slice"]["horizontal_stride"] = slice_img_np.size[0] if h_stride == "original" else h_stride
+        if enable_slicer:
+            kwargs["slice"]["horizontal_stride"] = slice_img_np.size[0] if h_stride == "original" else h_stride
 
         result = ocr_instance.ocr(
             np.array(slice_img_np),
