@@ -31,40 +31,40 @@
 <table align="center" width="400">
     <tbody>
         <tr>
-        <h4 align="center">Manhua (Martial Peak)</h4>
+            <h5 align="center">Manhua (Martial Peak)</h5>
         </tr>
         <tr>
-            <td width="50%">
-                <h4 align="center">Original</h4>
+            <td width="300">
+                <h5 align="center">Original</h5>
             </td>
-            <td width="50%">
-                <h4 align="center">Shitted</h4>
+            <td width="300">
+                <h5 align="center">Shitted</h5>
             </td>
         </tr>
         <tr>
-            <td width="50%">
+            <td width="300">
                 <img alt="" title="" src="../assets/images/demo-1-1.webp"/>
             </td>
-            <td width="50%">
+            <td width="300">
                 <img alt="" title="" src="../assets/images/demo-1-1-shitted.webp"/>
             </td>
         </tr>
         <tr>
-            <td width="50%">
+            <td width="300">
                 <img alt="" title="" src="../assets/images/demo-1-2.webp"/>
             </td>
-            <td width="50%">
-                <table>
-                <tr>
-                    <td>
-                    <img alt="" title="" src="../assets/images/demo-1-2a-shitted.webp"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                    <img alt="" title="" src="../assets/images/demo-1-2b-shitted.webp"/>
-                    </td>
-                </tr>
+            <td width="300">
+                <table align="center">
+                    <tr align="center">
+                        <td>
+                            <img width=150 alt="" title="" src="../assets/images/demo-1-2a-shitted.webp"/>
+                        </td>
+                    </tr>
+                    <tr align="center">
+                        <td>
+                            <img width=150 alt="" title="" src="../assets/images/demo-1-2b-shitted.webp"/>
+                        </td>
+                    </tr>
                 </table>
             </td>
         </tr>
@@ -106,23 +106,25 @@ pip install numpy==1.26.4 opencv-python-headless opencv-contrib-python-headless
 <table align="center" width="600">
     <tbody>
         <tr>
-        <h4 align="center">Manhwa (Hell is Other People)</h4>
+            <h5 align="center">Manhwa (Hell is Other People)</h5>
         </tr>
         <tr>
-            <td width="50%">
-                <h4 align="center">Original</h4>
+            <td width="300">
+                <h5 align="center">Original</h5>
             </td>
-            <td width="50%">
-                <h4 align="center">Shitted</h4>
+            <td width="300">
+                <h5 align="center">Shitted</h5>
             </td>
         </tr>
         <tr>
-            <td width="50%">
+            <td width="300">
                 <img alt="" title="" src="../test/remote/manhwa/RAW/030/03.jpeg"/>
             </td>
-            <td width="50%">
+            <td width="300">
                 <img alt="" title="" src="../assets/images/demo-4-3-shitted.jpg"/>
             </td>
         </tr>
     </tbody>
 </table>
+
+My phone sure is slow haha. Well, the program was run inside a container with an emulator after all. The overhead is to be expected.
