@@ -112,7 +112,7 @@ pip install numpy==1.26.4 opencv-python-headless opencv-contrib-python-headless
 <table align="center" width="600">
     <tbody>
         <tr>
-            <h5 align="center">Manhwa (Hell is Other People)</h5>
+            <h5 align="center">Manhwa (Hell Is Other People)</h5>
         </tr>
         <tr>
             <td width="300">
