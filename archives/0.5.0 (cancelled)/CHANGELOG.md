@@ -33,7 +33,7 @@ N/A
 4. Upgrade PaddleOCR version to support PP-OCRv5 (tried but somehow I couldn't get it to work reliably and accurately, unlike the older version. \*Sigh\*)
 
 ## v0.5.0 (cancelled)
-20/11/2025
+8/12/2025
 > [!NOTE]
     <details>
         <summary>Why?</summary>
