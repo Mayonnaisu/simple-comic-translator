@@ -48,17 +48,17 @@ def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process, log_level)
     for i, slice_info in enumerate(tqdm(slices)):
         slice_name = f"image_{i:02d}"
         try:
-            slice_img_np = slice_info["image"]
+            slice_img = slice_info["image"]
             top_offset = slice_info["top_offset"]
         except Exception:
-            slice_img_np = slice_info
+            slice_img = slice_info
             top_offset = 0
 
         if enable_slicer:
-            kwargs["slice"]["horizontal_stride"] = slice_img_np.size[0] if h_stride == "original" else h_stride
+            kwargs["slice"]["horizontal_stride"] = slice_img.size[0] if h_stride == "original" else h_stride
 
         result = ocr_instance.ocr(
-            np.array(slice_img_np),
+            np.array(slice_img),
             **kwargs
         )
 
