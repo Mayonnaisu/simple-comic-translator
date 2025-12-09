@@ -48,6 +48,8 @@
 ## NOTICE
 ### <mark>All PowerShell scripts (.ps1) are only tested on Windows and may not be compatible with PowerShell Core run *directly* on other OSes.</mark>
 
+### <mark>If you encounter ValueError when using PaddleOCR's built-in slicer, see https://github.com/Mayonnaisu/simple-comic-translator/issues/1 for the fix.</mark>
+
 ## ABOUT
 ### Full Name
 [***THAT TIME I GOT REINCARNATED AS A SCRIPT KIDDIE FOR THE SAKE OF CREATING THIS NOT-SO-SIMPLE COMIC TRANSLATOR WITH THE HELP OF MY UNRELIABLE SYSTEM (GEMINI)***](https://github.com/Mayonnaisu/simple-comic-translator) 😂
