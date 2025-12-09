@@ -1,6 +1,6 @@
 ## DEMO
 
-> [!IMPORTANT]
+> [!NOTE]
 >
 > Tested on:
 > - [Windows 11 25H2](#windows-11-25h2)
@@ -28,7 +28,7 @@
 ```
 
 #### Result
-<table align="center" width="400">
+<table align="center" width="600">
     <tbody>
         <tr>
             <h5 align="center">Manhua (Martial Peak)</h5>
@@ -43,15 +43,21 @@
         </tr>
         <tr>
             <td width="300">
-                <img alt="" title="" src="../assets/images/demo-1-1.webp"/>
+                <img width=300 alt="" title="" src="../assets/images/demo-1-1.webp"/>
             </td>
             <td width="300">
-                <img alt="" title="" src="../assets/images/demo-1-1-shitted.webp"/>
+                <img width=300 alt="" title="" src="../assets/images/demo-1-1-shitted.webp"/>
             </td>
         </tr>
         <tr>
             <td width="300">
-                <img alt="" title="" src="../assets/images/demo-1-2.webp"/>
+                <table align="center">
+                    <tr align="center">
+                        <td>
+                            <img width=250 alt="" title="" src="../assets/images/demo-1-2.webp"/>
+                        </td>
+                    </tr>
+                </table>
             </td>
             <td width="300">
                 <table align="center">
