@@ -11,8 +11,13 @@ runs:
       shell: /usr/bin/zsh {0}
       run: |
         # Replace the use of .env file with GitHub Secrets
-        sed -i.bak 's/api_key=api_key//g' app/core/translation.py
-        rm -f app/core/translation.py.bak
+        python -c "
+        with open('app/core/translation.py', 'r') as f:
+            content = f.read()
+        content = content.replace('api_key=api_key', '')
+        with open('app/core/translation.py', 'w') as f:
+            f.write(content)
+        "
 
     - name: Install Ccache
       shell: /usr/bin/zsh {0}
