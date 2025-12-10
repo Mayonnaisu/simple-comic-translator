@@ -210,6 +210,17 @@ try {
         Throw "`nFailed to Install Microsoft C++ Build Tools!`nERROR: $($_.Exception.Message)"
     }
 
+    # Install Ccache
+    try {
+        Write-Host "`nInstalling Ccache..." -ForegroundColor Yellow
+
+        winget install --id Ccache.Ccache --source winget --exact --force -ErrorAction Stop
+
+        Write-Host "`nCcache Installed Successfully." -ForegroundColor DarkGreen
+    } catch {
+        Throw "`nFailed to Install Ccache!`nERROR: $($_.Exception.Message)"
+    }
+
     # Install Pyenv Windows
     try {
         Write-Host "`nChecking Pyenv Windows..." -ForegroundColor Yellow
