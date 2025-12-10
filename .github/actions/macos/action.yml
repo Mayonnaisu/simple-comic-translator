@@ -8,12 +8,10 @@ runs:
   using: "composite"
   steps:
     - name: Modify variables for testing
-      env:
-          LC_ALL: 'C' # set the locale to the standard C locale
       shell: /usr/bin/zsh {0}
       run: |
         # Replace the use of .env file with GitHub Secrets
-        sed -i '' 's/api_key=api_key//g' 'app/core/translation.py'
+        sed -i '' 's/api_key=api_key//g' app/core/translation.py
 
     - name: Install Ccache
       shell: /usr/bin/zsh {0}
