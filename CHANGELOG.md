@@ -9,8 +9,6 @@ N/A
 
 ## v0.4.0
 23/11/2025
-## v0.4.1
-10/12/2025
 1. Remove ultralytics, sahi, & huggingface_hub from dependencies
 2. Downgrade Python version from 3.12.0 to 3.11.0
 3. Downgrade `torch`, `torchvision`, & `numpy` versions
@@ -27,8 +25,11 @@ N/A
 14. Add progress bar and only show certain outputs in debug mode
 15. Add testing with GitHub Actions
 16. Add demo
-17. Upgrade `paddlepaddle` for patching vulnerabilities in transitive dependencies: https://github.com/Mayonnaisu/simple-comic-translator/commit/cd167d36acef6a041aaeeaf0e3a6a7cb8ab36aca
-18. Add Ccahe installation
+## v0.4.1
+10/12/2025
+
+18. Upgrade `paddlepaddle` for patching vulnerabilities in transitive dependencies (cd167d3)
+19. Add Ccahe installation
 
 ### TODO
 1. Add manga support
