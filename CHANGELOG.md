@@ -4,14 +4,14 @@ N/A
 ## v0.2.0
 20/11/2025
 1. Download repo snapshot instead of only model file
-2. Remove onnx & onnxruntime from dependencies
+2. Remove `onnx` & `onnxruntime` from dependencies
 3. Documentation is still a draft
 
 ## v0.4.0
 23/11/2025
 1. Remove ultralytics, sahi, & huggingface_hub from dependencies
 2. Downgrade Python version from 3.12.0 to 3.11.0
-3. Downgrade torch, torchvision, & numpy versions
+3. Downgrade `torch`, `torchvision`, & `numpy` versions
 4. Use PaddleOCR for detection instead of YOLO
 5. Add installer, launcher, & updater
 6. Add extra module/s
@@ -25,6 +25,7 @@ N/A
 14. Add progress bar and only show certain outputs in debug mode
 15. Add testing with GitHub Actions
 16. Add demo
+17. Upgrade `paddlepaddle` for patching vulnerabilities in transitive dependencies: https://github.com/Mayonnaisu/simple-comic-translator/commit/cd167d36acef6a041aaeeaf0e3a6a7cb8ab36aca
 
 ### TODO
 1. Add manga support
