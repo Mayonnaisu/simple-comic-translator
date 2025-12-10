@@ -13,6 +13,16 @@ runs:
         # Replace the use of .env file with GitHub Secrets
         sed -i 's/api_key=api_key//g' 'app/core/translation.py'
 
+    - name: Install Ccache
+      shell: bash
+      run: |
+        # Install ccache
+        sudo apt update
+        sudo apt install ccache
+
+        # Add ccache to PATH
+        echo 'export PATH="/usr/lib/ccache:$PATH"' >> $GITHUB_PATH
+
     - name: Install Simple Comic Translator
       shell: bash
       run: |
