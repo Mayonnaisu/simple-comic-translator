@@ -8,6 +8,8 @@ runs:
   using: "composite"
   steps:
     - name: Modify variables for testing
+      env:
+          LC_ALL: 'C' # set the locale to the standard C locale
       shell: /usr/bin/zsh {0}
       run: |
         # Replace the use of .env file with GitHub Secrets
