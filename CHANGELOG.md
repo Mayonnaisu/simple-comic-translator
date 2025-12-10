@@ -28,6 +28,7 @@ N/A
 15. Add testing with GitHub Actions
 16. Add demo
 17. Upgrade `paddlepaddle` for patching vulnerabilities in transitive dependencies: https://github.com/Mayonnaisu/simple-comic-translator/commit/cd167d36acef6a041aaeeaf0e3a6a7cb8ab36aca
+18. Add Ccahe installation
 
 ### TODO
 1. Add manga support
