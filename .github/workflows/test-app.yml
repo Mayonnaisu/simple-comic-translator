@@ -9,6 +9,7 @@ on:
       - ".github/workflows/**"
       - "app/**"
       - "*.ps1"
+      - "*.psm1"
       - "requirements*"
 
 jobs:
