@@ -145,7 +145,7 @@ python -m venv venv
 # Activate it
 ## For Windows
 venv/Scripts/activate
-## For Linux
+## For Linux & macOS
 source venv/bin/activate
 
 # Install dependencies
@@ -183,7 +183,7 @@ For more info, see [config options](docs/config.md).
 # Activate venv
 ## For Windows
 venv/Scripts/activate
-## For Linux
+## For Linux & macOS
 source venv/bin/activate
 
 # Run with required argument only
@@ -208,6 +208,12 @@ python main.py --help
 ```powershell
 # Update local repo
 git pull
+
+# Activate venv
+## For Windows
+venv/Scripts/activate
+## For Linux & macOS
+source venv/bin/activate
 
 # Install new dependencies
 pip install -r requirements-lock.txt
