@@ -9,6 +9,8 @@ N/A
 
 ## v0.4.0
 23/11/2025
+## v0.4.1
+10/12/2025
 1. Remove ultralytics, sahi, & huggingface_hub from dependencies
 2. Downgrade Python version from 3.12.0 to 3.11.0
 3. Downgrade `torch`, `torchvision`, & `numpy` versions
