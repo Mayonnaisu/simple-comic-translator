@@ -136,6 +136,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
 **Prerequisites:**
 - Python 3.11.0
 - Microsoft C++ Build Tools (for Windows)
+- Ccache ([optional](docs/install-ccache.md))
 
 ```powershell
 # Create virtual environment
