@@ -214,7 +214,7 @@ try {
     try {
         Write-Host "`nInstalling Ccache..." -ForegroundColor Yellow
 
-        winget install --id Ccache.Ccache --source winget --exact --force -ErrorAction Stop
+        winget install --id Ccache.Ccache --source winget --exact --force
 
         Write-Host "`nCcache Installed Successfully." -ForegroundColor DarkGreen
     } catch {
