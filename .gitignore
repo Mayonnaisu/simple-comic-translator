@@ -5,6 +5,7 @@ models/
 result/
 test/local/
 temp/
+venv12/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
