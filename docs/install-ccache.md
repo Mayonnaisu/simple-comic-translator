@@ -1,4 +1,7 @@
 # Installing Ccache
+> [!NOTE]
+> For more info, see https://github.com/Mayonnaisu/simple-comic-translator/issues/3.
+
 ## Windows
 ### Installation
 ```powershell
