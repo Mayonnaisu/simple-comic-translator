@@ -88,10 +88,10 @@ This is just a ~~shitty~~ simple app for translating comics in batch with Gemini
 However, if you insist on using my app, then proceed to the next section. You've been warned! Just don't expect much cuz it's intended to be "simpler" than those better alternatives or other programs not mentioned here (go search them on your own).
 
 ## WORKFLOW
-Go to [here](docs/workflow.md)
+Go to [here](docs/workflow.md).
 
 ## DEMO
-Go to [here](docs/demo.md)
+Go to [here](docs/demo.md).
 
 ## DOWNLOAD
 ### Method 1: Download Zip
