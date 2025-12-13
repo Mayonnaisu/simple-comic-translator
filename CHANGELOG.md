@@ -9,14 +9,14 @@ N/A
 
 ## v0.4.0
 23/11/2025
-1. Remove ultralytics, sahi, & huggingface_hub from dependencies
+1. Remove `ultralytics`, `sahi`, & `huggingface-hub` from dependencies
 2. Downgrade Python version from 3.12.0 to 3.11.0
 3. Downgrade `torch`, `torchvision`, & `numpy` versions
 4. Use PaddleOCR for detection instead of YOLO
 5. Add installer, launcher, & updater
 6. Add extra module/s
 7. Improve console output
-8. Add summarization of the translation [(to be removed?)](docs/workflow.md#5-translate-and-summarize-extracted-texts-with-gemini)
+8. Add summarization of the translation ([to be removed?](docs/workflow.md#5-translate-and-summarize-extracted-texts-with-gemini))
 9. Add function to save translation & summary as text file
 10. Add more content to documentations
 11. Improve error handling (in progress)
