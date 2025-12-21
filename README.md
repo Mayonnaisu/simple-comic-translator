@@ -110,6 +110,7 @@ git clone "https://github.com/Mayonnaisu/simple-comic-translator"
 
 ## INSTALLATION
 ### Method 1: Installer
+> [!IMPORTANT]
 > **The installer only supports Windows 10 & 11.**
 1. Open PowerShell as Administrator.
 2. Change PowerShell execution policy by entering the command below:
