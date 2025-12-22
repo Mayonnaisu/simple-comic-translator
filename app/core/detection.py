@@ -1,14 +1,10 @@
 import os
 import threading
-import itertools
 import numpy as np
 from tqdm import tqdm
 import onnxruntime as ort
 from loguru import logger
-from typing import List, Dict
-from natsort import natsorted
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
-# from natsort import natsorted
+from concurrent.futures import ThreadPoolExecutor
 
 lock = threading.Lock()
 all_results = []
@@ -109,16 +105,10 @@ class TextAreaDetection:
                         # Convert bbox to four-corner coordinates
                         xmin, ymin, xmax, ymax = box
 
-                        offset = 0
-                        new_xmin = xmin - offset
-                        new_ymin = ymin - offset
-                        new_xmax = xmax + offset
-                        new_ymax = ymax + offset
-
-                        top_left = [new_xmin, new_ymin]
-                        top_right = [new_xmax, new_ymin]
-                        bottom_right = [new_xmax, new_ymax]
-                        bottom_left = [new_xmin, new_ymax]
+                        top_left = [xmin, ymin]
+                        top_right = [xmax, ymin]
+                        bottom_right = [xmax, ymax]
+                        bottom_left = [xmin, ymax]
 
                         corners = [top_left, top_right, bottom_right, bottom_left]
 
@@ -206,53 +196,8 @@ def calculate_iou_2d(box1, box2):
 
     return inter_area / union_area
 
-
-def deduplicate_results_2d(results: List[Dict], iou_threshold, stage) -> List[Dict]:
-    """
-    Removes duplicate detections from overlapping tiles using 2D IoU check.
-    Processes high-confidence boxes first.
-    """
-    if not results:
-        return []
-
-    # Sort results by confidence score descending, then by Y position
-    # results.sort(key=lambda r: (r['image_name'], r['number']))
-
-    unique_results = []
-    for i, current_res in enumerate(results):
-        is_duplicate = False
-        current_bbox_coords = get_bbox_coords(current_res['box'])
-
-        for unique_res in unique_results:
-            unique_bbox_coords = get_bbox_coords(unique_res['box'])
-            
-            # Use 2D IOU to check overlap in both X and Y dimensions
-            if calculate_iou_2d(current_bbox_coords, unique_bbox_coords) > iou_threshold:
-                # If they overlap significantly, assume they are the same detection.
-                # if current_res['confidence'] > unique_res['confidence']:
-                #     results[i] = current_res
-                # else:
-                #     results[i] = unique_res
-
-                is_duplicate = True
-                break
-
-        if not is_duplicate:
-            # Keep only unique, high-confidence results
-            unique_results.append(current_res)
-
-    # Re-sort unique results top-to-bottom, left-to-right for subsequent merging
-    # sorted_unique_results = natsorted(unique_results, key=lambda r: (r['image_name'], r['number']))
-
-    if stage == 1:
-        return results
-    elif stage == 2:
-        return unique_results
-
 def merge_nearby_boxes(results, det_merge_threshold):
     if not results: return []
-
-    # results.sort(key=lambda r: (r['image_name'], min(p[1] for p in r['box'])))
 
     merged_blocks = []
     for current in results:
@@ -262,13 +207,9 @@ def merge_nearby_boxes(results, det_merge_threshold):
         for existing_block in merged_blocks:
             existing_bbox_coords = get_bbox_coords(existing_block['box'])
             e_min_x, e_min_y, e_max_x, e_max_y, _ = existing_bbox_coords
-            vertical_gap = c_min_y - e_max_y
-            horizontal_gap = c_min_x - e_max_x
-            # vertical_overlap = min(e_max_y, c_max_y) - max(e_min_y, c_min_y)
-            # horizontal_overlap = min(e_max_x, c_max_x) - max(e_min_x, c_min_x)
+
             IoU = calculate_iou_2d(current_bbox_coords, existing_bbox_coords)
-            # print(IoU)
-            # print(f"@@@{vertical_gap, horizontal_gap}")
+
             if IoU >= det_merge_threshold:
                 existing_block['original_text'] += " " + current['original_text']
                 new_min_x, new_min_y = min(e_min_x, c_min_x), min(e_min_y, c_min_y)
@@ -281,7 +222,5 @@ def merge_nearby_boxes(results, det_merge_threshold):
             merged_blocks.append(current)
 
     logger.success(f"Found {len(merged_blocks)} detections.")
-
-    # merged_blocks.sort(key=lambda r: (r['image_name'], r['number']))
 
     return merged_blocks
