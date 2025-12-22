@@ -21,18 +21,18 @@ Start-Transcript -Path $LogErrorInstallDependencyPath
 
 Write-Host "`n$PWD"
 
-# Install Python 3.11.0
+# Install Python 3.12.0
 try {
-    Write-Host "`nInstalling Python 3.11.0" -ForegroundColor Yellow
+    Write-Host "`nInstalling Python 3.12.0" -ForegroundColor Yellow
 
     pyenv --version
 
-    pyenv install 3.11.0
+    pyenv install 3.12.0
 
-    pyenv global 3.11.0
+    pyenv global 3.12.0
 
     if ($LASTEXITCODE -ne 0) {
-        Throw "`nFailed to Install Python 3.11.0!`nEXIT CODE: $LASTEXITCODE"
+        Throw "`nFailed to Install Python 3.12.0!`nEXIT CODE: $LASTEXITCODE"
     }
     
     pyenv versions
@@ -46,7 +46,7 @@ try {
     Write-Host "`nERROR: $($_.Exception.Message)"
     exit 1
 }
-Write-Host "`nPython 3.11.0 Installed." -ForegroundColor DarkGreen
+Write-Host "`nPython 3.12.0 Installed." -ForegroundColor DarkGreen
 
 # Set Up Python Virtual Environment
 try {
@@ -258,7 +258,7 @@ try {
         Throw "`nFailed to Install Pyenv Windows!`nERROR: $($_.Exception.Message)"
     }
 
-    # Since it's required to reopen PowerShell after installing Pyenv Windows, I'll just launch PowerShell in a new window to install Python 3.11.0 with Pyenv, set up Python virtual environment, & install SCT dependencies.
+    # Since it's required to reopen PowerShell after installing Pyenv Windows, I'll just launch PowerShell in a new window to install Python 3.12.0 with Pyenv, set up Python virtual environment, & install SCT dependencies.
     try {
         Write-Host "`nInstalling Python, Setting Up Python Virtual Environment, & Installing SCT Dependencies..." -ForegroundColor Yellow
 
