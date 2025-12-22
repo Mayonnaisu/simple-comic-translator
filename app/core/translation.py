@@ -6,7 +6,9 @@ from pathlib import Path
 from loguru import logger
 from google.genai import types
 from dotenv import load_dotenv
+from colorama import Fore, Style, init
 
+init(autoreset=True)
 
 def subtract_one(match):
     # Get the found number (group 0 is the entire match)
@@ -39,7 +41,7 @@ def translate_texts_with_gemini(text_info_list, target_lang, model, output_dir):
     try:
         client = genai.Client(api_key=api_key)
     except Exception as e:
-        raise Exception('\033[31m' + f"Failed to initialize Gemini client: {e}")
+        raise Exception(Fore.RED + f"Failed to initialize Gemini client: {e}")
 
     response_schema={
         "type": "object",
@@ -137,7 +139,7 @@ Input List:
                 text_info_list[i]["translated_text"] = translated_map[i]
             else:
                 logger.warning(
-                    f"Warning: Missing translation for index {i}, using original text."
+                    Fore.YELLOW + f"Warning: Missing translation for index {i}, using original text."
                 )
                 text_info_list[i]["translated_text"] = text_info_list[i][
                     "original_text"
