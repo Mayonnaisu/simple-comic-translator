@@ -60,12 +60,11 @@ if config:
     # For merging images
     merge_images = config['IMAGE_MERGE']['enable']
     # For text-area detection
-    slice_height = config['DETECTION']['slice_height']
-    slice_width = config['DETECTION']['slice_width']
-    slice_overlap = config['DETECTION']['slice_overlap']
-    slice_max_dimension = config['DETECTION']['slice_max_dimension']
     det_conf_threshold = config['OCR']['confidence_threshold']
     det_merge_threshold = config['DETECTION']['merge_threshold']
+    tile_height = config['DETECTION']['tile']['height']
+    tile_width = config['DETECTION']['tile']['width']
+    tile_overlap = config['DETECTION']['tile']['overlap']
     # For OCR
     source_language = config['OCR']['source_language']
     ocr_conf_threshold = config['OCR']['confidence_threshold']
@@ -170,22 +169,22 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
         image_width, image_height = merged_image.size
 
         # --- Stage 2: Detect Text Areas with ogkalu/comic-text-and-bubble-detector.onnx
-        slice_width = image_width if slice_width == "original" else slice_width
+        tile_width = image_width if tile_width == "original" else tile_width
 
-        slice_height = slice_width if slice_height == "slice_width" else slice_height
+        tile_height = tile_width if tile_height == "tile_width" else tile_height
 
-        slice_overlap = int(slice_height * slice_overlap)
+        tile_overlap = int(tile_height * tile_overlap)
 
         image_slices = slice_image_in_tiles_pil(
-            [merged_image, image_width, image_height], slice_height, slice_width, slice_max_dimension, slice_overlap, "", output_dir, log_level
+            [merged_image, image_width, image_height], tile_height, tile_width, 640, tile_overlap, "", output_dir, log_level
         )
 
-        # detections = detector.batch_threaded("", image_slices, target_sizes=[slice_height, slice_width], log_level=log_level, image_tiled=True)
+        # detections = detector.batch_threaded("", image_slices, target_sizes=[tile_height, tile_width], log_level=log_level, image_tiled=True)
 
         logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
         detections = []
         for i, slice in enumerate(tqdm(image_slices)):
-            detection = detector.detect_text_areas("", i, slice, target_sizes=[slice_height, slice_width], log_level=log_level, image_tiled=True)
+            detection = detector.detect_text_areas("", i, slice, target_sizes=[tile_height, tile_width], log_level=log_level, image_tiled=True)
             if detection:
                 detections.extend(detection)
 
@@ -212,25 +211,25 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             })
 
             # --- Stage 1: Detect Text Areas ogkalu/comic-text-and-bubble-detector.onnx
-            slice_width = image_width if slice_width == "original" else slice_width
+            tile_width = image_width if tile_width == "original" else tile_width
 
-            slice_height = slice_width if slice_height == "slice_width" else slice_height
+            tile_height = tile_width if tile_height == "tile_width" else tile_height
 
-            slice_overlap = int(slice_height * slice_overlap)
+            tile_overlap = int(tile_height * tile_overlap)
 
-            if image_width > slice_width:
-                image_slices = slice_image_in_tiles_pil([image, image_width, image_height], slice_height, slice_width, slice_max_dimension, slice_overlap, n, output_dir, log_level)
+            if image_width > tile_width:
+                image_slices = slice_image_in_tiles_pil([image, image_width, image_height], tile_height, tile_width, 640, tile_overlap, n, output_dir, log_level)
 
-                # detections = detector.batch_threaded(image_name,image_slices, target_sizes=[slice_height, slice_width], log_level=log_level, batch=True)
+                # detections = detector.batch_threaded(image_name,image_slices, target_sizes=[tile_height, tile_width], log_level=log_level, batch=True)
 
                 logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
                 detections = []
                 for i, slice in enumerate(tqdm(image_slices)):
-                    detection = detector.detect_text_areas(image_name, i, slice, target_sizes=[slice_height, slice_width], log_level=log_level, image_tiled=True)
+                    detection = detector.detect_text_areas(image_name, i, slice, target_sizes=[tile_height, tile_width], log_level=log_level, image_tiled=True)
                     detections.extend(detection)
             else:
                 logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
-                detections = detector.detect_text_areas(image_name, n, image, target_sizes=[slice_height, slice_width], log_level=log_level, image_tiled=False)
+                detections = detector.detect_text_areas(image_name, n, image, target_sizes=[tile_height, tile_width], log_level=log_level, image_tiled=False)
 
             if not detections:
                 logger.warning(Fore.YELLOW + "NO DETECTION! Skipping...")

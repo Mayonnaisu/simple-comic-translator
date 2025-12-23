@@ -4,20 +4,21 @@
   },
 
   "DETECTION": {
-    "slice_height": "slice_width",
-    "slice_width": 640,
-    "slice_overlap": 0.2,
-    "slice_max_dimension": 640,
     "confidence_threshold": 0.3,
-    "merge_threshold": 0.1
+    "merge_threshold": 0.1,
+    "tile": {
+      "height": "tile_width",
+      "width": 640,
+      "overlap": 0.2
+    }
   },
 
   "OCR": {
     "source_language": "korean",
     "confidence_threshold": 0.5,
-    "resizer": {
+    "resize": {
       "enable": false,
-      "resize_width": 640
+      "width": 640
     }
   },
 
