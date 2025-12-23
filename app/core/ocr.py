@@ -133,7 +133,7 @@ class MangaOCRRecognition:
         Initializes the Manga OCR model.
         :param use_gpu: Whether to use CPU for inference.
         """
-        logger.info(f"Initializing Manga OCR model...")
+        logger.info(f"Initializing Manga OCR model.")
 
         self.mocr = MangaOcr(force_cpu=use_cpu)
 
