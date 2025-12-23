@@ -9,7 +9,7 @@
     "slice_overlap": 0.2,
     "slice_max_dimension": 640,
     "confidence_threshold": 0.3,
-    "merge_threshold": 0.2
+    "merge_threshold": 0.1
   },
 
   "OCR": {
@@ -27,7 +27,11 @@
 
   "TRANSLATION": {
     "target_language": "en",
-    "gemini_model": "gemini-2.5-flash"
+    "gemini": {
+      "model": "gemini-2.5-flash",
+      "temperature": 0.5,
+      "top_p": 0.8
+    } 
   },
 
   "OVERLAY": {

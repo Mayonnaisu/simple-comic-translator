@@ -26,11 +26,13 @@ def subtract_one(match):
     return new_string
 
 
-def translate_texts_with_gemini(text_info_list, target_lang, model, output_dir):
+def translate_texts_with_gemini(text_info_list, target_lang, gemini, output_dir):
     if not text_info_list:
         return text_info_list
     
     logger.info(f"\nTranslating texts to ({target_lang.upper()}) with Gemini.")
+
+    model, temperature, top_p = gemini
 
     # Load environment variables from .env file
     load_dotenv()
@@ -53,8 +55,8 @@ def translate_texts_with_gemini(text_info_list, target_lang, model, output_dir):
     }
 
     my_config = types.GenerateContentConfig(
-        temperature=0.5,
-        top_p=0.8,
+        temperature=temperature,
+        top_p=top_p,
         response_mime_type="application/json",
         response_schema=response_schema
     )
