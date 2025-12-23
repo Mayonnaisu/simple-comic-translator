@@ -85,7 +85,7 @@ def slice_image_in_tiles_pil(image_path: str, tile_height: int, tile_width: int,
             scale_y = 1
 
             if original_tile_w != target_max_dim or original_tile_h != target_max_dim:
-                cropped_img_pil.resize((target_max_dim, target_max_dim), Image.Resampling.LANCZOS)
+                cropped_img_pil = cropped_img_pil.resize((target_max_dim, target_max_dim), Image.Resampling.LANCZOS)
                 resized_tile_w, resized_tile_h = cropped_img_pil.size
 
                 # Calculate scaling factors
