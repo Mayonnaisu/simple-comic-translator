@@ -63,7 +63,7 @@ def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_siz
 
 
 def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_results: list[dict], box: list[int | str | tuple], font: list[int | str], image_extension: str, source_language: str, output_path: str, log_level: str):
-    """Overlays the detected text boxes onto the corresponding non-overlapping images and saves them."""
+    """Overlays the detected text boxes and translated texts onto the corresponding safely-splitted images and saves them."""
     if not os.path.exists(output_path): os.makedirs(output_path)
 
     box_offset, box_fill_color, box_outline_color = box
@@ -111,19 +111,20 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             original_text = item["original_text"]
             translated_text = item["translated_text"]
 
-            # Filter for sound effects in original_text
+            # Filter out sound effects in original_text
             if is_string_in_file(filter_path, original_text):
                 continue
 
-            # Filter translated texts whose characters are fewer than 3 and not in inclusion list, potentially removing gibberish
+            # Filter out translated texts whose characters are fewer than 3 and not in inclusion list, potentially removing gibberish
             if len(translated_text) < 3 and translated_text.lower() not in inclusion:
                 continue
 
-            # Adjust points back to be relative to the *current tile's* top edge
+            # Adjust points back to be relative to the *current split's* top edge
             relative_points = [[p[0], p[1] - slice_top] for p in original_points]
-            rel_xmin, rel_ymin, rel_xmax, rel_ymax, _ = get_bbox_coords(relative_points)
 
             # Add offsets to enlarge text areas
+            rel_xmin, rel_ymin, rel_xmax, rel_ymax, _ = get_bbox_coords(relative_points)
+
             new_xmin = rel_xmin - box_offset
             new_ymin = rel_ymin - box_offset
             new_xmax = rel_xmax + box_offset
@@ -155,7 +156,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             text_x = target_box_center_x - text_width // 2
             text_y = target_box_center_y - text_height // 2
 
-            # Optional: Draw the target bounding box
+            # Draw the target bounding box
             draw.rectangle(
                 (target_box_x1, target_box_y1, target_box_x1 + box_width, target_box_y1 + box_height),
                 fill=box_fill_color,
@@ -181,9 +182,6 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
                 except IOError:
                     font = ImageFont.load_default()
 
-                # Skip empty string
-                if original_text == "":
-                    continue
                 annotate.rectangle(
                     (new_xmin, new_ymin, new_xmax, new_ymax),
                     outline="red",
