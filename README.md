@@ -225,10 +225,9 @@ pip install -r requirements-lock.txt
 ```
 
 ## LIMITATIONS
-1. Currently, it can't properly recognize vertical texts, which is usually found in manga.
-2. Some sound effects (onomatopoeia) and watermark texts are also detected and recognized, making the result riddled with unnecessary texts and white rectangles.
-3. No automatic retry in case of error.
-4. It can't automatically detect the input language and only supports one language in each process. As a result, you need to manually specify the language in **config.json**.
+1. Some sound effects (onomatopoeia) and watermark texts are also detected and recognized, making the result riddled with unnecessary texts and white rectangles.
+2. No automatic retry in case of error.
+3. It can't automatically detect the input language and only supports one language in each process. As a result, you need to manually specify the language in **config.json**.
 
 ## EXTRA INFO
 ### How to Get Gemini API Key

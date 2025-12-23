@@ -1,12 +1,13 @@
 import os
 import textwrap
+import numpy as np
 from loguru import logger
 from PIL import Image, ImageDraw, ImageFont
 
-from app.core.ocr import get_bbox_coords
+from app.core.detection import get_bbox_coords
 
 
-def is_string_in_file(file_path, search_string):
+def is_string_in_file(file_path: int, search_string: str):
     with open(file_path, 'r', encoding="utf-8") as file:
         for line in file:
             if search_string in line:
@@ -14,7 +15,7 @@ def is_string_in_file(file_path, search_string):
     return False
 
 
-def get_fitted_font_and_text(text, max_width, max_height, min_size, max_size, font_path):
+def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_size: int, max_size: int, font_path: int):
     """
     Finds the largest font size and the corresponding wrapped text that fits within the specified max_width and max_height.
     """
@@ -37,7 +38,7 @@ def get_fitted_font_and_text(text, max_width, max_height, min_size, max_size, fo
         chars_per_line = int(max_width / avg_char_width) if avg_char_width > 0 else 1
 
         # Wrap text based on calculated characters per line
-        wrapped_text_list = textwrap.wrap(text, width=chars_per_line)
+        wrapped_text_list = textwrap.wrap(text, width=chars_per_line if chars_per_line > 0 else 1)
         wrapped_text = "\n".join(wrapped_text_list)
 
         # Measure the total size of the wrapped text using ImageDraw.multiline_textbbox
@@ -61,102 +62,152 @@ def get_fitted_font_and_text(text, max_width, max_height, min_size, max_size, fo
     return fitted_size, best_wrapped_text
 
 
-def overlay_translated_texts(non_overlap_slices, all_ocr_results, font, image_extension, language, output_path):
-    """Maps OCR results to the correct non-overlapping slice and draws them."""
-    font_min, font_max, font_path = font
+def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_results: list[dict], box: list[int | str | tuple], font: list[int | str], image_extension: str, source_language: str, output_path: str, log_level: str):
+    """Overlays the detected text boxes onto the corresponding non-overlapping images and saves them."""
+    if not os.path.exists(output_path): os.makedirs(output_path)
 
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
+    box_offset, box_fill_color, box_outline_color = box
+    font_min, font_max, font_color, font_path = font
 
     inclusion = ("i", "you", "we", "they", "he", "she", "it", "ah")
 
-    # Set filter according to source language
-    if language == "japan":
+    # Set filter according to source source_language
+    source_language, lang_code_jp = source_language
+
+    if source_language in lang_code_jp:
         filter_path = "filters/manga.txt"
-    elif language == "korean":
+    elif source_language == "korean":
         filter_path = "filters/manhwa.txt"
-    elif language == "ch":
+    elif source_language == "ch":
         filter_path = "filters/manhua.txt"
 
-    for i, slice_info in enumerate(non_overlap_slices):
-        slice_name = f"image_{i:02d}"
-        try:
-            slice_img_pil = slice_info["image"]
-        except Exception:
-            slice_img_pil = slice_info
+    for i, image_info in enumerate(images):
+        image_name = f"image_{i:02d}"
 
-        draw = ImageDraw.Draw(slice_img_pil)
+        if images_merged:
+            image_slice = image_info['image'].copy()
+            slice_top = image_info['top_offset']
+            image = image_slice
 
-        for item in all_ocr_results:
-            if item["image_name"] == slice_name:
-                box = item["box"]
-                original_text = item["original_text"]
-                translated_text = item["translated_text"]
+            results_for_this_slice = []
+            for res in all_ocr_results:
+                s_min_y, s_max_y = np.min(np.array(res['box'])[:, 1]), np.max(np.array(res['box'])[:, 1])
+                if max(slice_top, s_min_y) < min(slice_top + image_slice.size[1], s_max_y):
+                     results_for_this_slice.append(res)
+        else:
+            image = image_info['image'].copy()
+            image_name = image_info['image_name']
+            slice_top = 0
 
-                # Filter for sound effects in original_text
-                if is_string_in_file(filter_path, original_text):
+            results_for_this_slice = []
+            for res in all_ocr_results:
+                if res["image_name"] == image_name:
+                    results_for_this_slice.append(res)
+
+        draw = ImageDraw.Draw(image)
+
+        for item in results_for_this_slice:
+            original_points = item["box"]
+            original_text = item["original_text"]
+            translated_text = item["translated_text"]
+
+            # Filter for sound effects in original_text
+            if is_string_in_file(filter_path, original_text):
+                continue
+
+            # Filter translated texts whose characters are fewer than 3 and not in inclusion list, potentially removing gibberish
+            if len(translated_text) < 3 and translated_text.lower() not in inclusion:
+                continue
+
+            # Adjust points back to be relative to the *current tile's* top edge
+            relative_points = [[p[0], p[1] - slice_top] for p in original_points]
+            rel_xmin, rel_ymin, rel_xmax, rel_ymax, _ = get_bbox_coords(relative_points)
+
+            # Add offsets to enlarge text areas
+            new_xmin = rel_xmin - box_offset
+            new_ymin = rel_ymin - box_offset
+            new_xmax = rel_xmax + box_offset
+            new_ymax = rel_ymax + box_offset
+
+            box_width = new_xmax - new_xmin
+            box_height = new_ymax - new_ymin
+
+            # Use textwrap on the *already structured* text from Gemini
+            # This acts as a secondary safety measure to prevent spilling
+            optimal_size, wrapped_text = get_fitted_font_and_text(
+                translated_text, box_width, box_height, font_min, font_max, font_path
+            )
+
+            final_font = ImageFont.truetype(font_path, optimal_size)
+
+            # Calculate position to center the text within the target box
+            bbox = draw.multiline_textbbox(
+                (0, 0), wrapped_text, font=final_font, align="center"
+            )
+            text_width = bbox[2] - bbox[0]
+            text_height = bbox[3] - bbox[1]
+
+            # Center the text within the target box region
+            target_box_x1, target_box_y1 = (new_xmin, new_ymin)
+            target_box_center_x = target_box_x1 + box_width // 2
+            target_box_center_y = target_box_y1 + box_height // 2
+
+            text_x = target_box_center_x - text_width // 2
+            text_y = target_box_center_y - text_height // 2
+
+            # Optional: Draw the target bounding box
+            draw.rectangle(
+                (target_box_x1, target_box_y1, target_box_x1 + box_width, target_box_y1 + box_height),
+                fill=box_fill_color,
+                outline=box_outline_color
+            )
+
+            # Draw the text
+            text_position = (text_x, text_y)
+            draw.multiline_text(
+                text_position,
+                wrapped_text,
+                align="center",
+                font=final_font,
+                fill=font_color
+            )
+
+            # Annotate image in debug mode
+            if log_level == "TRACE":
+                annotate = ImageDraw.Draw(image_info['image'])
+
+                try:
+                    font = ImageFont.truetype(font_path, 30)
+                except IOError:
+                    font = ImageFont.load_default()
+
+                # Skip empty string
+                if original_text == "":
                     continue
-                # Filter translated texts whose characters are fewer than 4 and not in inclusion list, potentially removing gibberish
-                if len(translated_text) < 3 and translated_text.lower() not in inclusion:
-                    continue
-                # Adjust points back to be relative to the *current slice's* top edge
-                rel_min_x, rel_min_y, rel_max_x, rel_max_y, _ = get_bbox_coords(
-                    [[p[0], p[1]] for p in box]
+                annotate.rectangle(
+                    (new_xmin, new_ymin, new_xmax, new_ymax),
+                    outline="red",
+                    width=2
+                )
+                annotate.text(
+                    (new_xmin, new_ymin - 35),
+                    original_text,
+                    font=font,
+                    fill="green",
                 )
 
-                offset = 10
-                new_y_min = rel_min_y - offset
-                new_y_max = rel_max_y + offset
-                new_x_min = rel_min_x - offset
-                new_x_max = rel_max_x + offset
+        # Save the final image
+        full_output_path = f"{output_path}/{image_name}.{image_extension}"
+        image.save(full_output_path, quality=100)
+        image.close()
 
-                box_width = new_x_max - new_x_min
-                box_height = new_y_max - new_y_min
-
-                # Use textwrap on the *already structured* text from Gemini
-                # This acts as a secondary safety measure to prevent spilling
-                optimal_size, wrapped_text = get_fitted_font_and_text(
-                    translated_text, box_width, box_height, font_min, font_max, font_path
-                )
-
-                final_font = ImageFont.truetype(font_path, optimal_size)
-
-                # Calculate position to center the text within the target box
-                bbox = draw.multiline_textbbox(
-                    (0, 0), wrapped_text, font=final_font, align="center"
-                )
-                text_width = bbox[2] - bbox[0]
-                text_height = bbox[3] - bbox[1]
-
-                # Center the text within the target box region
-                target_box_x1, target_box_y1 = (new_x_min, new_y_min)
-                target_box_center_x = target_box_x1 + box_width // 2
-                target_box_center_y = target_box_y1 + box_height // 2
-
-                text_x = target_box_center_x - text_width // 2
-                text_y = target_box_center_y - text_height // 2
-
-                # Optional: Draw the target bounding box or inpaint the original text (TODO)
-                draw.rectangle(
-                    (target_box_x1, target_box_y1, target_box_x1 + box_width, target_box_y1 + box_height),
-                    fill="white",
-                    # outline="red"
-                )
-
-                # Draw the text
-                text_position = (text_x, text_y)
-                draw.multiline_text(
-                    text_position,
-                    wrapped_text,
-                    align="center",
-                    font=final_font,
-                    fill="black",
-                )
-
-        # Save the processed slice image
-        # os.makedirs(output_path, exist_ok=True)
-        full_output_path = f"{output_path}/{slice_name}.{image_extension}"
-        slice_img_pil.save(full_output_path, quality=100)
-        slice_img_pil.close()
+        # Save the annotated image in debug mode
+        if log_level == "TRACE":
+            full_output_path = f'{output_path}/debug/annotation'
+            os.makedirs(full_output_path, exist_ok=True)
+            annotation_image = image_info['image']
+            annotation_image.save(f'{full_output_path}/annotation_{i:02d}.jpg', quality=100)
+            logger.success(f"Saved annotated result to {output_path}")
+            annotation_image.close()
 
     logger.info(f"Translated images saved to {output_path}.")

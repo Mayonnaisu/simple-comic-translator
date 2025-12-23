@@ -1,30 +1,32 @@
-# -*- coding: utf-8 -*- 
-
 import os
 import re
 import sys
 import time
 import argparse
-import itertools
 from PIL import Image
+from tqdm import tqdm
 from pathlib import Path
 from loguru import logger
-from datetime import datetime, timedelta
+from datetime import datetime
 from natsort import natsorted
 from collections import Counter
 from colorama import Fore, Back, Style, init
 
+from _version import __version__
 from app.core.config import load_config
-from app.core.image_utils import merge_images_vertically, slice_image_horizontally, split_image_safely
-from app.core.ocr import run_ocr_on_slices, deduplicate_results, merge_nearby_boxes
+from app.core.model import download_repo_snapshot
+from app.core.image_utils import merge_images_vertically, slice_image_in_tiles_pil, split_image_safely
+from app.core.detection import TextAreaDetection, merge_nearby_boxes
+from app.core.ocr import PaddleOCRRecognition, MangaOCRRecognition
 from app.core.translation import translate_texts_with_gemini
 from app.core.overlay import overlay_translated_texts
 
 # Measure time
 start_time = time.perf_counter()
 
-# Set the environment variables and configurations
-os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = str(pow(2, 40))
+# Set other environment variables and configurations
+os.environ["DISABLE_MODEL_SOURCE_CHECK"] = "True" # not working :(
+# os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = str(pow(2, 40))
 Image.MAX_IMAGE_PIXELS = None
 init(autoreset=True)
 
@@ -49,42 +51,63 @@ formatted_datetime = datetime.now().strftime("%Y-%m-%d_%H.%M")
 logger.add(sys.stderr, format="{message}", level=log_level)
 logger.add(f"temp/logs/{formatted_datetime}.log", format="{message}", level=log_level)
 
-# Read configurations from config.json
-# Load the configuration
-config = load_config('config.json')
+# Show app version
+logger.info(f"SCT version: {__version__}\n")
 
-# Access configuration values
+# Load configurations from config.json
+config = load_config('config.json')
 if config:
     # For merging images
     merge_images = config['IMAGE_MERGE']['enable']
     # For text-area detection
-    source_language = config['DETECTION']['source_language']
     slice_height = config['DETECTION']['slice_height']
-    ocr_overlap = int(slice_height * config['DETECTION']['ocr_overlap'])
-    det_y_threshold = config['DETECTION']['merge_y_threshold']
-    det_x_threshold = config['DETECTION']['merge_x_threshold'] 
+    slice_width = config['DETECTION']['slice_width']
+    slice_overlap = config['DETECTION']['slice_overlap']
+    slice_max_dimension = config['DETECTION']['slice_max_dimension']
+    det_conf_threshold = config['OCR']['confidence_threshold']
+    det_merge_threshold = config['DETECTION']['merge_threshold']
+    # For OCR
+    source_language = config['OCR']['source_language']
+    ocr_conf_threshold = config['OCR']['confidence_threshold']
+    use_resizer = config['OCR']['resizer']['enable']
+    resize_width = config['OCR']['resizer']['resize_width']
     # For splitting image
     max_height = config['IMAGE_SPLIT']['max_height']
-    # For OCR
-    ocr_y_threshold = config['OCR']['merge_y_threshold']
-    ocr_x_threshold = config['OCR']['merge_x_threshold']
-    use_slicer = config['OCR']['slicer']['enable']
-    h_stride = config['OCR']['slicer']['horizontal_stride']
-    v_stride = config['OCR']['slicer']['vertical_stride']
     # For translation
     target_language = config['TRANSLATION']['target_language']
     gemini_model = config['TRANSLATION']['gemini_model']
     # For overlay
+    box_offset = config['OVERLAY']['box']['offset']
+    box_fill_color = config['OVERLAY']['box']['fill_color']
+    box_outline_color = config['OVERLAY']['box']['outline_color']
     font_min = config['OVERLAY']['font']['min_size']
     font_max = config['OVERLAY']['font']['max_size']
+    font_color = config['OVERLAY']['font']['color']
     font_path = config['OVERLAY']['font']['path']
 
 # --- Main Execution ---
 image_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')
+lang_code_jp = ("japanese", "japan", "jpn", "jp", "ja")
 
 # Check if input path exists
 if not os.path.exists(args.input):
     raise Exception(Fore.RED + f"{args.input} does not exist!")
+
+# Download detection model if not exist
+repo_id="ogkalu/comic-text-and-bubble-detector"
+file_name="detector.onnx"
+model_path=f"./models/detection/{repo_id}"
+
+if not os.path.exists(f"{model_path}/{file_name}"):
+    download_repo_snapshot(repo_id=repo_id, local_dir=model_path)
+
+# Initialize models
+detector = TextAreaDetection(model_path="models/detection/ogkalu/comic-text-and-bubble-detector/repo/detector.onnx", confidence_threshold=det_conf_threshold, use_gpu=args.gpu)
+
+if source_language in lang_code_jp:
+    extractor = MangaOCRRecognition(use_cpu=True if args.gpu == False else True)
+else:
+    extractor = PaddleOCRRecognition(ocr_version='PP-OCRv5', language=source_language, confidence_threshold=ocr_conf_threshold, use_gpu=args.gpu)
 
 # Iterate through all directories using os.walk
 for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
@@ -112,15 +135,12 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
     if already_exist:
         continue
 
-    # Filter for image files (you can add more extensions if needed)
-    image_files = [os.path.join(dirpath, f) for f in filenames if f.lower().endswith(image_extensions)]
+    # Filter for image files and sort files to ensure consistent merging order
+    image_files = [os.path.join(dirpath, f) for f in natsorted(filenames) if f.lower().endswith(image_extensions)]
 
     if not image_files:
         logger.info(Fore.BLUE + f"- No image in '{dirpath}'. Skipping.")
         continue
-
-    # Sort files to ensure consistent merging order
-    image_files = natsorted(image_files)
 
     images = []
     try:
@@ -141,51 +161,102 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
         original_extension_counts = Counter(original_extensions)
         common_original_extension, counts = original_extension_counts.most_common(1)[0]
 
-
     if merge_images:
         # --- Stage 1: Merge images into one ---
         merged_image = merge_images_vertically(images, output_dir, log_level)
 
         image_width, image_height = merged_image.size
 
-        # --- Stage 2: Detect Text Areas PaddleOCR
-        image_slices = slice_image_horizontally(
-            [merged_image, image_width, image_height], slice_height, ocr_overlap, output_dir, log_level
+        # --- Stage 2: Detect Text Areas with ogkalu/comic-text-and-bubble-detector.onnx
+        slice_width = image_width if slice_width == "original" else slice_width
+
+        slice_height = slice_width if slice_height == "slice_width" else slice_height
+
+        slice_overlap = int(slice_height * slice_overlap)
+
+        image_slices = slice_image_in_tiles_pil(
+            [merged_image, image_width, image_height], slice_height, slice_width, slice_max_dimension, slice_overlap, "", output_dir, log_level
         )
-        detections = run_ocr_on_slices(image_slices, source_language, args.gpu, [use_slicer, h_stride, v_stride], "detection", log_level)
 
-        unique_detections = deduplicate_results(detections, iou_threshold=0.6)
+        # detections = detector.batch_threaded("", image_slices, target_sizes=[slice_height, slice_width], log_level=log_level, batch=True)
+        logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
+        detections = []
+        for i, slice in enumerate(tqdm(image_slices)):
+            detection = detector.detect_text_areas("", i, slice, target_sizes=[slice_height, slice_width], log_level=log_level, image_tiled=True)
+            if detection:
+                detections.extend(detection)
 
-        merged_detections = merge_nearby_boxes(unique_detections, det_y_threshold, det_x_threshold, process="detection")
+        # unique_detections = deduplicate_results_2d(detections, det_merge_threshold)
 
-        # --- Stage 3: Split Image Safely on Non-Text Areas ---
-        image_chunks, chunks_number = split_image_safely([merged_image, image_width, image_height], merged_detections, max_height)
+        merged_detections = merge_nearby_boxes(detections, det_merge_threshold)
+
+        # merged_detections2 = merge_nearby_boxes(merged_detections1, det_merge_threshold)
+
+        # --- Stage 3: Extract Texts with Manga OCR/PaddleOCR
+        if source_language in lang_code_jp:
+            recognitions = extractor.batch_threaded2(merged_image, "", merged_detections, [use_resizer, resize_width], output_dir, log_level)
+        else:
+            recognitions = extractor.batch_threaded(merged_image, "", merged_detections, [use_resizer, resize_width], output_dir, log_level)
+
+        # --- Stage 4: Split Image Safely on Non-Text Areas ---
+        image_chunks, chunks_number = split_image_safely([merged_image, image_width, image_height], recognitions, max_height)
     else:
-        image_chunks = images
-        chunks_number = range(len(image_chunks))
+        image_chunks = []
+        recognitions = []
 
-    # --- Stage 4: Extract Text with PaddleOCR ---
-    ocr_results = run_ocr_on_slices(image_chunks, source_language, args.gpu, [use_slicer, h_stride, v_stride], "ocr", log_level)
+        for n, image in enumerate(images):
+            image_width, image_height = image.size
+            image_name = f"image_{n:02d}"
+            image_chunks.append({
+                "image_name": image_name,
+                "image": image
+            })
 
-    merged_ocr = []
-    for i in chunks_number:
-        detected_items = []
-        chunk_name = f"image_{i:02d}"
-        for item in ocr_results:
-            if item["image_name"] == chunk_name:
-                detected_items.append(item)
+            # --- Stage 1: Detect Text Areas ogkalu/comic-text-and-bubble-detector.onnx
+            slice_width = image_width if slice_width == "original" else slice_width
 
-        merged_ocr.append(merge_nearby_boxes(detected_items, ocr_y_threshold, ocr_x_threshold, process="ocr"))
+            slice_height = slice_width if slice_height == "slice_width" else slice_height
 
-    merged_ocr_results = list(itertools.chain.from_iterable(merged_ocr))
+            slice_overlap = int(slice_height * slice_overlap)
 
-    logger.success(f"Extracted {len(merged_ocr_results)} texts.")
+            if image_width > slice_width:
+                image_slices = slice_image_in_tiles_pil([image, image_width, image_height], slice_height, slice_width, slice_max_dimension, slice_overlap, n, output_dir, log_level)
 
-    # --- Stage 5: Translate Extracted Text with Gemini ---
-    translated_text_data = translate_texts_with_gemini(merged_ocr_results, target_language, gemini_model, output_dir)
+                # detections = detector.batch_threaded(image_name,image_slices, target_sizes=[slice_height, slice_width], log_level=log_level, batch=True)
+                logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
+                detections = []
+                for i, slice in enumerate(tqdm(image_slices)):
+                    detection = detector.detect_text_areas(image_name, i, slice, target_sizes=[slice_height, slice_width], log_level=log_level, image_tiled=True)
+                    detections.extend(detection)
+            else:
+                logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
+                detections = detector.detect_text_areas(image_name, n, image, target_sizes=[slice_height, slice_width], log_level=log_level, image_tiled=False)
 
-    # --- Stage 6: Whiten Text Areas & Overlay Translated Texts to Split Images ---
-    overlay_translated_texts(image_chunks, translated_text_data, [font_min, font_max, font_path], common_original_extension, source_language, output_dir)
+            if not detections:
+                logger.warning(Fore.YELLOW + "NO DETECTION! Skipping...")
+                continue
+
+            merged_detections = merge_nearby_boxes(detections, det_merge_threshold)
+
+            # --- Stage 2: Extract Texts with Manga OCR/PaddleOCR
+            if source_language in lang_code_jp:
+                recognition = extractor.batch_threaded2(image, n, merged_detections, [use_resizer, resize_width], output_dir, log_level)
+
+                # recognition = []
+                # for i, detection in enumerate(merged_detections):
+                #     rec = extractor.run_mangaocr_on_detections(image, f"crop{n}_{i:02d}.png", detection, [use_resizer, resize_width], output_dir, log_level)
+                #     if rec:
+                #         recognition.append(rec)
+            else:
+                recognition = extractor.batch_threaded(image, n, merged_detections, [use_resizer, resize_width], output_dir, log_level)
+
+            recognitions.extend(recognition)
+
+    # --- Stage 5/3: Translate Extracted Text with Gemini ---
+    translated_text_data = translate_texts_with_gemini(recognitions, target_language, gemini_model, output_dir)
+
+    # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
+    overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_fill_color, box_outline_color], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
 
 logger.info(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_path}'.")
 

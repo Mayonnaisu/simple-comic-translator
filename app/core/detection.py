@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 lock = threading.Lock()
 all_results = []
 
-def get_bbox_coords(points):
+def get_bbox_coords(points: list[list]):
     """Helper to get min/max coordinates and center from points."""
     points_np = np.array(points)
     min_x, min_y = np.min(points_np, axis=0)
@@ -23,7 +23,7 @@ class TextAreaDetection:
     :param model_path: Path to the model.
     :return: A list of bounding boxes.
     """
-    def __init__(self, model_path, confidence_threshold, use_gpu):
+    def __init__(self, model_path: str, confidence_threshold: float, use_gpu: bool):
         """
         Initializes detection model.
         """
@@ -53,14 +53,14 @@ class TextAreaDetection:
 
         logger.info("Detection model initialized.\n")
 
-    def detect_text_areas(self, image_name, number, slice, target_sizes, log_level, batch):
+    def detect_text_areas(self, image_name: str, number: int, slice: dict | object, target_sizes: list[int], log_level: str, image_tiled: bool) -> list[dict]:
         """Runs PaddleOCR on slices and adjusts coordinates to original image space."""
 
         result_list = []
 
         with lock:
             try:
-                if batch:
+                if image_tiled:
                     slice_img_np = np.array(slice["image"])
                     top_offset = slice["top_offset"]
                     left_offset = slice["left_offset"]
@@ -136,11 +136,11 @@ class TextAreaDetection:
                         result_list.append(result)
 
             except Exception as e:
-                print(f"Error processing image: {e}")
+                logger.error(f"Error processing image: {e}")
 
         return result_list
 
-    def batch_threaded(self, image_name, images, target_sizes, log_level, batch):
+    def batch_threaded(self, image_name: str, images: dict | object, target_sizes: list[int], log_level: str, image_tiled: bool):
         """Manages thread pool for batch detection"""
 
         num_threads = int(os.cpu_count()/2) # Adjust based on your system (optimal for I/O bound tasks, less so for CPU bound)
@@ -150,7 +150,7 @@ class TextAreaDetection:
         # Use ThreadPoolExecutor for concurrent execution
         with ThreadPoolExecutor(max_workers=num_threads) as executor:
             # Submit all images for processing
-            future_to_path = [executor.submit(self.detect_text_areas, image_name, i, image, target_sizes, log_level, batch) for i, image in enumerate(images)]
+            future_to_path = [executor.submit(self.detect_text_areas, image_name, i, image, target_sizes, log_level, image_tiled) for i, image in enumerate(images)]
 
             # Monitor progress and wait for all futures to complete
             for future in tqdm(future_to_path, total=len(images), desc="Detection"):
@@ -160,12 +160,12 @@ class TextAreaDetection:
                     if result:
                         all_results.extend(result)
                 except Exception as exc:
-                    print(f'{future_to_path[index]} generated an exception: {exc}')
+                    logger.error(f'{future_to_path[index]} generated an exception: {exc}')
 
         # Return the populated, thread-safe results dictionary
         return all_results
 
-def calculate_iou_2d(box1, box2):
+def calculate_iou_2d(box1: tuple[int], box2: tuple[int]):
     """
     Calculates 2D Intersection over Union (IoU) for two upright bounding boxes.
     Box format is (xmin, ymin, xmax, ymax).
@@ -196,7 +196,41 @@ def calculate_iou_2d(box1, box2):
 
     return inter_area / union_area
 
-def merge_nearby_boxes(results, det_merge_threshold):
+def deduplicate_results_2d(results: list[dict], iou_threshold: float) -> list[dict]:
+    """
+    Removes duplicate detections from overlapping tiles using 2D IoU check.
+    Processes high-confidence boxes first.
+    """
+    if not results:
+        return []
+
+    # Sort results by confidence score descending, then by Y position
+    # results.sort (key=lambda r: (r['image_name'], min(p[1] for p in r['box']), r['confidence']))
+
+    unique_results = []
+    for i, current_res in enumerate(results):
+        is_duplicate = False
+        current_bbox_coords = get_bbox_coords(current_res['box'])
+
+        for unique_res in unique_results:
+            unique_bbox_coords = get_bbox_coords(unique_res['box'])
+            
+            # Use 2D IOU to check overlap in both X and Y dimensions
+            if calculate_iou_2d(current_bbox_coords, unique_bbox_coords) > iou_threshold:
+                # If they overlap significantly, assume they are the same detection.
+                is_duplicate = True
+                break
+
+        if not is_duplicate:
+            # Keep only unique results
+            unique_results.append(current_res)
+
+    # Re-sort unique results top-to-bottom, left-to-right for subsequent merging
+    # sorted_unique_results = natsorted(unique_results, key=lambda r: (r['image_name'], r['number']))
+
+    return unique_results
+
+def merge_nearby_boxes(results: list[dict], det_merge_threshold: float) -> list[dict]:
     if not results: return []
 
     merged_blocks = []
@@ -210,7 +244,7 @@ def merge_nearby_boxes(results, det_merge_threshold):
 
             IoU = calculate_iou_2d(current_bbox_coords, existing_bbox_coords)
 
-            if IoU >= det_merge_threshold:
+            if IoU > det_merge_threshold:
                 existing_block['original_text'] += " " + current['original_text']
                 new_min_x, new_min_y = min(e_min_x, c_min_x), min(e_min_y, c_min_y)
                 new_max_x, new_max_y = max(e_max_x, c_max_x), max(e_max_y, c_max_y)

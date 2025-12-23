@@ -1,247 +1,200 @@
+import os
+import logging
+import threading
 import numpy as np
-from loguru import logger
-from paddleocr import PaddleOCR
+import faulthandler
 from tqdm import tqdm
+import concurrent.futures
+from loguru import logger
+from manga_ocr import MangaOcr
+from paddleocr import PaddleOCR
 
+from app.core.image_utils import crop_out_box_pil
 
-def get_bbox_coords(points):
-    """Helper to get min/max coordinates and center from points."""
-    points_np = np.array(points)
-    min_x, min_y = np.min(points_np, axis=0)
-    max_x, max_y = np.max(points_np, axis=0)
-    center_y = (min_y + max_y) / 2
-    return min_x, min_y, max_x, max_y, center_y
+# suppress PaddleOCR's verbose logging
+os.environ["DISABLE_MODEL_SOURCE_CHECK"] = 'True'
+os.environ['FLAGS_log_level'] = '3'
+logging.getLogger("ppocr").setLevel(logging.ERROR)
 
+faulthandler.enable()
 
-def run_ocr_on_slices(slices, language, use_gpu, use_slicer, process, log_level):
-    """Runs PaddleOCR on slices and adjusts coordinates to original image space."""
+lock = threading.Lock()
+all_results = []
 
-    logger.info("Extracting texts with PaddleOCR.") if process == "ocr" else logger.info("Detecting text areas with PaddleOCR.")
+class PaddleOCRRecognition:
+    """
+    A class to handle text extraction using PaddleOCR.
+    """
+    def __init__(self, ocr_version: str, language: str, confidence_threshold: float, use_gpu: bool):
+        """
+        Initializes the PaddleOCR model.
+        :param language: The language for OCR (e.g., 'japan', 'korean', 'ch', 'en', etc).
+        :param device: Device to use for inference.
+        """
+        logger.info(f"Initializing PaddleOCR model for language: {language}...")
 
-    all_results = []
+        self.confidence_threshold = confidence_threshold
 
-    enable_slicer, h_stride, v_stride = use_slicer
-
-    # Initialize the OCR engine
-    ocr_instance = PaddleOCR(
-        ocr_version='PP-OCRv4',
-        lang=language, 
-        use_angle_cls=True,
-        use_gpu=use_gpu,
-        show_log=False)
-    
-    # Define additional arguments for accomodating slicer
-    kwargs = {
-        "cls": False,
-        "det": True,
-        "rec": True,
-    }
-
-    if enable_slicer:
-        kwargs["slice"] = {
-            "horizontal_stride": h_stride,
-            "vertical_stride": v_stride,
-            "merge_x_thres": 30,
-            "merge_y_thres": 30,
-        }
-
-    for i, slice_info in enumerate(tqdm(slices)):
-        slice_name = f"image_{i:02d}"
-        try:
-            slice_img = slice_info["image"]
-            top_offset = slice_info["top_offset"]
-        except Exception:
-            slice_img = slice_info
-            top_offset = 0
-
-        if enable_slicer:
-            kwargs["slice"]["horizontal_stride"] = slice_img.size[0] if h_stride == "original" else h_stride
-
-        result = ocr_instance.ocr(
-            np.array(slice_img),
-            **kwargs
+        self.ppocr = PaddleOCR(
+            ocr_version=ocr_version,
+            lang=language,
+            device='gpu:0' if use_gpu else 'cpu',
+            use_doc_orientation_classify=False,
+            use_doc_unwarping=False,
+            use_textline_orientation=False,
         )
 
-        if result and result[0]:
-            for line in result[0]:
-                # PaddleOCR result format: [[point1, point2, ...], (text, confidence)]
-                confidence = line[1][1]
+        logger.info("PaddleOCR model initialized.")
 
-                # Filter out lower confidence
-                if confidence < 0.6:
-                    continue
+    def run_paddleocr_on_detections(self, image: object, crop_name: str, detection: dict, resizer: list[bool | int], output_dir: str, log_level: str):
+        """Runs PaddleOCR on slices and adjusts coordinates to original image space."""
 
-                points = line[0]
-                text = line[1][0]
+        with lock:
+            try:
+                use_resizer, resize_width = resizer
 
-                # Adjust coordinates to the original image's coordinate system
-                adjusted_points = [[p[0], p[1] + top_offset] for p in points]
-                _, _, _, _, center_y = get_bbox_coords(adjusted_points)
+                box = detection["box"]
 
-                all_results.append(
-                    {
-                        "box": np.array(adjusted_points),
-                        "original_text": text,
-                        "confidence": confidence,
-                        "center_y": center_y,
-                        "translated_text": "",
-                        "image_name": slice_name,
-                    }
+                xmin = box[0][0]
+                ymin = box[0][1]
+                xmax = box[2][0]
+                ymax = box[2][1]
+
+                cropped_img_resized = crop_out_box_pil([xmin, ymin, xmax, ymax], image, [use_resizer, resize_width], output_dir, crop_name, log_level)
+
+                result = self.ppocr.predict(
+                    np.array(cropped_img_resized)
                 )
 
-                if log_level == "TRACE":
-                    logger.debug(f"({confidence:.2f}) {text} {adjusted_points}")
+                recognized_text = ""
+                avg_conf = 0
+                if result:
+                    for line in result:
+                        # Filter out lower confidence
+                        confidence = line['rec_scores']
+                        confidence_number = len(confidence)
+                        if confidence_number > 0:
+                            avg_conf = sum([c for c in confidence]) / confidence_number
+                        else:
+                            avg_conf = 0
 
-    return all_results
+                        if avg_conf < self.confidence_threshold:
+                            continue
 
+                        text = line['rec_texts']
+                        recognized_text = " ".join(text)
 
-def calculate_iou_vertical(box1, box2):
-    """Calculate Intersection over Union (IoU) for vertical overlap."""
-    _, y1_min, _, y1_max, _ = box1
-    _, y2_min, _, y2_max, _ = box2
+                    detection["original_text"] = recognized_text.strip()
 
-    intersection_min = max(y1_min, y2_min)
-    intersection_max = min(y1_max, y2_max)
+                    detection["text_confidence"] = avg_conf
 
-    if intersection_max <= intersection_min:
-        return 0
+                    if log_level == "TRACE" and recognized_text != "":
+                        logger.debug(f"({avg_conf:.2f}) {recognized_text}")
 
-    intersection_area = intersection_max - intersection_min
-    area1 = y1_max - y1_min
-    area2 = y2_max - y2_min
+                    return detection
+            except Exception as e:
+                logger.error(f"Error processing image: {e}")
 
-    # Use the smaller area for denominator to ensure high IOU for near matches
-    union_area = max(area1, area2)
-    if union_area == 0:
-        return 0
+    def batch_threaded(self, image: object, number: int, detections: list[dict], resizer: list[bool | int], output_dir: str, log_level: str):
+        """Manages thread pool for batch detection"""
 
-    return intersection_area / union_area
+        num_threads = int(os.cpu_count()/2) # Adjust based on your system (optimal for I/O bound tasks, less so for CPU bound)
 
+        logger.info(f"\nExtracting texts with PaddleOCR in {num_threads} threads.")
 
-def deduplicate_results(results, iou_threshold=0.5):
+        # Use ThreadPoolExecutor for concurrent execution
+        with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+            # Submit all images for processing
+            future_to_path = {executor.submit(self.run_paddleocr_on_detections, image, f"crop{number}_{i:02d}.png", detection, resizer, output_dir, log_level): detection for i, detection in enumerate(detections)}
+
+            # Monitor progress and wait for all futures to complete
+            for future in tqdm(concurrent.futures.as_completed(future_to_path), total=len(detections), desc="OCR"):
+                image_path = future_to_path[future]
+                try:
+                    result = future.result()
+                    if result:
+                        all_results.append(result)
+                except Exception as exc:
+                    logger.error(f'{image_path} generated an exception: {exc}')
+
+        # Return the populated, thread-safe results dictionary
+        filtered_results = [result for result in all_results if result["original_text"] != ""]
+
+        logger.success(f"Extracted {len(filtered_results)} texts.\n")
+
+        return filtered_results
+
+class MangaOCRRecognition:
     """
-    Removes exact or near-duplicate detections from overlapping slices.
-
-    Uses vertical IOU to identify potential overlaps and then compares text content to avoid duplication.
+    A class to handle text extraction using Manga OCR.
     """
-    if not results:
-        return []
+    def __init__(self, use_cpu: bool):
+        """
+        Initializes the Manga OCR model.
+        :param use_gpu: Whether to use CPU for inference.
+        """
+        logger.info(f"Initializing Manga OCR model...")
 
-    unique_results = []
+        self.mocr = MangaOcr(force_cpu=use_cpu)
 
-    for current_res in results:
-        is_duplicate = False
-        current_bbox = get_bbox_coords(current_res["box"])
+        logger.info("Manga OCR model initialized.")
 
-        for unique_res in unique_results:
-            unique_bbox = get_bbox_coords(unique_res["box"])
+    def run_mangaocr_on_detections(self, image: object, crop_name: str, detection: dict, resizer: list[bool | int], output_dir: str, log_level: str):
 
-            # Check for significant vertical overlap
-            if calculate_iou_vertical(current_bbox, unique_bbox) > iou_threshold:
-                # Check if the text is essentially the same (simple substring check for fragments)
-                if (
-                    current_res["original_text"] in unique_res["original_text"]
-                    or unique_res["original_text"] in current_res["original_text"]
-                ):
-                    is_duplicate = True
-                    break
-                # If they overlap spatially but have different text, they might be adjacent lines.
-                # The current logic will treat them as separate lines.
+        use_resizer, resize_width = resizer
 
-        if not is_duplicate:
-            unique_results.append(current_res)
+        with lock:
+            try:
+                box = detection["box"]
 
-    # Note: This strategy handles *complete* text repetitions well.
-    # Merging *fragments* of a single line of text across slices (e.g., "Hello wor" and "rld")
-    # is much more complex and usually requires the automated slice operator.
+                xmin = box[0][0]
+                ymin = box[0][1]
+                xmax = box[2][0]
+                ymax = box[2][1]
 
-    return unique_results
+                cropped_img_resized = crop_out_box_pil([xmin, ymin, xmax, ymax], image, [use_resizer, resize_width], output_dir, crop_name, log_level)
 
+                text = self.mocr(cropped_img_resized)
 
-def merge_boxes_and_text(box1, text1, box2, text2):
-    """
-    Merges two boxes and concatenates text.
-    """
-    # box format: [[x1, y1], [x2, y2], [x3, y3], [x4, y4]] -> needs conversion to [x_min, y_min, x_max, y_max]
-    b1_flat = [
-        np.min(box1[:, 0]),
-        np.min(box1[:, 1]),
-        np.max(box1[:, 0]),
-        np.max(box1[:, 1]),
-    ]
-    b2_flat = [
-        np.min(box2[:, 0]),
-        np.min(box2[:, 1]),
-        np.max(box2[:, 0]),
-        np.max(box2[:, 1]),
-    ]
+                if text and text != "．．．":
+                    detection["original_text"] = text.strip()
 
-    new_box_flat = [
-        min(b1_flat[0], b2_flat[0]),
-        min(b1_flat[1], b2_flat[1]),
-        max(b1_flat[2], b2_flat[2]),
-        max(b1_flat[3], b2_flat[3]),
-    ]
-    # Return as numpy array in the original 4-point format (for consistency, although we use flat format later)
-    # The new box is treated as a simple upright rectangle
-    new_box = np.array(
-        [
-            [new_box_flat[0], new_box_flat[1]],
-            [new_box_flat[2], new_box_flat[1]],
-            [new_box_flat[2], new_box_flat[3]],
-            [new_box_flat[0], new_box_flat[3]],
-        ]
-    )
+                    if log_level == "INFO" and text != "":
+                        logger.info(f"{text}")
 
-    # Sort text logically (top-to-bottom, left-to-right is hard with angle, generally a space works)
-    new_text = f"{text1} {text2}"
-    return new_box, new_text
+                    return detection
+            except Exception as e:
+                logger.error(f"Error processing image: {e}")
 
 
-def merge_nearby_boxes(ocr_results, y_threshold, x_threshold, process):
-    """
-    Groups text lines that are close vertically into single items
-    """
-    if not ocr_results:
-        return []
+    def batch_threaded2(self, image: object, number: int, detections: list[dict], resizer: list[bool | int], output_dir: str, log_level: str):
+        """Manages thread pool for batch detection"""
 
-    merged_list = []
+        num_threads = int(os.cpu_count()/2)
 
-    current_group = ocr_results[0]
+        logger.info(f"\nExtracting texts with Manga OCR in {num_threads} threads.")
 
-    for next_item in ocr_results[1:]:
-        # Get Y coordinates of current and next item
-        current_y_max = np.max(current_group["box"][:, 1])
-        next_y_min = np.min(next_item["box"][:, 1])
+        # Use ThreadPoolExecutor for concurrent execution
+        with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+            # Submit all images for processing
+            future_to_path = {executor.submit(self.run_mangaocr_on_detections, image, f"crop{number}_{i:02d}.png", detection, resizer, output_dir, log_level): detection for i, detection in enumerate(detections)}
 
-        e_min_x, _, e_max_x, _, _ = get_bbox_coords(current_group["box"])
-        c_min_x, _, c_max_x, _, _ = get_bbox_coords(next_item["box"])
+            # Monitor progress and wait for all futures to complete
+            for future in tqdm(concurrent.futures.as_completed(future_to_path), total=len(detections), desc="OCR"):
+                image_path = future_to_path[future]
+                try:
+                    result = future.result()
+                    if result:
+                        all_results.append(result)
+                except Exception as exc:
+                    logger.error(f'{image_path} generated an exception: {exc}')
 
-        # Check if the vertical and horizontal gaps are less than the threshold
-        vertical_gap = next_y_min - current_y_max
-        horizontal_overlap_or_gap = (
-            max(e_min_x, c_min_x) < min(e_max_x, c_max_x) + x_threshold
-        )
+        # Return the populated, thread-safe results dictionary
+        filtered_results = [result for result in all_results if result["original_text"] != ""]
 
-        if vertical_gap < y_threshold and horizontal_overlap_or_gap:
-            # Merge the boxes and text
-            new_box, new_text = merge_boxes_and_text(
-                current_group["box"],
-                current_group["original_text"],
-                next_item["box"],
-                next_item["original_text"],
-            )
-            current_group["box"] = new_box
-            current_group["original_text"] = new_text
-        else:
-            # The gap is too large, finalize the current group and start a new one
-            merged_list.append(current_group)
-            current_group = next_item
+        # for rec in filtered_results:
+        #     logger.info(f"{rec}\n")
 
-    # Append the last group after the loop finishes
-    merged_list.append(current_group)
+        logger.success(f"Extracted {len(filtered_results)} texts.\n")
 
-    if process == "detection":
-        logger.success(f"Found {len(merged_list)} detections.")
-
-    return merged_list
+        return filtered_results

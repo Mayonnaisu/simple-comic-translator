@@ -2,34 +2,45 @@
   "IMAGE_MERGE": {
     "enable": true
   },
+
   "DETECTION": {
-    "source_language": "korean",
-    "slice_height": 2000,
-    "ocr_overlap": 0.2,
-    "merge_y_threshold": 30,
-    "merge_x_threshold": 100
+    "slice_height": "slice_width",
+    "slice_width": 640,
+    "slice_overlap": 0.2,
+    "slice_max_dimension": 640,
+    "confidence_threshold": 0.3,
+    "merge_threshold": 0.2
   },
-  "IMAGE_SPLIT": {
-    "max_height": 1200
-  },
+
   "OCR": {
-    "merge_y_threshold": 30,
-    "merge_x_threshold": 100,
-    "slicer": {
+    "source_language": "korean",
+    "confidence_threshold": 0.5,
+    "resizer": {
       "enable": false,
-      "horizontal_stride": "original",
-      "vertical_stride": 640
+      "resize_width": 640
     }
   },
+
+  "IMAGE_SPLIT": {
+    "max_height": 2000
+  },
+
   "TRANSLATION": {
     "target_language": "en",
     "gemini_model": "gemini-2.5-flash"
   },
+
   "OVERLAY": {
+    "box": {
+      "offset": 10,
+      "fill_color": "white",
+      "outline_color": null
+    },
     "font": {
       "min_size": 11,
       "max_size": 40,
-      "path": "fonts/JetBrainsMonoNerdFont-Bold.ttf"
+      "color": "black",
+      "path": "fonts/NotoSerifKR-Bold.ttf"
     }
   }
 }

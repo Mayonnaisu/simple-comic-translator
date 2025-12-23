@@ -2,6 +2,9 @@
 $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $True
 
+# Set environment variables
+$env:DISABLE_MODEL_SOURCE_CHECK = $True # not working, why?
+
 # Define function to select folder with OpenFileDialog
 function Select-FolderDialog {
     # Load the assembly
@@ -59,7 +62,7 @@ try {
     try {
         Write-Host "`nActivating Virtual Environment..." -ForegroundColor Yellow
 
-        venv/Scripts/activate
+        venv12/Scripts/activate
 
         Write-Host "`nVirtual Environment Activated." -ForegroundColor Green
     } catch {

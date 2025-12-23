@@ -7,7 +7,7 @@ from huggingface_hub import hf_hub_download, snapshot_download
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "0"
 init(autoreset=True)
 
-def download_model(repo_id, file_name, local_dir):
+def download_model(repo_id: str, file_name: str, local_dir: str):
     logger.info(Style.BRIGHT + Fore.YELLOW + "\nModel does not exist. Initiating download...")
 
     local_path = hf_hub_download(
@@ -18,7 +18,7 @@ def download_model(repo_id, file_name, local_dir):
 
     logger.info(Style.BRIGHT + Fore.GREEN + f"Model downloaded to: {local_path}")
 
-def download_repo_snapshot(repo_id, local_dir):
+def download_repo_snapshot(repo_id: str, local_dir: str):
     logger.info(Style.BRIGHT + Fore.YELLOW + "\nRepo snapshot does not exist. Initiating download...")
 
     local_path = snapshot_download(
