@@ -20,8 +20,10 @@ def get_bbox_coords(points: list[list]):
 class TextAreaDetection:
     """
     A class to handle text area detection.
-    :param model_path: Path to the model.
-    :return: A list of bounding boxes.
+
+    :param model_path: Path to the onnx model file.
+
+    :return: A list of dictionary containing bounding boxes among others.
     """
     def __init__(self, model_path: str, confidence_threshold: float, use_gpu: bool):
         """
@@ -149,18 +151,15 @@ class TextAreaDetection:
 
         # Use ThreadPoolExecutor for concurrent execution
         with ThreadPoolExecutor(max_workers=num_threads) as executor:
-            # Submit all images for processing
-            future_to_path = [executor.submit(self.detect_text_areas, image_name, i, image, target_sizes, log_level, image_tiled) for i, image in enumerate(images)]
+            number = len(images)
+            futures = executor.map(self.detect_text_areas, [image_name]*number, range(number), images, [target_sizes]*number, [log_level]*number, [image_tiled]*number)
 
-            # Monitor progress and wait for all futures to complete
-            for future in tqdm(future_to_path, total=len(images), desc="Detection"):
-                index = future_to_path.index(future)
+            for future in tqdm(futures, total=len(images), desc="Detection"):
                 try:
-                    result = future.result()
-                    if result:
-                        all_results.extend(result)
+                    if future:
+                        all_results.extend(future)
                 except Exception as exc:
-                    logger.error(f'{future_to_path[index]} generated an exception: {exc}')
+                    logger.error(f'{exc}')
 
         # Return the populated, thread-safe results dictionary
         return all_results
