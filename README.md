@@ -198,6 +198,10 @@ python main.py --help
 ### Method 1: Updater
 > [!WARNING]
 > This updater will replace the old files with the newer ones, so make sure to back up the files you want to keep first. For more info, see [here](CHANGELOG.md).
+>
+> **Exclusions:**
+> - config.json
+> - filters/*
 
 1. Right click on **updater.ps1** > Run with PowerShell.
 2. Wait until you get ${{\color{lightgreen}{\textsf{UPDATE COMPLETED!}}}}\$ message.
