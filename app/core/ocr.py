@@ -120,7 +120,7 @@ class PaddleOCRRecognition:
         # Return the populated, thread-safe results dictionary
         filtered_results = [result for result in all_results if result["original_text"] != ""]
 
-        logger.success(f"Extracted {len(filtered_results)} texts.\n")
+        logger.success(f"Extracted {len(filtered_results)} texts.")
 
         return filtered_results
 
@@ -195,6 +195,6 @@ class MangaOCRRecognition:
         # for rec in filtered_results:
         #     logger.info(f"{rec}\n")
 
-        logger.success(f"Extracted {len(filtered_results)} texts.\n")
+        logger.success(f"Extracted {len(filtered_results)} texts.")
 
         return filtered_results
