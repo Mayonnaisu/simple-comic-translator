@@ -103,7 +103,7 @@ if not os.path.exists(f"{model_path}/{file_name}"):
     download_repo_snapshot(repo_id=repo_id, local_dir=model_path)
 
 # Initialize models
-detector = TextAreaDetection(model_path="models/detection/ogkalu/comic-text-and-bubble-detector/repo/detector.onnx", confidence_threshold=det_conf_threshold, use_gpu=args.gpu)
+detector = TextAreaDetection(model_path="models/detection/ogkalu/comic-text-and-bubble-detector/detector.onnx", confidence_threshold=det_conf_threshold, use_gpu=args.gpu)
 
 if source_language in lang_code_jp:
     extractor = MangaOCRRecognition(use_cpu=True if args.gpu == False else True)
