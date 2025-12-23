@@ -84,10 +84,9 @@ def slice_image_in_tiles_pil(image_path: str, tile_height: int, tile_width: int,
 
             scale_x = 1
             scale_y = 1
-            if original_slice_w > target_max_dim or original_slice_h > target_max_dim:
-                # Use PIL's thumbnail method to resize while maintaining aspect ratio
-                # It resizes in place to fit within the given max dimensions
-                cropped_img_pil.thumbnail((target_max_dim, target_max_dim), Image.Resampling.LANCZOS)
+            if original_slice_w != target_max_dim or original_slice_h != target_max_dim:
+                # Resize image if its size is not equal to target dimension for the detection model (640x640)
+                cropped_img_pil.resize((target_max_dim, target_max_dim), Image.Resampling.LANCZOS)
                 resized_slice_w, resized_slice_h = cropped_img_pil.size
 
                 # Calculate scaling factors
