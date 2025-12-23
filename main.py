@@ -178,7 +178,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             [merged_image, image_width, image_height], slice_height, slice_width, slice_max_dimension, slice_overlap, "", output_dir, log_level
         )
 
-        # detections = detector.batch_threaded("", image_slices, target_sizes=[slice_height, slice_width], log_level=log_level, batch=True)
+        # detections = detector.batch_threaded("", image_slices, target_sizes=[slice_height, slice_width], log_level=log_level, image_tiled=True)
 
         logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
         detections = []
