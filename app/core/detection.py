@@ -115,7 +115,7 @@ class TextAreaDetection:
                         corners = [top_left, top_right, bottom_right, bottom_left]
 
                         # Adjust coordinates back to the original slice size (inverse scaling) and then to the original full image coordinate system (offsets)
-                        adjusted_points = [[(int(p[0]) * int(scale_x)) + left_offset, (int(p[1]) * int(scale_y)) + top_offset] for p in corners]
+                        adjusted_points = [[(int(p[0]) * scale_x) + left_offset, (int(p[1]) * scale_y) + top_offset] for p in corners]
 
                         _, _, _, _, center_y = get_bbox_coords(adjusted_points)
 
