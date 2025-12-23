@@ -10,7 +10,10 @@ from colorama import Fore, Style, init
 
 init(autoreset=True)
 
-def subtract_one(match):
+def subtract_one(match: str):
+    '''
+    Subtract 1 from number in string
+    '''
     # Get the found number (group 0 is the entire match)
     num_str = match.group(0)
     # Get the length (an integer)
@@ -26,7 +29,10 @@ def subtract_one(match):
     return new_string
 
 
-def translate_texts_with_gemini(text_info_list, target_lang, gemini, output_dir):
+def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, gemini: list[str|float], output_dir: str):
+    '''
+    Translate all texts from one chapter and summarize them with Gemini
+    '''
     if not text_info_list:
         return text_info_list
     
