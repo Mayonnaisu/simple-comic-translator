@@ -179,6 +179,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
         )
 
         # detections = detector.batch_threaded("", image_slices, target_sizes=[slice_height, slice_width], log_level=log_level, batch=True)
+
         logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
         detections = []
         for i, slice in enumerate(tqdm(image_slices)):
@@ -186,11 +187,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             if detection:
                 detections.extend(detection)
 
-        # unique_detections = deduplicate_results_2d(detections, det_merge_threshold)
-
         merged_detections = merge_nearby_boxes(detections, det_merge_threshold)
-
-        # merged_detections2 = merge_nearby_boxes(merged_detections1, det_merge_threshold)
 
         # --- Stage 3: Extract Texts with Manga OCR/PaddleOCR
         if source_language in lang_code_jp:
@@ -223,6 +220,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
                 image_slices = slice_image_in_tiles_pil([image, image_width, image_height], slice_height, slice_width, slice_max_dimension, slice_overlap, n, output_dir, log_level)
 
                 # detections = detector.batch_threaded(image_name,image_slices, target_sizes=[slice_height, slice_width], log_level=log_level, batch=True)
+
                 logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
                 detections = []
                 for i, slice in enumerate(tqdm(image_slices)):
