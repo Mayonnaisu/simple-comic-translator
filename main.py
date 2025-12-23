@@ -69,7 +69,7 @@ if config:
     source_language = config['OCR']['source_language']
     ocr_conf_threshold = config['OCR']['confidence_threshold']
     use_upscaler = config['OCR']['upscale']['enable']
-    upscale_ratio = config['OCR']['upscale']['scale']
+    upscale_ratio = config['OCR']['upscale']['ratio']
     # For splitting image
     max_height = config['IMAGE_SPLIT']['max_height']
     # For translation
