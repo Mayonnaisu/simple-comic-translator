@@ -79,19 +79,18 @@ def slice_image_in_tiles_pil(image_path: str, tile_height: int, tile_width: int,
             box = (effective_left, effective_top, effective_left + tile_width, effective_top + tile_height)
             cropped_img_pil = img_pil.crop(box)
 
-            # --- Aspect Ratio Resize the slice ---
-            original_slice_w, original_slice_h = cropped_img_pil.size
-
+            # Resize image if its size is not equal to target dimension for the detection model (640x640)
+            original_tile_w, original_tile_h = cropped_img_pil.size
             scale_x = 1
             scale_y = 1
-            if original_slice_w != target_max_dim or original_slice_h != target_max_dim:
-                # Resize image if its size is not equal to target dimension for the detection model (640x640)
+
+            if original_tile_w != target_max_dim or original_tile_h != target_max_dim:
                 cropped_img_pil.resize((target_max_dim, target_max_dim), Image.Resampling.LANCZOS)
-                resized_slice_w, resized_slice_h = cropped_img_pil.size
+                resized_tile_w, resized_tile_h = cropped_img_pil.size
 
                 # Calculate scaling factors
-                scale_x = original_slice_w / resized_slice_w
-                scale_y = original_slice_h / resized_slice_h
+                scale_x = original_tile_w / resized_tile_w
+                scale_y = original_tile_h / resized_tile_h
 
             tiles.append({
                 'image': cropped_img_pil, 
