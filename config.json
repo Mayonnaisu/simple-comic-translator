@@ -4,22 +4,22 @@
   },
 
   "DETECTION": {
+    "confidence_threshold": 0.3,
+    "merge_threshold": 0.1,
     "tile": {
       "height": "tile_width",
       "width": 640,
       "overlap": 0.2
-    },
-    "confidence_threshold": 0.3,
-    "merge_threshold": 0.1
+    }
   },
 
   "OCR": {
+    "source_language": "korean",
+    "confidence_threshold": 0.5,
     "upscale": {
       "enable": false,
       "ratio": 2
-    },
-    "source_language": "korean",
-    "confidence_threshold": 0.5
+    }
   },
 
   "IMAGE_SPLIT": {
