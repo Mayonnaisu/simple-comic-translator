@@ -159,7 +159,7 @@ class MangaOCRRecognition:
                 if text and text != "．．．":
                     detection["original_text"] = text.strip()
 
-                    if log_level == "INFO" and text != "":
+                    if log_level == "TRACE" and text != "":
                         logger.info(f"{text}")
 
                     return detection
