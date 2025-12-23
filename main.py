@@ -68,8 +68,8 @@ if config:
     # For OCR
     source_language = config['OCR']['source_language']
     ocr_conf_threshold = config['OCR']['confidence_threshold']
-    use_resizer = config['OCR']['resizer']['enable']
-    resize_width = config['OCR']['resizer']['resize_width']
+    use_upscaler = config['OCR']['upscale']['enable']
+    upscale_ratio = config['OCR']['upscale']['scale']
     # For splitting image
     max_height = config['IMAGE_SPLIT']['max_height']
     # For translation
@@ -192,9 +192,9 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
         # --- Stage 3: Extract Texts with Manga OCR/PaddleOCR
         if source_language in lang_code_jp:
-            recognitions = extractor.batch_threaded2(merged_image, "", merged_detections, [use_resizer, resize_width], output_dir, log_level)
+            recognitions = extractor.batch_threaded2(merged_image, "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
         else:
-            recognitions = extractor.batch_threaded(merged_image, "", merged_detections, [use_resizer, resize_width], output_dir, log_level)
+            recognitions = extractor.batch_threaded(merged_image, "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
 
         # --- Stage 4: Split Image Safely on Non-Text Areas ---
         image_chunks, chunks_number = split_image_safely([merged_image, image_width, image_height], recognitions, max_height)
@@ -239,15 +239,15 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
             # --- Stage 2: Extract Texts with Manga OCR/PaddleOCR
             if source_language in lang_code_jp:
-                recognition = extractor.batch_threaded2(image, n, merged_detections, [use_resizer, resize_width], output_dir, log_level)
+                recognition = extractor.batch_threaded2(image, n, merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
 
                 # recognition = []
                 # for i, detection in enumerate(merged_detections):
-                #     rec = extractor.run_mangaocr_on_detections(image, f"crop{n}_{i:02d}.png", detection, [use_resizer, resize_width], output_dir, log_level)
+                #     rec = extractor.run_mangaocr_on_detections(image, f"crop{n}_{i:02d}.png", detection, [use_upscaler, upscale_ratio], output_dir, log_level)
                 #     if rec:
                 #         recognition.append(rec)
             else:
-                recognition = extractor.batch_threaded(image, n, merged_detections, [use_resizer, resize_width], output_dir, log_level)
+                recognition = extractor.batch_threaded(image, n, merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
 
             recognitions.extend(recognition)
 

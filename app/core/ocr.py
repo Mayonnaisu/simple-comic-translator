@@ -46,12 +46,12 @@ class PaddleOCRRecognition:
 
         logger.info("PaddleOCR model initialized.")
 
-    def run_paddleocr_on_detections(self, image: object, crop_name: str, detection: dict, resizer: list[bool | int], output_dir: str, log_level: str):
+    def run_paddleocr_on_detections(self, image: object, crop_name: str, detection: dict, upscaler: list[bool | int], output_dir: str, log_level: str):
         """Runs PaddleOCR on slices and adjusts coordinates to original image space."""
 
         with lock:
             try:
-                use_resizer, resize_width = resizer
+                use_upscaler, upscale_ratio = upscaler
 
                 box = detection["box"]
 
@@ -60,7 +60,7 @@ class PaddleOCRRecognition:
                 xmax = box[2][0]
                 ymax = box[2][1]
 
-                cropped_img_resized = crop_out_box_pil([xmin, ymin, xmax, ymax], image, [use_resizer, resize_width], output_dir, crop_name, log_level)
+                cropped_img_resized = crop_out_box_pil([xmin, ymin, xmax, ymax], image, [use_upscaler, upscale_ratio], output_dir, crop_name, log_level)
 
                 result = self.ppocr.predict(
                     np.array(cropped_img_resized)
@@ -95,7 +95,7 @@ class PaddleOCRRecognition:
             except Exception as e:
                 logger.error(f"Error processing image: {e}")
 
-    def batch_threaded(self, image: object, number: int, detections: list[dict], resizer: list[bool | int], output_dir: str, log_level: str):
+    def batch_threaded(self, image: object, number: int, detections: list[dict], upscaler: list[bool | int], output_dir: str, log_level: str):
         """Manages thread pool for batch detection"""
 
         num_threads = int(os.cpu_count()/2) # Adjust based on your system (optimal for I/O bound tasks, less so for CPU bound)
@@ -105,7 +105,7 @@ class PaddleOCRRecognition:
         # Use ThreadPoolExecutor for concurrent execution
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
             # Submit all images for processing
-            future_to_path = {executor.submit(self.run_paddleocr_on_detections, image, f"crop{number}_{i:02d}.png", detection, resizer, output_dir, log_level): detection for i, detection in enumerate(detections)}
+            future_to_path = {executor.submit(self.run_paddleocr_on_detections, image, f"crop{number}_{i:02d}.png", detection, upscaler, output_dir, log_level): detection for i, detection in enumerate(detections)}
 
             # Monitor progress and wait for all futures to complete
             for future in tqdm(concurrent.futures.as_completed(future_to_path), total=len(detections), desc="OCR"):
@@ -139,9 +139,9 @@ class MangaOCRRecognition:
 
         logger.info("Manga OCR model initialized.")
 
-    def run_mangaocr_on_detections(self, image: object, crop_name: str, detection: dict, resizer: list[bool | int], output_dir: str, log_level: str):
+    def run_mangaocr_on_detections(self, image: object, crop_name: str, detection: dict, upscaler: list[bool | int], output_dir: str, log_level: str):
 
-        use_resizer, resize_width = resizer
+        use_upscaler, upscale_ratio = upscaler
 
         with lock:
             try:
@@ -152,7 +152,7 @@ class MangaOCRRecognition:
                 xmax = box[2][0]
                 ymax = box[2][1]
 
-                cropped_img_resized = crop_out_box_pil([xmin, ymin, xmax, ymax], image, [use_resizer, resize_width], output_dir, crop_name, log_level)
+                cropped_img_resized = crop_out_box_pil([xmin, ymin, xmax, ymax], image, [use_upscaler, upscale_ratio], output_dir, crop_name, log_level)
 
                 text = self.mocr(cropped_img_resized)
 
@@ -167,7 +167,7 @@ class MangaOCRRecognition:
                 logger.error(f"Error processing image: {e}")
 
 
-    def batch_threaded2(self, image: object, number: int, detections: list[dict], resizer: list[bool | int], output_dir: str, log_level: str):
+    def batch_threaded2(self, image: object, number: int, detections: list[dict], upscaler: list[bool | int], output_dir: str, log_level: str):
         """Manages thread pool for batch detection"""
 
         num_threads = int(os.cpu_count()/2)
@@ -177,7 +177,7 @@ class MangaOCRRecognition:
         # Use ThreadPoolExecutor for concurrent execution
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
             # Submit all images for processing
-            future_to_path = {executor.submit(self.run_mangaocr_on_detections, image, f"crop{number}_{i:02d}.png", detection, resizer, output_dir, log_level): detection for i, detection in enumerate(detections)}
+            future_to_path = {executor.submit(self.run_mangaocr_on_detections, image, f"crop{number}_{i:02d}.png", detection, upscaler, output_dir, log_level): detection for i, detection in enumerate(detections)}
 
             # Monitor progress and wait for all futures to complete
             for future in tqdm(concurrent.futures.as_completed(future_to_path), total=len(detections), desc="OCR"):

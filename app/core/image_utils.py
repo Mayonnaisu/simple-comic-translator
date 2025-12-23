@@ -194,7 +194,7 @@ def slice_image_in_tiles_cv2(image_path, tile_height, tile_width, target_max_dim
 
 def crop_out_box_pil(box, image, resize, output_dir, crop_name, log_level):
     [xmin, ymin, xmax, ymax] = box
-    use_resizer, resize_width = resize
+    use_upscaler, upscale_ratio = resize
 
     # Ensure coordinates are valid for cropping
     xmin, ymin, xmax, ymax = max(0, xmin), max(0, ymin), min(image.size[0], xmax), min(image.size[1], ymax)
@@ -205,12 +205,11 @@ def crop_out_box_pil(box, image, resize, output_dir, crop_name, log_level):
     # --- Resizing while maintaining aspect ratio for OCR input ---
     w, h = cropped_img.size
 
-    # Calculate scale factor and new height/width
-    scale = resize_width / w
-    new_w = resize_width
-    new_h = int(h * scale)
+    # Upscale cropped image if enabled
+    if use_upscaler:
+        new_w = int(w * upscale_ratio)
+        new_h = int(h * upscale_ratio)
 
-    if use_resizer:
         cropped_img = cropped_img.resize((new_w, new_h), Image.Resampling.LANCZOS)
 
     if log_level == "TRACE":
@@ -222,7 +221,7 @@ def crop_out_box_pil(box, image, resize, output_dir, crop_name, log_level):
 
 def crop_out_box_cv2(box, image, resize, output_dir, crop_name, log_level):
     [xmin, ymin, xmax, ymax] = box
-    use_resizer, resize_width = resize
+    use_upscaler, upscale_ratio = resize
 
     # Ensure coordinates are valid for cropping
     xmin, ymin, xmax, ymax = max(0, xmin), max(0, ymin), min(image.shape[1], xmax), min(image.shape[0], ymax)
@@ -233,13 +232,11 @@ def crop_out_box_cv2(box, image, resize, output_dir, crop_name, log_level):
     # --- Resizing while maintaining aspect ratio for OCR input ---
     h, w, c = cropped_img.shape
 
-    # Calculate scale factor and new height/width
-    scale = resize_width / w
-    new_w = resize_width
-    new_h = int(h * scale)
-
-    if use_resizer:
-        cropped_img = cv2.resize(cropped_img, (new_w, new_h), interpolation=(cv2.INTER_AREA if w > resize_width else cv2.INTER_LANCZOS4))
+    # Upscale cropped image if enabled
+    if use_upscaler:
+        new_w = int(w * upscale_ratio)
+        new_h = int(h * upscale_ratio)
+        cropped_img = cv2.resize(cropped_img, (new_w, new_h), interpolation=(cv2.INTER_AREA if w > new_w else cv2.INTER_LANCZOS4))
 
     cropped_img_rgb = cv2.cvtColor(cropped_img, cv2.COLOR_BGR2RGB)
 
