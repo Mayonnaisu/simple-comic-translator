@@ -29,7 +29,7 @@ class TextAreaDetection:
         """
         Initializes detection model.
         """
-        logger.info(f"Initializing detection model...")
+        logger.info(f"Initializing detection model.")
 
         self.model_path = model_path
         self.confidence_threshold = confidence_threshold

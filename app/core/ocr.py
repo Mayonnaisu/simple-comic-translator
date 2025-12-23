@@ -31,7 +31,7 @@ class PaddleOCRRecognition:
         :param language: The language for OCR (e.g., 'japan', 'korean', 'ch', 'en', etc).
         :param device: Device to use for inference.
         """
-        logger.info(f"Initializing PaddleOCR model for language: {language}...")
+        logger.info(f"Initializing PaddleOCR model for language: {language}")
 
         self.confidence_threshold = confidence_threshold
 
