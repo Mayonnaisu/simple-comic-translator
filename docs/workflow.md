@@ -3,24 +3,27 @@
 SCT merges all images in each subfolder into one respectively.
 
 > [!NOTE]
-> This step ensures that the text will be detected and recognized properly in later steps because it eliminates the split text areas from the original images.
+> This step ensures that the text will be detected and recognized properly in later steps because it eliminates the split text areas from the original images, if there is any.
 
-### 2. Detect Text Areas with [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) (depends on step 1)
-SCT detects texts in order to find the areas that need to be avoided during the splitting step.
+### 2. Detect Text Areas with [ogkalu/comic-text-and-bubble-detector](https://huggingface.co/ogkalu/comic-text-and-bubble-detector)
+SCT detects text areas in order to find the areas that need to be cropped out for OCR step and avoided during the safe-splitting step.
 
 > [!NOTE]
-> Before the detection, I had to add image-slicing with overlap function because I found out that some detectors and OCR models I tried can't accurately detect or recognize objects when the image resolution is too large. One of them can't even detect object accurately if the image resolution is not exactly 640x640 px smh. 
+> Before the detection, I had to add **image-tiling-with-overlap+resizing** function because I found that this model can't accurately detect objects when the image resolution is not exactly 640x640 px.
+>
+> Since it will take too long time to process multiple 640x640 tiles, I decided to add option to use the original image width as the tile sizes. This is where the resizing comes into handy. The resizing will get trigerred when the tile sizes aren't equal to 640x640 px. As a result, there will be fewer tiles to process, hence the speed increase.
+
+### 4. Extract Texts with [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
+SCT extracts texts from each cropped-out text area.
+
+> [!NOTE]
+> Unlike the previously used PaddleOCR version, this version doesn't have the built-in slicer anymore. However, it's fine because the quality and resolution of the cropped-out image should already be good enough for it to accurately recognize.
 
 ### 3. Split Image Safely on Non-Text Areas with [Pillow](https://github.com/python-pillow/Pillow) (depends on step 1)
 SCT splits the merged image into the specified height without overlap while avoiding the detected text areas.
 
-### 4. Extract Texts with [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
-SCT extracts texts from each split image.
-
 > [!NOTE]
-> You may be wondering why I chose the older version of PaddleOCR. It is because this version still has a built-in slicing feature that's useful for extracting smaller texts. The feature has annoying limitation tho. It will throw error if [the input image resolution is larger than 32k pixels](https://github.com/opencv/opencv/issues/7544) because it uses OpenCV, which is known for being unable to handle large images gracefully in some cases (as of now).
-> 
-> Besides the accuracy issue mentioned above, this is also why I decided to make the program split the merged image before OCR although PadlleOCR itself has a built-in slicer.
+> Usually, the original images have some areas where the texts are split (talking about long-strip comics). This step prevents the overlaid text from also getting split. It's because it eliminates the situation where the program attempts to overlay the text to the non-existent part of area which only exists on the next image.
 
 ### 5. Translate and Summarize Extracted Texts with [Gemini](https://github.com/googleapis/python-genai)
 SCT sends the extracted texts to Gemini for translation and summarization.
@@ -34,20 +37,16 @@ SCT sends the extracted texts to Gemini for translation and summarization.
 > I'm considering removing the summarization function because I found that it does nothing to improve the translation quality. 🤔
 
 ### 6. Redact Text Areas with [Pillow](https://github.com/python-pillow/Pillow)
-SCT whitens text areas by simply overlaying white rectangle with offset/padding on them.
+SCT whitens text areas by simply overlaying white rectangle with offset on them.
 
 > [!NOTE]
-> Whitening is used because it's simpler and lighter, thus faster compared to inpainting. It also results in better readability as it overlays bigger white boxes to the original text areas, in case the translated texts overflow from their original text areas. The downside is that it doesn't look as pretty and clean as inpainting.
+> Whitening is used because it's simpler and lighter, thus faster compared to inpainting. It also results in better readability in a way as it overlays bigger white boxes to the original text areas, in case the translated texts overflow from their original text areas. The downside is that it doesn't look as pretty and clean as inpainting.
 
 ### 7 Overlay Translated Texts with [Pillow](https://github.com/python-pillow/Pillow)
-SCT overlays translated texts to the padded whitened areas while attempting to auto resize the fonts to fit into the areas.
+SCT overlays translated texts to the offset whitened areas while attempting to auto resize the fonts to fit into the areas.
 
 > [!NOTE]
-> The padding/offset is necessary to make the area bigger so that the translated text, which is usually longer than the original text, can fit more nicely in the area.
->
-> Btw, during the earlier stage of development, there was a time when I made the program to only (1) merge images, then (2) slice the merged image with overlap before (3) feeding it to OCR, & (4) translate OCR results before (5) overlaying the text to the original images. It had fewer steps, and thus was faster than the current pipeline.
->
-> There was one critical issue tho. Usually, the original images have some areas where the texts are split (talking about long-strip comic). This caused the overlaid text to also get split because the program tried to overlay the text to the non-existent part of area which only exists on the next image.
+> The offset is necessary to make the area bigger so that the translated text, which is usually longer than the original text, can fit more nicely in the area.
 
 ### 8. Save to Corresponding Output Folders with [os.walk](https://docs.python.org/3.11/library/os.html#os.walk) + [pathlib.Path](https://docs.python.org/3.11/library/pathlib.html#pathlib.Path)
 Save the translated images to the corresponding output subfolders, maintaining the directory structure from the original directory.
