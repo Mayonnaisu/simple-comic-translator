@@ -71,6 +71,7 @@
 ```jsonc
 "box": {
   "offset": 10,                 // offset to enlarge text areas
+  "padding": 5,                 // padding to prevent text overflow
   "fill_color": "white",        // main color of text areas
   "outline_color": null         // border color of text areas
 },
