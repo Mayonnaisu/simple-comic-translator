@@ -5,6 +5,9 @@
 "enable": true                  // enable or disable merging, including IMAGE_SPLIT
 ```
 
+> [!TIP]
+> You can disable image merging if your comics don't have splitted text areas (paged format). Well, even if it is left enabled when there's no splitted text areas, it can still work fine. It's just that the output images will be splitted differently from the original images.
+
 ### DETECTION
 ```jsonc
 "confidence_threshold": 0.3,     // minimum detection score: 0-1
