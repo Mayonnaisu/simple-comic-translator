@@ -38,7 +38,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, ge
     
     logger.info(f"\nTranslating texts to ({target_lang.upper()}) with Gemini.")
 
-    model, temperature, top_p = gemini
+    model, temperature, top_p, max_out_tokens = gemini
 
     # Load environment variables from .env file
     load_dotenv()
@@ -63,7 +63,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, ge
     my_config = types.GenerateContentConfig(
         temperature=temperature,
         top_p=top_p,
-        max_output_tokens=8192,
+        max_output_tokens=max_out_tokens,
         response_mime_type="application/json",
         response_schema=response_schema
     )

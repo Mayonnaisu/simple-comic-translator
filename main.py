@@ -77,6 +77,7 @@ if config:
     gemini_model = config['TRANSLATION']['gemini']['model']
     gemini_temp = config['TRANSLATION']['gemini']['temperature']
     gemini_top_p = config['TRANSLATION']['gemini']['top_p']
+    gemini_max_out_tokens = config['TRANSLATION']['gemini']['max_output_tokens']
     # For overlay
     box_offset = config['OVERLAY']['box']['offset']
     box_padding = config['OVERLAY']['box']['padding']
@@ -254,7 +255,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             recognitions.extend(recognition)
 
     # --- Stage 5/3: Translate Extracted Text with Gemini ---
-    translated_text_data = translate_texts_with_gemini(recognitions, target_language, [gemini_model, gemini_temp, gemini_top_p], output_dir, log_level)
+    translated_text_data = translate_texts_with_gemini(recognitions, target_language, [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], output_dir, log_level)
 
     # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
     overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)

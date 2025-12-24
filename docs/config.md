@@ -55,7 +55,8 @@
 "gemini": {
   "model": "gemini-2.5-flash",  // Gemini model ID
   "temperature": 0.5,           // Gemini temperature
-  "top_p": 0.8                  // Gemini top p
+  "top_p": 0.8,                 // Gemini top p
+  "max_output_tokens": 8192     // Gemini max response tokens
 } 
 ```
 
