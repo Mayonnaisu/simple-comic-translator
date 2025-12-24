@@ -37,8 +37,8 @@ N/A
 4. Use dedicated detection model ([ogkalu/comic-text-and-bubble-detector](https://huggingface.co/ogkalu/comic-text-and-bubble-detector))
 5. Add manga support with [manga-ocr](https://github.com/kha-white/manga-ocr)
 6. Upgrade PaddleOCR to support PP-OCRv5 model (slower than the older version & doesn't have the built-in slicer anymore :/)
-7. Replace **horizontal-slicing-with-overlap** with **tiling-with-overlap+resize** function for detection pre-processing
-8. Replace **safe-splitting** with **text-area-cropping** function for OCR pre-processing
+7. Replace **horizontal-slicing-with-overlap** with **tiling-with-overlap+resizing** function for detection pre-processing
+8. Replace **safe-splitting** with **text-area-cropping+upscaling** function for OCR pre-processing
 
 ### TODO
 1. Improve comments
