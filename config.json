@@ -38,6 +38,7 @@
   "OVERLAY": {
     "box": {
       "offset": 10,
+      "padding": 5,
       "fill_color": "white",
       "outline_color": null
     },

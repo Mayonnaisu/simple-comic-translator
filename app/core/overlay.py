@@ -15,7 +15,7 @@ def is_string_in_file(file_path: int, search_string: str):
     return False
 
 
-def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_size: int, max_size: int, font_path: int):
+def get_fitted_font_and_text(text: str, max_width: int, max_height: int, padding: int, min_size: int, max_size: int, font_path: int):
     """
     Finds the largest font size and the corresponding wrapped text that fits within the specified max_width and max_height.
     """
@@ -55,7 +55,7 @@ def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_siz
         fitted_size = size
         best_wrapped_text = wrapped_text
 
-        if width < max_width and height < max_height:
+        if width < (max_width-padding) and height < (max_height-padding):
             break
 
     # Return the last size and text that fit
@@ -66,7 +66,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
     """Overlays the detected text boxes and translated texts onto the corresponding safely-splitted images and saves them."""
     if not os.path.exists(output_path): os.makedirs(output_path)
 
-    box_offset, box_fill_color, box_outline_color = box
+    box_offset, box_padding, box_fill_color, box_outline_color = box
     font_min, font_max, font_color, font_path = font
 
     inclusion = ("i", "you", "we", "they", "he", "she", "it", "ah")
@@ -136,7 +136,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             # Use textwrap on the *already structured* text from Gemini
             # This acts as a secondary safety measure to prevent spilling
             optimal_size, wrapped_text = get_fitted_font_and_text(
-                translated_text, box_width, box_height, font_min, font_max, font_path
+                translated_text, box_width, box_height, box_padding, font_min, font_max, font_path
             )
 
             final_font = ImageFont.truetype(font_path, optimal_size)
