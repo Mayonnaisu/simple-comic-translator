@@ -62,7 +62,7 @@ try {
     try {
         Write-Host "`nActivating Virtual Environment..." -ForegroundColor Yellow
 
-        venv12/Scripts/activate
+        venv/Scripts/activate
 
         Write-Host "`nVirtual Environment Activated." -ForegroundColor Green
     } catch {
