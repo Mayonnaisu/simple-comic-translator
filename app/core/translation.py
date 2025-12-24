@@ -63,6 +63,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, ge
     my_config = types.GenerateContentConfig(
         temperature=temperature,
         top_p=top_p,
+        max_output_tokens=8192,
         response_mime_type="application/json",
         response_schema=response_schema
     )
