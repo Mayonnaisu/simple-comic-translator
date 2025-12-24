@@ -2,10 +2,12 @@ import os
 import textwrap
 import numpy as np
 from loguru import logger
+from colorama import Fore, Style, init
 from PIL import Image, ImageDraw, ImageFont
 
 from app.core.detection import get_bbox_coords
 
+init(autoreset=True)
 
 def is_string_in_file(file_path: int, search_string: str):
     with open(file_path, 'r', encoding="utf-8") as file:
@@ -208,4 +210,4 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             logger.success(f"Saved annotated result to {output_path}")
             annotation_image.close()
 
-    logger.info(f"Translated images saved to {output_path}.")
+    logger.success(Fore.GREEN + f"Translated images saved to {output_path}.")
