@@ -253,7 +253,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             recognitions.extend(recognition)
 
     # --- Stage 5/3: Translate Extracted Text with Gemini ---
-    translated_text_data = translate_texts_with_gemini(recognitions, target_language, [gemini_model, gemini_temp, gemini_top_p], output_dir)
+    translated_text_data = translate_texts_with_gemini(recognitions, target_language, [gemini_model, gemini_temp, gemini_top_p], output_dir, log_level)
 
     # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
     overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_fill_color, box_outline_color], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)

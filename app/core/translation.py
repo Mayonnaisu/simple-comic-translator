@@ -29,7 +29,7 @@ def subtract_one(match: str):
     return new_string
 
 
-def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, gemini: list[str|float], output_dir: str):
+def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, gemini: list[str|float], output_dir: str, log_level: str):
     '''
     Translate all texts from one chapter and summarize them with Gemini
     '''
@@ -125,6 +125,9 @@ Input List:
         )
 
         data_dict = json.loads(response.text.strip())
+
+        if log_level == "TRACE":
+            logger.debug(data_dict)
 
         translation_text = f"{data_dict['Translation']}"
         translated_map = {}
