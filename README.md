@@ -228,6 +228,7 @@ pip install -r requirements-lock.txt
 1. Some sound effects (onomatopoeia) and watermark texts are also detected and recognized, making the result riddled with unnecessary texts and white rectangles.
 2. No automatic retry in case of error.
 3. It can't automatically detect the input language and only supports one language in each process. As a result, you need to manually specify the language in **config.json**.
+4. Gemini itself is prone to throwing [model-overloaded error](https://github.com/google-gemini/gemini-cli/issues/4360) or returning `None` response. What those happens, just retry it.
 
 ## EXTRA INFO
 ### How to Get Gemini API Key
