@@ -113,6 +113,9 @@ if source_language in lang_code_jp:
 else:
     extractor = PaddleOCRRecognition(ocr_version='PP-OCRv5', language=source_language, confidence_threshold=ocr_conf_threshold, use_gpu=args.gpu)
 
+# Define previous directory
+previous_dir = None
+
 # Iterate through all directories using os.walk
 for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
@@ -137,6 +140,8 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
                 break
 
     if already_exist:
+        # Update previous directory
+        previous_dir = dirpath
         continue
 
     # Filter for image files and sort files to ensure consistent merging order
@@ -255,10 +260,13 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             recognitions.extend(recognition)
 
     # --- Stage 5/3: Translate Extracted Text with Gemini ---
-    translated_text_data = translate_texts_with_gemini(recognitions, target_language, [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], output_dir, log_level)
+    translated_text_data = translate_texts_with_gemini(recognitions, target_language, [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], previous_dir, output_dir, log_level)
 
     # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
     overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
+
+    # Update previous directory
+    previous_dir = dirpath
 
 logger.info(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_path}'.")
 

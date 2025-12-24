@@ -8,28 +8,11 @@ from google.genai import types
 from dotenv import load_dotenv
 from colorama import Fore, Style, init
 
+
 init(autoreset=True)
 
-def subtract_one(match: str):
-    '''
-    Subtract 1 from number in string
-    '''
-    # Get the found number (group 0 is the entire match)
-    num_str = match.group(0)
-    # Get the length (an integer)
-    width = len(num_str)
 
-    # Convert to integer, subtract one
-    num = int(num_str)
-    subtracted_number = num - 1
-    # Convert back to string and use zfill to pad with zeros to the original width
-    # zfill handles the sign if the number becomes negative
-    new_string = str(subtracted_number).zfill(width)
-
-    return new_string
-
-
-def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, gemini: list[str|float], output_dir: str, log_level: str):
+def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, gemini: list[str|float], previous_dir: str, output_dir: str, log_level: str):
     '''
     Translate all texts from one chapter and summarize them with Gemini
     '''
@@ -68,13 +51,8 @@ def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, ge
         response_schema=response_schema
     )
 
-    full_path = Path(output_dir)
-    parent_path = full_path.parent
-    last_folder = full_path.name
-
-    previous_folder = re.sub(r'\d+', subtract_one, last_folder)
-
-    previous_summary_path = f"{parent_path}/{previous_folder}/summary.txt"
+    # Load previous summary file
+    previous_summary_path = f"{previous_dir}/summary.txt"
     if os.path.exists(previous_summary_path):
         prev_summary_list = []
         with open(previous_summary_path, "r", encoding="utf-8") as summary:
@@ -153,9 +131,7 @@ Input List:
                 logger.warning(
                     Fore.YELLOW + f"Warning: Missing translation for index {i}, using original text."
                 )
-                text_info_list[i]["translated_text"] = text_info_list[i][
-                    "original_text"
-                ]
+                text_info_list[i]["translated_text"] = text_info_list[i]["original_text"]
 
             original_text = info["original_text"]
             translated_text = info["translated_text"]
