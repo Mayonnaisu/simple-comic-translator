@@ -2,62 +2,78 @@
 
 ### IMAGE_MERGE
 ```jsonc
-"enable": true                  // enable/disable including DETECTION & IMAGE_SPLIT
+"enable": true                  // enable or disable merging, including IMAGE_SPLIT
 ```
 
 ### DETECTION
 ```jsonc
-"source_language": "korean",    // input language for PaddleOCR: "japan", "korean", "ch", "en", etc.
-"slice_height": 2000,           // height of each slice
-"det_overlap": 0.2,             // overlap of each slice
-"merge_y_threshold": 30,        // maximum vertical distance to merge detections
-"merge_x_threshold": 100        // maximum horizontal distance to merge detections
-```
-
-> [!TIP]
-> For more language codes, see https://github.com/Mushroomcat9998/PaddleOCR/blob/main/doc/doc_en/multi_languages_en.md#5-support-languages-and-abbreviations. Idk which ones aren't supported by PP-OCRv4 tho.
-
-### IMAGE_SPLIT
-```jsonc
-"max_height": 1200              // maximum height of each split
-```
-
-> [!NOTE]
-> Split & slice are basically the same thing.
-
-> [!TIP]
-> If some texts are missed by PaddleOCR because they're too small in general, lower the `max_height` value.
-
-### OCR
-```jsonc
-"merge_y_threshold": 30,        // maximum vertical distance to merge ocr results
-"merge_x_threshold": 100,       // maximum horizontal distance to merge ocr results
-"slicer": {
-    "enable": false,            // use PaddleOCR built-in slicer
-    "horizontal_stride": "original",  // horizontal step size of the sliding window: "original" (width) or number
-    "vertical_stride": 640      // vertical step size of the sliding window
+"confidence_threshold": 0.3,     // minimum detection score: 0-1
+"merge_threshold": 0.1,          // minimum IoU (overlap) to merge boxes: 0-1
+"tile": {
+  "width": "original",           // width of each tile: "original" (image width)/number
+  "height": "tile_width",        // height of each tile: "tile_width"/number
+  "overlap": 0.2                 // overlap of each tile
 }
 ```
 
 > [!TIP]
-> - PaddleOCR built-in slicer is useful when `IMAGE_MERGE` is disabled, & PaddleOCR struggles to recognize texts. For more info, see https://github.com/PaddlePaddle/PaddleOCR/blob/main/docs/version2.x/ppocr/blog/slice.en.md.
+> - Increase `merge_threshold` value if there are nearby boxes that shouldn't be merged, and vice versa.
+> - It's recommended to set `tile_width` to `640` if you want to use number instead of `"original"` because the detection model works accurately when the image sizes are 640x640 px.
 >
-> - Reduce `merge_threshold` value if there are nearby texts that shouldn't be merged, and vice versa.
+>   However, if you choose to use `"original"`, it will be faster when the original image width is bigger than 640. It's because in that case there will be fewer tiles to process. The thing is there's automatic resizing under the hood in case the image sizes aren't equal to 640x640 px to make sure it fits into the model.
+>
+>   Still, it may be less accurate than directly processing the real, unresized 640x640 tiles. 
 
-### TRANSLATION
+### OCR
 ```jsonc
-"target_language": "en",            // translation language
-"gemini_model": "gemini-2.5-flash"  // Gemini model ID
+"source_language": "korean",    // input language: "jp", "korean", "ch", "en", etc
+"confidence_threshold": 0.5,    // minimum recognition score: 0-1
+"upscale": {
+  "enable": false,              // enable or disable upscaling
+  "ratio": 2                    // upscaling ratio: number
+}
 ```
 
 > [!TIP]
-> Visit https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions#gemini-auto-updated to see Gemini model IDs.
+> - For Japanese language, you can use `"japanese"`, `"japan"`, `"jpn"`, `"jp"`, or `"ja"`. And it will automatically use Manga OCR instead PaddleOCR engine.
+>
+> - For other language codes, see https://github.com/Mushroomcat9998/PaddleOCR/blob/main/doc/doc_en/multi_languages_en.md#5-support-languages-and-abbreviations. Idk which ones are and aren't supported by PP-OCRv5 model tho.
+>
+> - As for upscaling, it can actually be used for downscaling as well (not recommended since less accurate). Use number >= 1 for upscaling and number < 1 for downscaling. The number can be integer/float.
+
+### IMAGE_SPLIT
+```jsonc
+"max_height": 2000              // maximum height of each safe split
+```
+
+### TRANSLATION
+```jsonc
+"target_language": "en",        // translation language
+"gemini": {
+  "model": "gemini-2.5-flash",  // Gemini model ID
+  "temperature": 0.5,           // Gemini temperature
+  "top_p": 0.8                  // Gemini top p
+} 
+```
+
+> [!TIP]
+> - You can use ISO language codes for brevity when setting `"target_language"`. For more ISO language codes, see https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes#Table.
+>
+> - To see Gemini model IDs, visit https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions#gemini-auto-updated 
+>
+> - To learn more about Gemini parameters, see https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/prompts/adjust-parameter-values.
 
 ### OVERLAY
 ```jsonc
+"box": {
+  "offset": 10,                 // offset to enlarge text areas
+  "fill_color": "white",        // main color of text areas
+  "outline_color": null         // border color of text areas
+},
 "font": {
-  "min_size": 11,                   // minimum size of font
-  "max_size": 40,                   // maximum size of font
-  "path": "fonts/JetBrainsMonoNerdFont-Bold.ttf" // path to font file
+  "min_size": 11,               // minimum size of font
+  "max_size": 40,               // maximum size of font
+  "color": "black",             // font color
+  "path": "fonts/NotoSerifKR-Bold.ttf" // path to font file
 }
 ```
