@@ -24,13 +24,14 @@ N/A
 13. Add progress bar and only show certain outputs in debug mode
 14. Add testing with GitHub Actions
 15. Add demo
+
 ## v0.4.1
 10/12/2025
-
-18. Upgrade `paddlepaddle` for patching vulnerabilities in transitive dependencies ([cd167d3](https://github.com/Mayonnaisu/simple-comic-translator/commit/cd167d36acef6a041aaeeaf0e3a6a7cb8ab36aca))
-19. Add Ccahe installation
+17. Upgrade `paddlepaddle` for patching vulnerabilities in transitive dependencies ([cd167d3](https://github.com/Mayonnaisu/simple-comic-translator/commit/cd167d36acef6a041aaeeaf0e3a6a7cb8ab36aca))
+18. Add Ccahe installation
 
 ## v0.5.0
+23/12/2025
 1. Upgrade Python version to 3.12
 2. Add `torch`, `onnxruntime`, `huggingface-hub`, & `manga-ocr` to dependencies
 3. Upgrade `numpy` version
