@@ -7,7 +7,7 @@
     "confidence_threshold": 0.3,
     "merge_threshold": 0.1,
     "tile": {
-      "width": 640,
+      "width": "original",
       "height": "tile_width",
       "overlap": 0.2
     }
