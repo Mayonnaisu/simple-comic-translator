@@ -23,7 +23,7 @@
 > [!TIP]
 > - Increase `merge_threshold` value if there are overlapping boxes that shouldn't be merged, and vice versa.
 >
-> - Increase `merge_times` value if somehow calling boxes-merging function 2x still leave some overlapping boxes unmerged. I had to add this option becuase 1x isn't enough to merge all overlapping boxes in my testings.
+> - Increase `merge_times` value if somehow calling boxes-merging function 2x still leaves some overlapping boxes unmerged. I had to add this option because 1x isn't enough to merge all overlapping boxes in my testings.
 >
 > - It's recommended to set `tile_width` to `640` if you want to use number instead of `"original"` because the detection model works accurately when the image sizes are 640x640 px.
 >
