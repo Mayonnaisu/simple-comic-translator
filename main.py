@@ -284,7 +284,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             break
         except Exception as e:
             attempts += 1
-            logger.error(Fore.RED + f"{e}")
+            logger.error(f"\n{Fore.RED}{e}")
             if attempts < max_retries:
                 logger.info(f"({attempts}/{max_retries}) Retrying in {retry_delay} seconds...")
                 time.sleep(retry_delay)
