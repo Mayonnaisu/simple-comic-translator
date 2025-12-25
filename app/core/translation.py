@@ -65,7 +65,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, ge
     for i, info in enumerate(text_info_list):
         # Replace actual newlines with a space for a cleaner prompt list entry
         clean_text = info["original_text"].replace("\n", " ")
-        enumerated_input += f"<|{i+1}|> {clean_text}\n"
+        enumerated_input += f"<|{i+1}|> {clean_text} "
 
     # The prompt itself is a standard multiline string, no f-string syntax error here.
     prompt = f"""
@@ -76,7 +76,6 @@ Task 1 (Translation):
 * Translate the following enumerated list of text items to the ISO language code '{target_lang}'.
 * Each item is prefixed by its number (e.g., '<|1|> Text').
 * You must maintain the enumeration in your response (e.g., '<|1|> Translated Text').
-* You must maintain original line breaks and spacing within each item.
 * Do not add any introductory or concluding text, just the list.
 * Use the Summary of Previous Translation above as additional context if available.
 
@@ -112,7 +111,7 @@ Input List:
         # (.*?)        -> Non-greedily captures the translation
         # (?=...)      -> Lookahead to stop at the next tag or end of string
         pattern = re.compile(
-            r"<\|(\d+)\|>\s*(.*?)(?=\n<\|\d+\|>|\n*$)", re.DOTALL | re.MULTILINE
+            r"<\|(\d+)\|>\s*(.*?)(?=\s<\|\d+\|>|$)", re.DOTALL
         )
 
         for match in pattern.finditer(translation_text):
@@ -146,7 +145,7 @@ Input List:
             summary.write(summary_text)
 
     except Exception as e:
-        logger.debug("\n" + data_dict)
+        logger.debug(f"\n{data_dict}")
         raise Exception(Fore.RED + f"An error occurred during translation: {e}")
 
     return text_info_list
