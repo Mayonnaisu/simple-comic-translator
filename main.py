@@ -49,7 +49,7 @@ log_level = "INFO" if args.debug == False else "TRACE"
 formatted_datetime = datetime.now().strftime("%Y-%m-%d_%H.%M")
 
 logger.add(sys.stderr, format="{message}", level=log_level)
-logger.add(f"temp/logs/{formatted_datetime}.log", format="{message}", level=log_level)
+logger.add(f"temp/logs/{formatted_datetime}.log", format="{message}", level="TRACE")
 
 # Show app version
 logger.info(f"SCT version: {__version__}\n")
