@@ -107,12 +107,12 @@ Input List:
         translated_map = {}
 
         # Define the regex pattern outside of any f-string
-        # ^<\|(\d+)\|>  -> Matches the literal <|number|> tag at the start of line
-        # \s*           -> Consumes any whitespace after tag
-        # (.*?)         -> Non-greedily captures the translation
-        # (?=...)       -> Lookahead to stop at the next tag or end of string
+        # <\|(\d+)\|>  -> Matches the literal <|number|> tag
+        # \s*          -> Consumes any whitespace after tag
+        # (.*?)        -> Non-greedily captures the translation
+        # (?=...)      -> Lookahead to stop at the next tag or end of string
         pattern = re.compile(
-            r"^<\|(\d+)\|>\s*(.*?)(?=\n<\|\d+\|>|\n*$)", re.DOTALL | re.MULTILINE
+            r"<\|(\d+)\|>\s*(.*?)(?=\n<\|\d+\|>|\n*$)", re.DOTALL | re.MULTILINE
         )
 
         for match in pattern.finditer(translation_text):
