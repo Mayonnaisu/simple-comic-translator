@@ -65,7 +65,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, ge
     for i, info in enumerate(text_info_list):
         # Replace actual newlines with a space for a cleaner prompt list entry
         clean_text = info["original_text"].replace("\n", " ")
-        enumerated_input += f"{i+1}. {clean_text}\n"
+        enumerated_input += f"<|{i+1}|> {clean_text}\n"
 
     # The prompt itself is a standard multiline string, no f-string syntax error here.
     prompt = f"""
@@ -74,8 +74,8 @@ Summary of Previous Translation:
 
 Task 1 (Translation):
 * Translate the following enumerated list of text items to the ISO language code '{target_lang}'.
-* Each item is prefixed by its number (e.g., '1. Text').
-* You must maintain the enumeration in your response (e.g., '1. Translated Text').
+* Each item is prefixed by its number (e.g., '<|1|> Text').
+* You must maintain the enumeration in your response (e.g., '<|1|> Translated Text').
 * You must maintain original line breaks and spacing within each item.
 * Do not add any introductory or concluding text, just the list.
 * Use the Summary of Previous Translation above as additional context if available.
@@ -103,16 +103,16 @@ Input List:
 
         data_dict = json.loads(response.text.strip())
 
-        if log_level == "TRACE":
-            logger.debug(data_dict)
-
         translation_text = f"{data_dict['Translation']}"
         translated_map = {}
 
         # Define the regex pattern outside of any f-string
-        # Pattern looks for start of line, digits, dot, space, capture the rest until newline
+        # ^<\|(\d+)\|>  -> Matches the literal <|number|> tag at the start of line
+        # \s*           -> Consumes any whitespace after tag
+        # (.*?)         -> Non-greedily captures the translation
+        # (?=...)       -> Lookahead to stop at the next tag or end of string
         pattern = re.compile(
-            r"^(\d+)\.\s*(.*?)(?=\n\d+\.|\n*$)", re.DOTALL | re.MULTILINE
+            r"^<\|(\d+)\|>\s*(.*?)(?=\n<\|\d+\|>|\n*$)", re.DOTALL | re.MULTILINE
         )
 
         for match in pattern.finditer(translation_text):
@@ -126,10 +126,10 @@ Input List:
             if i in translated_map:
                 text_info_list[i]["translated_text"] = translated_map[i]
             else:
-                logger.warning(
-                    Fore.YELLOW + f"Warning: Missing translation for index {i}, using original text."
+                # Raise error in case there's any missing translation. No point in letting it silently continue and replacing it with original text.
+                raise Exception(
+                    Fore.RED + f"Missing translation for tag <|{i+1}|>"
                 )
-                text_info_list[i]["translated_text"] = text_info_list[i]["original_text"]
 
             original_text = info["original_text"]
             translated_text = info["translated_text"]
@@ -146,6 +146,7 @@ Input List:
             summary.write(summary_text)
 
     except Exception as e:
+        logger.debug(data_dict)
         raise Exception("\033[31m" + f"An error occurred during translation: {e}")
 
     return text_info_list
