@@ -147,6 +147,6 @@ Input List:
 
     except Exception as e:
         logger.debug("\n" + data_dict)
-        raise Exception("\033[31m" + f"An error occurred during translation: {e}")
+        raise Exception(Fore.RED + f"An error occurred during translation: {e}")
 
     return text_info_list
