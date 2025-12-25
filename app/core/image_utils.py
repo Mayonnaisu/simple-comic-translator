@@ -249,6 +249,8 @@ def split_image_safely(image: list[object | int], detections: list[dict], max_he
     """
     Split image on non-text areas.
     """
+    logger.info("\nSplitting image on non-text areas.")
+
     img, width, height = image
     split_points = [0]
     current_pos = 0
@@ -256,7 +258,6 @@ def split_image_safely(image: list[object | int], detections: list[dict], max_he
 
     boxes8 = [boxes["box"] for boxes in detections]
 
-    logger.info("Splitting image on non-text areas.")
     while current_pos < height:
         # Determine the maximum possible safe height for the current chunk
         max_safe_y = min(current_pos + max_height, height)
