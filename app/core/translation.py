@@ -146,7 +146,7 @@ Input List:
             summary.write(summary_text)
 
     except Exception as e:
-        logger.debug(data_dict)
+        logger.debug("\n" + data_dict)
         raise Exception("\033[31m" + f"An error occurred during translation: {e}")
 
     return text_info_list
