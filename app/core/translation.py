@@ -111,7 +111,7 @@ Input List:
         # (.*?)        -> Non-greedily captures the translation
         # (?=...)      -> Lookahead to stop at the next tag or end of string
         pattern = re.compile(
-            r"<\|(\d+)\|>\s*(.*?)(?=\s<\|\d+\|>|$)", re.DOTALL
+            r"<\|(\d+)\|>\s*(.*?)(?=<\|\d+\|>|$)", re.DOTALL
         )
 
         for match in pattern.finditer(translation_text):
