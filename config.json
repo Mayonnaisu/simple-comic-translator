@@ -6,6 +6,7 @@
   "DETECTION": {
     "confidence_threshold": 0.3,
     "merge_threshold": 0.1,
+    "merge_times": 2,
     "tile": {
       "width": "original",
       "height": "tile_width",

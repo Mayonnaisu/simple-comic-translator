@@ -11,7 +11,8 @@
 ### DETECTION
 ```jsonc
 "confidence_threshold": 0.3,     // minimum detection score: 0-1
-"merge_threshold": 0.1,          // minimum IoU (overlap) to merge boxes: 0-1
+"merge_threshold": 0.1,          // minimum IoU (overlap) to merge overlapping boxes: 0-1
+"merge_times": 2,                // number of times to merge overlapping boxes
 "tile": {
   "width": "original",           // width of each tile: "original" (image width)/number
   "height": "tile_width",        // height of each tile: "tile_width"/number
@@ -20,7 +21,10 @@
 ```
 
 > [!TIP]
-> - Increase `merge_threshold` value if there are nearby boxes that shouldn't be merged, and vice versa.
+> - Increase `merge_threshold` value if there are overlapping boxes that shouldn't be merged, and vice versa.
+>
+> - Increase `merge_times` value if somehow calling boxes-merging function 2x still leave some overlapping boxes unmerged. I had to add this option becuase 1x isn't enough to merge all overlapping boxes in my testings.
+>
 > - It's recommended to set `tile_width` to `640` if you want to use number instead of `"original"` because the detection model works accurately when the image sizes are 640x640 px.
 >
 >   However, if you choose to use `"original"`, it will be faster when the original image width is bigger than 640. It's because in that case there will be fewer tiles to process. The thing is there's automatic resizing under the hood in case the image sizes aren't equal to 640x640 px to make sure it fits into the model.
