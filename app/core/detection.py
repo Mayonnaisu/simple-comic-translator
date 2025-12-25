@@ -254,6 +254,4 @@ def merge_overlapping_boxes(results: list[dict], det_merge_threshold: float) -> 
         if not merged:
             merged_blocks.append(current)
 
-    logger.success(f"Found {len(merged_blocks)} detections.")
-
     return merged_blocks

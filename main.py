@@ -202,6 +202,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
         for x in range(det_merge_times):
             detections = merge_overlapping_boxes(detections, det_merge_threshold)
             merged_detections = detections
+        logger.success(f"Found {len(merged_detections)} detections.")
 
         # --- Stage 3: Extract Texts with Manga OCR/PaddleOCR
         if source_language in lang_code_jp:
@@ -253,6 +254,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             for x in range(det_merge_times):
                 detections = merge_overlapping_boxes(detections, det_merge_threshold)
                 merged_detections = detections
+            logger.success(f"Found {len(merged_detections)} detections.")
 
             # --- Stage 2: Extract Texts with Manga OCR/PaddleOCR
             if source_language in lang_code_jp:
