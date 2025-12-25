@@ -229,7 +229,7 @@ def deduplicate_results_2d(results: list[dict], iou_threshold: float) -> list[di
 
     return unique_results
 
-def merge_nearby_boxes(results: list[dict], det_merge_threshold: float) -> list[dict]:
+def merge_overlapping_boxes(results: list[dict], det_merge_threshold: float) -> list[dict]:
     if not results: return []
 
     merged_blocks = []

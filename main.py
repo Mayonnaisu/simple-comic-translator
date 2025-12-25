@@ -16,7 +16,7 @@ from _version import __version__
 from app.core.config import load_config
 from app.core.model import download_repo_snapshot
 from app.core.image_utils import merge_images_vertically, slice_image_in_tiles_pil, split_image_safely
-from app.core.detection import TextAreaDetection, merge_nearby_boxes
+from app.core.detection import TextAreaDetection, merge_overlapping_boxes
 from app.core.ocr import PaddleOCRRecognition, MangaOCRRecognition
 from app.core.translation import translate_texts_with_gemini
 from app.core.overlay import overlay_translated_texts
@@ -200,7 +200,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
         # Merge overlapping boxes by the specified number of times because 1x isn't enough to merge all of them
         merged_detections = None
         for x in range(det_merge_times):
-            detections = merge_nearby_boxes(detections, det_merge_threshold)
+            detections = merge_overlapping_boxes(detections, det_merge_threshold)
             merged_detections = detections
 
         # --- Stage 3: Extract Texts with Manga OCR/PaddleOCR
@@ -251,7 +251,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             # Merge overlapping boxes by the specified number of times because 1x isn't enough to merge all of them
             merged_detections = None
             for x in range(det_merge_times):
-                detections = merge_nearby_boxes(detections, det_merge_threshold)
+                detections = merge_overlapping_boxes(detections, det_merge_threshold)
                 merged_detections = detections
 
             # --- Stage 2: Extract Texts with Manga OCR/PaddleOCR
