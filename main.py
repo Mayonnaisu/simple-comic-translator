@@ -273,7 +273,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             recognitions.extend(recognition)
 
     # --- Stage 5/3: Translate Extracted Text with Gemini ---
-    # Use automatic retry in case any errors with translation
+    # Use automatic retry in case of any translation errors
     max_retries = max_retries
     retry_delay = retry_delay
     attempts = 0
