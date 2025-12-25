@@ -24,6 +24,8 @@ N/A
 13. Add progress bar and only show certain outputs in debug mode
 14. Add testing with GitHub Actions
 15. Add demo
+16. Improve Gemini input format
+17. Add automatic retry for translation
 
 ## v0.4.1
 10/12/2025

@@ -29,6 +29,8 @@
 
   "TRANSLATION": {
     "target_language": "en",
+    "max_retries": 3,
+    "retry_delay": 30,
     "gemini": {
       "model": "gemini-2.5-flash",
       "temperature": 0.5,

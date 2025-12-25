@@ -56,6 +56,8 @@
 ### TRANSLATION
 ```jsonc
 "target_language": "en",        // translation language
+"max_retries": 3,               // maximum retry attempts
+"retry_delay": 30,              // retry delay in seconds
 "gemini": {
   "model": "gemini-2.5-flash",  // Gemini model ID
   "temperature": 0.5,           // Gemini temperature
@@ -66,6 +68,8 @@
 
 > [!TIP]
 > - You can use ISO language codes for brevity when setting `"target_language"`. For more ISO language codes, see https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes#Table.
+>
+> - When changing retry-related configs, you need to take into account the RPM (request per minute) limit for the selected Gemini model. 
 >
 > - To see Gemini model IDs, visit https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions#gemini-auto-updated 
 >
