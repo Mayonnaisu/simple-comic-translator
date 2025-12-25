@@ -76,7 +76,7 @@ if config:
     # For translation
     target_language = config['TRANSLATION']['target_language']
     max_retries = config['TRANSLATION']['max_retries']
-    retry_delay = config['TRANSLATION']['delay']
+    retry_delay = config['TRANSLATION']['retry_delay']
     gemini_model = config['TRANSLATION']['gemini']['model']
     gemini_temp = config['TRANSLATION']['gemini']['temperature']
     gemini_top_p = config['TRANSLATION']['gemini']['top_p']
