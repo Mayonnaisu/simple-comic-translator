@@ -10,7 +10,7 @@
     "tile": {
       "width": "original",
       "height": "tile_width",
-      "overlap": 0.2
+      "overlap": 0.5
     }
   },
 
@@ -36,15 +36,15 @@
       "temperature": 0.5,
       "top_p": 0.8,
       "max_output_tokens": 999999999
-    } 
+    }
   },
 
   "OVERLAY": {
     "box": {
       "offset": 10,
-      "padding": 5,
+      "padding": 10,
       "fill_color": "white",
-      "outline_color": null
+      "outline_color": "red"
     },
     "font": {
       "min_size": 11,
