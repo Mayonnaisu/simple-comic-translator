@@ -78,6 +78,8 @@ Task 1 (Translation):
 * Translate the following enumerated list of text items to the ISO language code '{target_lang}'.
 * Each item is prefixed by its number (e.g., '<|1|> Text').
 * You must maintain the enumeration in your response (e.g., '<|1|> Translated Text').
+* Translate sound effects/onomatopoeia as (redacted)
+* Translate website promotion as (redacted)
 * Do not add any introductory or concluding text, just the list.
 * Use the Summary of Previous Translation above as additional context if available.
 
