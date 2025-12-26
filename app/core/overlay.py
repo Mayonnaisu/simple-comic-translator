@@ -17,7 +17,7 @@ def is_string_in_file(file_path: int, search_string: str):
     return False
 
 
-def get_fitted_font_and_text(text: str, max_width: int, max_height: int, padding: int, min_size: int, max_size: int, font_path: int):
+def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_size: int, max_size: int, font_path: int):
     """
     Finds the largest font size and the corresponding wrapped text that fits within the specified max_width and max_height.
     """
@@ -57,7 +57,7 @@ def get_fitted_font_and_text(text: str, max_width: int, max_height: int, padding
         fitted_size = size
         best_wrapped_text = wrapped_text
 
-        if width < (max_width-padding) and height < (max_height-padding):
+        if width < max_width and height < max_height:
             break
 
     # Return the last size and text that fit
@@ -111,15 +111,19 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
         for item in results_for_this_slice:
             original_points = item["box"]
             original_text = item["original_text"]
-            translated_text = item["translated_text"]
+            # Filter out sound effects and watermarks
+            translated_text = item["translated_text"].replace("(redacted)", "")
+
+            if translated_text == "":
+                continue
 
             # Filter out sound effects in original_text
-            if is_string_in_file(filter_path, original_text):
-                continue
+            # if is_string_in_file(filter_path, original_text):
+            #     continue
 
             # Filter out translated texts whose characters are fewer than 3 and not in inclusion list, potentially removing gibberish
-            if len(translated_text) < 3 and translated_text.lower() not in inclusion:
-                continue
+            # if len(translated_text) < 3 and translated_text.lower() not in inclusion:
+            #     continue
 
             # Adjust points back to be relative to the *current split's* top edge
             relative_points = [[p[0], p[1] - slice_top] for p in original_points]
@@ -138,7 +142,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             # Use textwrap on the *already structured* text from Gemini
             # This acts as a secondary safety measure to prevent spilling
             optimal_size, wrapped_text = get_fitted_font_and_text(
-                translated_text, box_width, box_height, box_padding, font_min, font_max, font_path
+                translated_text, box_width, box_height, font_min, font_max, font_path
             )
 
             final_font = ImageFont.truetype(font_path, optimal_size)
@@ -160,13 +164,13 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
 
             # Draw the target bounding box
             draw.rectangle(
-                (target_box_x1, target_box_y1, target_box_x1 + box_width, target_box_y1 + box_height),
+                (target_box_x1, target_box_y1, target_box_x1 + box_width, target_box_y1 + box_height + box_padding),
                 fill=box_fill_color,
                 outline=box_outline_color
             )
 
             # Draw the text
-            text_position = (text_x, text_y)
+            text_position = (text_x, text_y-box_padding)
             draw.multiline_text(
                 text_position,
                 wrapped_text,
