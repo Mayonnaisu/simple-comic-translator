@@ -90,3 +90,6 @@
   "path": "fonts/NotoSerifKR-Bold.ttf" // path to font file
 }
 ```
+
+> [!TIP]
+> - The color values can be color name (e.g. "red"), RGB tuple (e.g. (255,0,0) or (100%,0%,0%)), or hexadecimal strings: (e.g. "#ff0000").
