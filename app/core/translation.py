@@ -21,6 +21,8 @@ def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, ge
 
     model, temperature, top_p, max_out_tokens = gemini
 
+    data_dict = "data_dict" # define placeholder to prevent error when logging exception
+
     # Load environment variables from .env file
     load_dotenv()
 
@@ -145,7 +147,8 @@ Input List:
             summary.write(summary_text)
 
     except Exception as e:
-        logger.debug(f"\n{data_dict}")
+        if data_dict:
+            logger.debug(f"\n{data_dict}")
         raise Exception(Fore.RED + f"An error occurred during translation: {e}")
 
     return text_info_list
