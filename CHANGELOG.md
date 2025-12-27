@@ -16,8 +16,9 @@
 
 ### TODO
 1. Improve logging
-2. Improve comments
-3. Clean up & refactoring
+2. Improve docstrings
+3. Improve comments
+4. Clean up & refactoring
 
 ## v0.4.1
 10/12/2025
