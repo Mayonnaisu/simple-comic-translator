@@ -12,6 +12,7 @@
 10. Add automatic retry for translation
 11. Improve filtering by using prompt instead of files
 12. Make Gemini prompt editable in **prompt.yaml**
+13. Remove hashes from **requirements-lock.txt** cuz the installations on Linux & macOS kept nagging me to pin additional transitive dependencies when using hashes, which is so bothersome lol
 
 ### TODO
 1. Improve logging
