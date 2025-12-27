@@ -164,7 +164,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
 
             # Draw the target bounding box
             draw.rectangle(
-                (target_box_x1, target_box_y1, target_box_x1 + box_width, target_box_y1 + box_height + box_padding),
+                (target_box_x1, target_box_y1, target_box_x1 + box_width, target_box_y1 + box_height),
                 fill=box_fill_color,
                 outline=box_outline_color,
                 width=box_outline_thickness
