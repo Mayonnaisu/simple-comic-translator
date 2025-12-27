@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="256" height="256" alt="Simple Comic Translator" title="Simple Comic Translator" src="./assets/images/u1f609_u1f4a9.png" />
+  <img width="256" height="256" alt="Simple Comic Translator" title="Simple Comic Translator" src="../assets/images/u1f609_u1f4a9.png" />
     <h1 align="center">Simple Comic Translator 💩</h2>
     <p align="center">Translate comic and manhwa/hua in batch.</p>
 </p>
@@ -40,10 +40,6 @@
 ## NOTICE
 ### <mark>Version 0.5.0 has been released! To upgrade from the previous version, see https://github.com/Mayonnaisu/simple-comic-translator/issues/7.</mark>
 
-### <mark>All PowerShell scripts (.ps1) are only tested on Windows and may not be compatible with PowerShell Core run *directly* on other OSes.</mark>
-
-### For advanced users, use this [guide](docs/README.md).
-
 ## ABOUT
 ### Full Name
 [***THAT TIME I GOT REINCARNATED AS A SCRIPT KIDDIE FOR THE SAKE OF CREATING THIS NOT-SO-SIMPLE COMIC TRANSLATOR WITH THE HELP OF MY UNRELIABLE SYSTEM (GEMINI)***](https://github.com/Mayonnaisu/simple-comic-translator) 😂
@@ -66,7 +62,7 @@ Read:<br>
 -> "Shitty" 💩
 
 <p align="center">
-	<img width=200 alt="Tasteless T-Rex Meme"
+    <img width=200 alt="Tasteless T-Rex Meme"
 title="Tasteless T-Rex Meme" src="assets/images/stand-up-dinosaur.jpg" />
 </p>
 
@@ -82,70 +78,89 @@ This is just a ~~shitty~~ simple app for translating comics in batch with Gemini
 However, if you insist on using my app, then proceed to the next section. You've been warned! Just don't expect much cuz it's intended to be "simpler" than those better alternatives or other programs not mentioned here (go search them on your own).
 
 ## WORKFLOW
-Go to [here](docs/workflow.md).
+Go to [here](workflow.md).
 
 ## DEMO
-Go to [here](docs/demo.md).
+Go to [here](demo.md).
 
 ## DOWNLOAD
-1. Click on the green button on the top.
-2. Select "Download ZIP".
-3. Right click on the downloaded .zip file.
-4. Select "Extract Here" with WinRAR or 7-Zip.
+**Prerequisites:**
+- Git
+
+```powershell
+git clone "https://github.com/Mayonnaisu/simple-comic-translator"
+```
 
 ## INSTALLATION
-> [!IMPORTANT]
-> **The installer only supports Windows 10 & 11.**
-1. Open PowerShell as Administrator.
-2. Change PowerShell execution policy by entering the command below:
+**Prerequisites:**
+- Python 3.12.0
+- Microsoft C++ Build Tools (for Windows)
+- Ccache ([optional](install-ccache.md))
+
 ```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
+# Create virtual environment
+python -m venv venv
+
+# Activate it
+## For Windows
+venv/Scripts/activate
+## For Linux & macOS
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements-lock.txt
 ```
-3. Enter y or yes.
-4. Close the PowerShell.
-5. Right click on **installer.ps1**.
-6. Select "Run with PowerShell".
-7. Select "Yes" if UAC prompt pops up.
-8. Wait until you get ${{\color{lightgreen}{\textsf{INSTALLATION COMPLETED!}}}}\$ message.
-> [!TIP]
-> If you get a warning when opening the installer, uncheck the option, then Open. If you don't do this, the script won't be able to run properly.
-	<details>
-		<summary>View image</summary>
-			<p align="center">
-				<img width=350 alt="Warning for Script"
-	title="Warning for Script" src="https://github.com/user-attachments/assets/db276338-8c2a-4a87-88dd-017df8cef515" />
-			</p>
-	</details>
 
 ## CONFIGURATION
 ### Required
-1. Open **.env** file with text/code editor (Notepad, VS Code, etc).
-2. Paste your [Gemini API key](#how-to-get-gemini-api-key) between the quotation marks.
-3. Save.
+1. Create **.env** file manually.
+```powershell
+# .env
+GEMINI_API_KEY=''
+```
+2. Open **.env** file with text/code editor (Notepad, VS Code, etc).
+3. Paste your [Gemini API key](#how-to-get-gemini-api-key) between the quotation marks.
+4. Save.
 
 ### Optional
 1. Open **config.json** with text/code editor.
 2. Change the settings as you see fit.
 3. Save.
 
-For more info, see [config options](docs/config.md).
+For more info, see [config options](config.md).
 
 ## USAGE
-1. Right click on **launcher.ps1**.
-2. Select "Run with PowerShell".
-3. Select a folder containing your manhwa/hua.
+```powershell
+# Activate venv
+## For Windows
+venv/Scripts/activate
+## For Linux & macOS
+source venv/bin/activate
+
+# Run with required argument only
+python main.py --input "YOUR/COMIC/FOLDER/PATH"
+
+# For more info
+python main.py --help
+```
 
 ## UPDATE
-> [!WARNING]
-> This updater will replace the old files with the newer ones, so make sure to back up the files you want to keep first. For more info, see [here](CHANGELOG.md).
->
-> **Exclusions:**
-> - config.json
-> - prompt.yaml
-> - filters/*
+**Prerequisites:**
+- Git
 
-1. Right click on **updater.ps1** > Run with PowerShell.
-2. Wait until you get ${{\color{lightgreen}{\textsf{UPDATE COMPLETED!}}}}\$ message.
+```powershell
+# Update local repo
+git pull
+
+# Activate venv
+## For Windows
+venv/Scripts/activate
+## For Linux & macOS
+source venv/bin/activate
+
+# Install new dependencies
+pip install -r requirements-lock.txt
+```
 
 ## LIMITATIONS
 1. It can't automatically detect the input language and only supports one language in each process. As a result, you need to manually specify the language in **config.json**.
@@ -173,13 +188,13 @@ For more info, see [config options](docs/config.md).
 > 4. Scroll down > You will see your model quota usage on the top result. If you don't see it, use Filter to search it.
 >
 > For example: 
-	<details>
-		<summary>View image</summary>
-			<p align="center">
-				<img alt="Gemini Free Tier Quota"
-	title="Gemini Free Tier Quota" src="assets/images/gemini-quota.png" />
-			</p>
-	</details>
+    <details>
+        <summary>View image</summary>
+            <p align="center">
+                <img alt="Gemini Free Tier Quota"
+    title="Gemini Free Tier Quota" src="../assets/images/gemini-quota.png" />
+            </p>
+    </details>
 
 ### FAQ
-Go to [here](docs/faq.md).
+Go to [here](faq.md).
