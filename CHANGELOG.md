@@ -1,3 +1,5 @@
+# CHANGELOG
+
 ## v0.5.0
 23/12/2025
 1. Upgrade Python version to 3.12
@@ -13,12 +15,6 @@
 11. Improve filtering by using prompt instead of files
 12. Make Gemini prompt editable in **prompt.yaml**
 13. Remove hashes from **requirements-lock.txt** cuz the installations on Linux & macOS kept nagging me to pin additional transitive dependencies when using hashes, which is so bothersome lol
-
-### TODO
-1. Improve logging
-2. Improve docstrings
-3. Improve comments
-4. Clean up & refactoring
 
 ## v0.4.1
 10/12/2025
