@@ -1,11 +1,27 @@
-## Other older versions
-N/A
+## v0.5.0
+23/12/2025
+1. Upgrade Python version to 3.12
+2. Add `torch`, `onnxruntime`, `huggingface-hub`, `manga-ocr`, & `pyyaml` to dependencies
+3. Upgrade `numpy` version
+4. Use dedicated detection model ([ogkalu/comic-text-and-bubble-detector](https://huggingface.co/ogkalu/comic-text-and-bubble-detector))
+5. Add manga support with [manga-ocr](https://github.com/kha-white/manga-ocr)
+6. Upgrade PaddleOCR to support PP-OCRv5 model (slower than the older version & doesn't have the built-in slicer anymore :/)
+7. Replace **horizontal-slicing-with-overlap** with **tiling-with-overlap+resizing** function for detection pre-processing
+8. Replace **safe-splitting** with **text-area-cropping+upscaling** function for OCR pre-processing
+9. Improve Gemini input format to reduce the rate in which Gemini returning response with messed-up format
+10. Add automatic retry for translation
+11. Improve filtering by using prompt instead of files
+12. Make Gemini prompt editable in **prompt.yaml**
 
-## v0.2.0
-20/11/2025
-1. Download repo snapshot instead of only model file
-2. Remove `onnx` & `onnxruntime` from dependencies
-3. Documentation is still a draft
+### TODO
+1. Improve logging
+2. Improve comments
+3. Clean up & refactoring
+
+## v0.4.1
+10/12/2025
+16. Upgrade `paddlepaddle` for patching vulnerabilities in transitive dependencies ([cd167d3](https://github.com/Mayonnaisu/simple-comic-translator/commit/cd167d36acef6a041aaeeaf0e3a6a7cb8ab36aca))
+17. Add Ccahe installation
 
 ## v0.4.0
 23/11/2025
@@ -24,28 +40,12 @@ N/A
 13. Add progress bar and only show certain outputs in debug mode
 14. Add testing with GitHub Actions
 15. Add demo
-16. Improve Gemini input format
-17. Add automatic retry for translation
 
-## v0.4.1
-10/12/2025
-16. Upgrade `paddlepaddle` for patching vulnerabilities in transitive dependencies ([cd167d3](https://github.com/Mayonnaisu/simple-comic-translator/commit/cd167d36acef6a041aaeeaf0e3a6a7cb8ab36aca))
-17. Add Ccahe installation
+## v0.2.0
+20/11/2025
+1. Download repo snapshot instead of only model file
+2. Remove `onnx` & `onnxruntime` from dependencies
+3. Documentation is still a draft
 
-## v0.5.0
-23/12/2025
-1. Upgrade Python version to 3.12
-2. Add `torch`, `onnxruntime`, `huggingface-hub`, `manga-ocr`, & `pyyaml` to dependencies
-3. Upgrade `numpy` version
-4. Use dedicated detection model ([ogkalu/comic-text-and-bubble-detector](https://huggingface.co/ogkalu/comic-text-and-bubble-detector))
-5. Add manga support with [manga-ocr](https://github.com/kha-white/manga-ocr)
-6. Upgrade PaddleOCR to support PP-OCRv5 model (slower than the older version & doesn't have the built-in slicer anymore :/)
-7. Replace **horizontal-slicing-with-overlap** with **tiling-with-overlap+resizing** function for detection pre-processing
-8. Replace **safe-splitting** with **text-area-cropping+upscaling** function for OCR pre-processing
-9. Improve filtering by using prompt instead of files
-10. Make Gemini prompt editable in **prompt.yaml**
-
-### TODO
-1. Improve logging
-2. Improve comments
-3. Clean up & refactoring
+## Other older versions
+N/A
