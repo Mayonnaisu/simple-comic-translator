@@ -68,7 +68,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
     """Overlays the detected text boxes and translated texts onto the corresponding safely-splitted images and saves them."""
     if not os.path.exists(output_path): os.makedirs(output_path)
 
-    box_offset, box_padding, box_fill_color, box_outline_color = box
+    box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness = box
     font_min, font_max, font_color, font_path = font
 
     inclusion = ("i", "you", "we", "they", "he", "she", "it", "ah")
@@ -166,7 +166,8 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             draw.rectangle(
                 (target_box_x1, target_box_y1, target_box_x1 + box_width, target_box_y1 + box_height + box_padding),
                 fill=box_fill_color,
-                outline=box_outline_color
+                outline=box_outline_color,
+                width=box_outline_thickness
             )
 
             # Draw the text

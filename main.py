@@ -86,6 +86,7 @@ if config:
     box_padding = config['OVERLAY']['box']['padding']
     box_fill_color = config['OVERLAY']['box']['fill_color']
     box_outline_color = config['OVERLAY']['box']['outline_color']
+    box_outline_thickness = config['OVERLAY']['box']['outline_thickness']
     font_min = config['OVERLAY']['font']['min_size']
     font_max = config['OVERLAY']['font']['max_size']
     font_color = config['OVERLAY']['font']['color']
@@ -293,7 +294,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
                 raise Exception(Fore.RED + "Max retries reached!")
 
     # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
-    overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
+    overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
 
     # Update previous directory
     previous_dir = output_dir
