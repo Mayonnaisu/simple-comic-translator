@@ -35,7 +35,7 @@ N/A
 ## v0.5.0
 23/12/2025
 1. Upgrade Python version to 3.12
-2. Add `torch`, `onnxruntime`, `huggingface-hub`, & `manga-ocr` to dependencies
+2. Add `torch`, `onnxruntime`, `huggingface-hub`, `manga-ocr`, & `pyyaml` to dependencies
 3. Upgrade `numpy` version
 4. Use dedicated detection model ([ogkalu/comic-text-and-bubble-detector](https://huggingface.co/ogkalu/comic-text-and-bubble-detector))
 5. Add manga support with [manga-ocr](https://github.com/kha-white/manga-ocr)
