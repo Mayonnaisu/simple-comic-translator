@@ -1,7 +1,7 @@
 <p align="center">
   <img width="256" height="256" alt="Simple Comic Translator" title="Simple Comic Translator" src="../assets/images/u1f4a9_u1f913.png" />
     <h1 align="center">Simple Comic Translator 💩</h2>
-    <p align="center">Translate comic and manhwa/hua in batch.</p>
+    <p align="center">Translate comic and manga/hwa/hua in batch.</p>
 </p>
 
 <p align="center">

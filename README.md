@@ -1,7 +1,7 @@
 <p align="center">
   <img width="256" height="256" alt="Simple Comic Translator" title="Simple Comic Translator" src="./assets/images/u1f609_u1f4a9.png" />
     <h1 align="center">Simple Comic Translator 💩</h2>
-    <p align="center">Translate comic and manhwa/hua in batch.</p>
+    <p align="center">Translate comic and manga/hwa/hua in batch.</p>
 </p>
 
 <p align="center">
@@ -133,7 +133,7 @@ For more info, see [config options](docs/config.md).
 ## USAGE
 1. Right click on **launcher.ps1**.
 2. Select "Run with PowerShell".
-3. Select a folder containing your manhwa/hua.
+3. Select a folder containing your manga/hwa/hua.
 
 ## UPDATE
 > [!WARNING]
