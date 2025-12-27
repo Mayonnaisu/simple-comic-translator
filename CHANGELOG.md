@@ -42,7 +42,8 @@ N/A
 6. Upgrade PaddleOCR to support PP-OCRv5 model (slower than the older version & doesn't have the built-in slicer anymore :/)
 7. Replace **horizontal-slicing-with-overlap** with **tiling-with-overlap+resizing** function for detection pre-processing
 8. Replace **safe-splitting** with **text-area-cropping+upscaling** function for OCR pre-processing
-9. Make Gemini prompt editable in **prompt.yaml**
+9. Improve filtering by using prompt instead of files
+10. Make Gemini prompt editable in **prompt.yaml**
 
 ### TODO
 1. Improve comments
