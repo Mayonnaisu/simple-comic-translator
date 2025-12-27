@@ -246,8 +246,18 @@ pip install -r requirements-lock.txt
 > **To check your quota:**
 > 1. Visit https://aistudio.google.com/app/usage
 > 2. Make sure you are on the right account & project.
-> 3. Click "Rate Limit".
-> 4. Toggle on "All models" to see other rate limits.
+> 2. Click "Open in Cloud Console" on the bottom.
+> 3. Scroll down > Click "Quotas & System Limits".
+> 4. Scroll down > You will see your model quota usage on the top result. If you don't see it, use Filter to search it.
+>
+> For example: 
+	<details>
+		<summary>View image</summary>
+			<p align="center">
+				<img alt="Gemini Free Tier Quota"
+	title="Gemini Free Tier Quota" src="assets/images/gemini-quota.png" />
+			</p>
+	</details>
 
 ### FAQ
 1. **How to change detector, ocr, translator, etc?**<br>
