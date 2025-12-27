@@ -47,6 +47,7 @@ try {
 
         $filesToExclude = @(
             "config.json",
+            "prompt.yaml",
             "filter/manga.txt",
             "filter/manhwa.txt",
             "filter/manhua.txt"
