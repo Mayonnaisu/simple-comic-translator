@@ -67,7 +67,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, ge
     # Format input text as list separated by number tag
     enumerated_input = ""
     for i, info in enumerate(text_info_list):
-        enumerated_input += f"<|{i+1}|> {info["original_text"]} "
+        enumerated_input += f"<|{i+1}|> {info['original_text']} "
 
     # Load prompt template from the YAML file
     with open('prompt.yaml', 'r', encoding="utf-8") as file:
