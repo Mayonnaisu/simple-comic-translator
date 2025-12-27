@@ -46,8 +46,6 @@ N/A
 10. Make Gemini prompt editable in **prompt.yaml**
 
 ### TODO
-1. Improve comments
-2. Clean up, simplify, and optimize code
-3. Improve error handling (in progress)
-4. Improve filtering (in progress)
-5. Improve logging (in progress)
+1. Improve logging
+2. Improve comments
+3. Clean up & refactoring
