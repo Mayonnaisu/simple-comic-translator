@@ -6,3 +6,4 @@
 - [ ] Improve docstrings
 - [ ] Improve comments
 - [ ] Clean up & refactoring
+- [ ] Add glossary
