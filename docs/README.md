@@ -25,6 +25,7 @@
     *   [Background](#background)
 *   [WORKFLOW](#workflow)
 *   [DEMO](#demo)
+*   [PREREQUISITES](#prerequisites)
 *   [DOWNLOAD](#download)
 *   [INSTALLATION](#installation)
 *   [CONFIGURATION](#configuration)
@@ -83,20 +84,18 @@ Go to [here](workflow.md).
 ## DEMO
 Go to [here](demo.md).
 
-## DOWNLOAD
-**Prerequisites:**
+## PREREQUISITES
 - Git
+- Python 3.12.0
+- Microsoft C++ Build Tools (for Windows)
+- Ccache ([optional](install-ccache.md))
 
+## DOWNLOAD
 ```powershell
 git clone "https://github.com/Mayonnaisu/simple-comic-translator"
 ```
 
 ## INSTALLATION
-**Prerequisites:**
-- Python 3.12.0
-- Microsoft C++ Build Tools (for Windows)
-- Ccache ([optional](install-ccache.md))
-
 ```powershell
 # Create virtual environment
 python -m venv venv
