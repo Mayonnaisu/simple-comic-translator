@@ -8,7 +8,6 @@ prompt-template: |
   * You must maintain the enumeration in your response (e.g., '<|1|> Translated Text').
   * Translate sound effects/onomatopoeia as (redacted)
   * Translate website promotion as (redacted)
-  * Translate gibberish as (redacted)
   * Do not add any introductory or concluding text, just the list.
   * Use the Summary of Previous Translation above as additional context if available.
 
