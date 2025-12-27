@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import yaml
 from google import genai
 from pathlib import Path
 from loguru import logger
@@ -63,37 +64,17 @@ def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, ge
     else:
         previous_summary = "NOT AVAILABLE"
 
+    # Format input text as list separated by number tag
     enumerated_input = ""
     for i, info in enumerate(text_info_list):
-        # Replace actual newlines with a space for a cleaner prompt list entry
-        clean_text = info["original_text"].replace("\n", " ")
-        enumerated_input += f"<|{i+1}|> {clean_text} "
+        enumerated_input += f"<|{i+1}|> {info["original_text"]} "
 
-    # The prompt itself is a standard multiline string, no f-string syntax error here.
-    prompt = f"""
-Summary of Previous Translation:
-{previous_summary}
+    # Load prompt template from the YAML file
+    with open('prompt.yaml', 'r', encoding="utf-8") as file:
+        template = yaml.safe_load(file)['prompt-template']
 
-Task 1 (Translation):
-* Translate the following enumerated list of text items to the ISO language code '{target_lang}'.
-* Each item is prefixed by its number (e.g., '<|1|> Text').
-* You must maintain the enumeration in your response (e.g., '<|1|> Translated Text').
-* Translate sound effects/onomatopoeia as (redacted)
-* Translate website promotion as (redacted)
-* Do not add any introductory or concluding text, just the list.
-* Use the Summary of Previous Translation above as additional context if available.
-
-Task 2 (Summarization):
-* Please provide a concise summary of the translation in {target_lang}.
-* Do not include the enumeration.
-* Do not add any introductory or concluding text, just the summary.
-
-Output Format:
-Format your response strictly as a JSON object matching the requested schema.
-
-Input List:
-{enumerated_input}
-"""
+    ## Inject variables into the template with simple replace method
+    prompt = template.replace("{previous_summary}", previous_summary).replace("{target_language}", target_lang).replace("{input}", enumerated_input)
 
     logger.info(f"\nPROMPT:\n{prompt}")
 
