@@ -145,9 +145,6 @@ python main.py --help
 ```
 
 ## UPDATE
-**Prerequisites:**
-- Git
-
 ```powershell
 # Update local repo
 git pull
