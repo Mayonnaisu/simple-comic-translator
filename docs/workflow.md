@@ -48,7 +48,7 @@ SCT overlays translated texts to the offset whitened areas while attempting to a
 > [!NOTE]
 > The offset is necessary to make the area bigger so that the translated text, which is usually longer than the original text, can fit more nicely in the area.
 
-### 8. Save to Corresponding Output Folders with [os.walk](https://docs.python.org/3.11/library/os.html#os.walk) + [pathlib.Path](https://docs.python.org/3.11/library/pathlib.html#pathlib.Path)
+### 8. Save to Corresponding Output Folders with [os.walk](https://docs.python.org/3.12/library/os.html#os.walk) + [pathlib.Path](https://docs.python.org/3.12/library/pathlib.html#pathlib.Path)
 Save the translated images to the corresponding output subfolders, maintaining the directory structure from the original directory.
 
 > [!NOTE]
