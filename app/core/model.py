@@ -8,7 +8,7 @@ os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "0"
 init(autoreset=True)
 
 def download_model(repo_id: str, file_name: str, local_dir: str):
-    logger.info(Style.BRIGHT + Fore.YELLOW + "\nModel does not exist. Initiating download...")
+    logger.info(Style.BRIGHT + Fore.YELLOW + "Model does not exist. Initiating download...")
 
     local_path = hf_hub_download(
         repo_id=repo_id,
@@ -16,14 +16,14 @@ def download_model(repo_id: str, file_name: str, local_dir: str):
         local_dir=local_dir
     )
 
-    logger.info(Style.BRIGHT + Fore.GREEN + f"Model downloaded to: {local_path}")
+    logger.info(Style.BRIGHT + Fore.GREEN + f"Model downloaded to: {local_path}\n")
 
 def download_repo_snapshot(repo_id: str, local_dir: str):
-    logger.info(Style.BRIGHT + Fore.YELLOW + "\nRepo snapshot does not exist. Initiating download...")
+    logger.info(Style.BRIGHT + Fore.YELLOW + "Repo snapshot does not exist. Initiating download...")
 
     local_path = snapshot_download(
         repo_id=repo_id,
         local_dir=local_dir
     )
 
-    logger.info(Style.BRIGHT + Fore.GREEN + f"Repo snapshot downloaded to: {local_path}")
+    logger.info(Style.BRIGHT + Fore.GREEN + f"Repo snapshot downloaded to: {local_path}\n")
