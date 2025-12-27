@@ -1,8 +1,8 @@
 ## DEMO
 
 > [!NOTE]
->
-> Tested on:
+> **Version:** 0.4.0 (deprecated)<br>
+> **Tested on:**
 > - [Windows 11 25H2](#windows-11-25h2)
 > - [Ubuntu 25.10 (proot-distro) in Termux](#ubuntu-2510-proot-distro-in-termux)
 
