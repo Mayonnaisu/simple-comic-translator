@@ -1,7 +1,7 @@
 ## DEMO
 
 > [!NOTE]
-> **Version:** 0.4.0 (deprecated)<br>
+> **Version:** [0.4.0](https://github.com/Mayonnaisu/simple-comic-translator/tree/040416784338ee004e2755d94c183b73604ff088) (deprecated)<br>
 > **Tested on:**
 > - [Windows 11 25H2](#windows-11-25h2)
 > - [Ubuntu 25.10 (proot-distro) in Termux](#ubuntu-2510-proot-distro-in-termux)
