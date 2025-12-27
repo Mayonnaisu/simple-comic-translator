@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="256" height="256" alt="Simple Comic Translator" title="Simple Comic Translator" src="../assets/images/u1f609_u1f4a9.png" />
+  <img width="256" height="256" alt="Simple Comic Translator" title="Simple Comic Translator" src="../assets/images/u1f4a9_u1f913.png" />
     <h1 align="center">Simple Comic Translator 💩</h2>
     <p align="center">Translate comic and manhwa/hua in batch.</p>
 </p>
@@ -63,7 +63,7 @@ Read:<br>
 
 <p align="center">
     <img width=200 alt="Tasteless T-Rex Meme"
-title="Tasteless T-Rex Meme" src="assets/images/stand-up-dinosaur.jpg" />
+title="Tasteless T-Rex Meme" src="../assets/images/stand-up-dinosaur.jpg" />
 </p>
 
 ### Background
