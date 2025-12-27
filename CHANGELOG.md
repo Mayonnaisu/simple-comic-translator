@@ -20,6 +20,7 @@
 
 ## v0.4.1
 10/12/2025
+
 16. Upgrade `paddlepaddle` for patching vulnerabilities in transitive dependencies ([cd167d3](https://github.com/Mayonnaisu/simple-comic-translator/commit/cd167d36acef6a041aaeeaf0e3a6a7cb8ab36aca))
 17. Add Ccahe installation
 
