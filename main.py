@@ -17,7 +17,7 @@ from app.core.handle import handle_uncaught_exception
 from app.core.config import load_config
 from app.core.model import download_repo_snapshot
 from app.core.image_utils import merge_images_vertically, slice_image_in_tiles_pil, split_image_safely
-from app.core.detection import TextAreaDetection, merge_overlapping_boxes
+from app.core.detection import TextAreaDetection, merge_overlapping_boxes, get_bbox_coords
 from app.core.ocr import PaddleOCRRecognition, MangaOCRRecognition
 from app.core.translation import translate_texts_with_gemini
 from app.core.overlay import overlay_translated_texts
@@ -66,7 +66,6 @@ if config:
     # For text-area detection
     det_conf_threshold = config['OCR']['confidence_threshold']
     det_merge_threshold = config['DETECTION']['merge_threshold']
-    det_merge_times = config['DETECTION']['merge_times']
     tile_height = config['DETECTION']['tile']['height']
     tile_width = config['DETECTION']['tile']['width']
     tile_overlap = config['DETECTION']['tile']['overlap']
@@ -204,11 +203,30 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             if detection:
                 detections.extend(detection)
 
-        # Merge overlapping boxes by the specified number of times because 1x isn't enough to merge all of them
-        merged_detections = None
-        for x in range(det_merge_times):
-            detections = merge_overlapping_boxes(detections, det_merge_threshold)
-            merged_detections = detections
+        # Merge overlapping boxes 2x (without offset & with offset) because some split text areas originally don't have overlapping boxes
+        merged_detections = merge_overlapping_boxes(detections, det_merge_threshold)
+
+        offset_detections = []
+        for det in merged_detections:
+            xmin, ymin, xmax, ymax, _ = get_bbox_coords(det["box"])
+
+            new_xmin = xmin - box_offset
+            new_ymin = ymin - box_offset
+            new_xmax = xmax + box_offset
+            new_ymax = ymax + box_offset
+            
+            top_left = [new_xmin, new_ymin]
+            top_right = [new_xmax, new_ymin]
+            bottom_right = [new_xmax, new_ymax]
+            bottom_left = [new_xmin, new_ymax]
+
+            corners = [top_left, top_right, bottom_right, bottom_left]
+
+            det["box"] = corners
+            offset_detections.append(det)
+
+        merged_detections = merge_overlapping_boxes(offset_detections, det_merge_threshold)
+
         logger.success(f"Found {len(merged_detections)} detections.")
 
         # --- Stage 3: Extract Texts with Manga OCR/PaddleOCR
@@ -256,11 +274,26 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
                 logger.warning(Fore.YELLOW + "NO DETECTION! Skipping...")
                 continue
 
-            # Merge overlapping boxes by the specified number of times because 1x isn't enough to merge all of them
-            merged_detections = None
-            for x in range(det_merge_times):
-                detections = merge_overlapping_boxes(detections, det_merge_threshold)
-                merged_detections = detections
+            # Merge overlapping boxes 2x (without offset & with offset) because some split text areas originally don't have overlapping boxes
+            merged_detections = merge_overlapping_boxes(detections, det_merge_threshold)
+
+            offset_detections = [
+                {**det, "box": [
+                    # top_left
+                    [xmin - box_offset, ymin - box_offset],
+                    # top_right
+                    [xmax + box_offset, ymin - box_offset],
+                    # bottom_right
+                    [xmax + box_offset, ymax + box_offset],
+                    # bottom_left
+                    [xmin - box_offset, ymax + box_offset]
+                ]}
+                for det in merged_detections
+                for xmin, ymin, xmax, ymax, _ in [get_bbox_coords(det["box"])]
+            ]
+
+            merged_detections = merge_overlapping_boxes(offset_detections, det_merge_threshold)
+
             logger.success(f"Found {len(merged_detections)} detections.")
 
             # --- Stage 2: Extract Texts with Manga OCR/PaddleOCR
@@ -297,7 +330,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
                 raise Exception(Fore.RED + "Max retries reached!")
 
     # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
-    overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
+    overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_padding, box_fill_color, box_outline_color, box_outline_thickness], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
 
     # Update previous directory
     previous_dir = output_dir
