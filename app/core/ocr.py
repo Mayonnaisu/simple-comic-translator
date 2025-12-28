@@ -17,9 +17,7 @@ os.environ['FLAGS_log_level'] = '3'
 logging.getLogger("ppocr").setLevel(logging.ERROR)
 
 faulthandler.enable()
-
 lock = threading.Lock()
-all_results = []
 
 class PaddleOCRRecognition:
     """
@@ -96,9 +94,11 @@ class PaddleOCRRecognition:
                 logger.error(f"Error processing image: {e}")
 
     def batch_threaded(self, image: object, number: int, detections: list[dict], upscaler: list[bool | int], output_dir: str, log_level: str):
-        """Manages thread pool for batch detection"""
+        """Manages thread pool for batch recognition"""
 
-        num_threads = int(os.cpu_count()/2) # Adjust based on your system (optimal for I/O bound tasks, less so for CPU bound)
+        all_results = []
+        # Get the number of CPU threads and divide it by 2
+        num_threads = int(os.cpu_count()/2)
 
         logger.info(f"\nExtracting texts with PaddleOCR in {num_threads} threads.")
 
@@ -168,8 +168,10 @@ class MangaOCRRecognition:
 
 
     def batch_threaded2(self, image: object, number: int, detections: list[dict], upscaler: list[bool | int], output_dir: str, log_level: str):
-        """Manages thread pool for batch detection"""
+        """Manages thread pool for batch recognition"""
 
+        all_results = []
+        # Get the number of CPU threads and divide it by 2
         num_threads = int(os.cpu_count()/2)
 
         logger.info(f"\nExtracting texts with Manga OCR in {num_threads} threads.")

@@ -7,7 +7,6 @@ from loguru import logger
 from concurrent.futures import ThreadPoolExecutor
 
 lock = threading.Lock()
-all_results = []
 
 def get_bbox_coords(points: list[list]):
     """Helper to get min/max coordinates and center from points."""
@@ -145,7 +144,9 @@ class TextAreaDetection:
     def batch_threaded(self, image_name: str, images: dict | object, target_sizes: list[int], log_level: str, image_tiled: bool):
         """Manages thread pool for batch detection"""
 
-        num_threads = int(os.cpu_count()/2) # Adjust based on your system (optimal for I/O bound tasks, less so for CPU bound)
+        all_results = []
+        # Get the number of CPU threads and divide it by 2
+        num_threads = int(os.cpu_count()/2)
 
         logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx in {num_threads} threads.")
 

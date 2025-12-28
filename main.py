@@ -204,7 +204,6 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
         merged_detections = None
         for x in range(det_merge_times):
             detections = merge_overlapping_boxes(detections, det_merge_threshold)
-            detections = natsorted(detections, key=lambda r: (r['number']))
             merged_detections = detections
         logger.success(f"Found {len(merged_detections)} detections.")
 
@@ -257,6 +256,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             merged_detections = None
             for x in range(det_merge_times):
                 detections = merge_overlapping_boxes(detections, det_merge_threshold)
+                detections = natsorted(detections, key=lambda r: (r['number']))
                 merged_detections = detections
             logger.success(f"Found {len(merged_detections)} detections.")
 
