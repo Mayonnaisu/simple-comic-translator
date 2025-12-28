@@ -112,7 +112,7 @@ pip install -r requirements-lock.txt
 ## CONFIGURATION
 ### Required
 1. Get your [Gemini API key](#how-to-get-gemini-api-key).
-2. Create **.env** file in the program root directory with the following content:
+2. Create **.env** file in the program root directory:
 ```powershell
 # powershell/bash/zsh/etc
 echo "GEMINI_API_KEY='YourGeminiAPIkey'" > .env
