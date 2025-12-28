@@ -11,7 +11,7 @@
 ### DETECTION
 ```jsonc
 "confidence_threshold": 0.3,     // minimum detection score: 0-1
-"merge_threshold": 0.1,          // minimum IoU (overlap) to merge overlapping boxes: 0-1
+"merge_threshold": 0.2,          // minimum IoU (overlap) to merge overlapping boxes: 0-1
 "merge_times": 2,                // number of times to merge overlapping boxes
 "tile": {
   "width": "original",           // width of each tile: "original" (image width)/number
