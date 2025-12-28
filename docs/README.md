@@ -85,7 +85,7 @@ Go to [here](demo.md).
 
 ## PREREQUISITES
 - Git
-- Python 3.12.0
+- Python 3.11 or 3.12
 - Microsoft C++ Build Tools (for Windows)
 - Ccache ([optional](install-ccache.md))
 
