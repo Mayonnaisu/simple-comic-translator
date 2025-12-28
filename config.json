@@ -8,9 +8,9 @@
     "merge_threshold": 0.2,
     "merge_times": 2,
     "tile": {
-      "width": "original",
+      "width": 640,
       "height": "tile_width",
-      "overlap": 0.2
+      "overlap": 0.5
     }
   },
 

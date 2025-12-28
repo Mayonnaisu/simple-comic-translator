@@ -16,7 +16,7 @@
 "tile": {
   "width": "original",           // width of each tile: "original" (image width)/number
   "height": "tile_width",        // height of each tile: "tile_width"/number
-  "overlap": 0.2                 // overlap of each tile
+  "overlap": 0.5                 // overlap of each tile
 }
 ```
 
