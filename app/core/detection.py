@@ -165,6 +165,7 @@ class TextAreaDetection:
         # Return the populated, thread-safe results dictionary
         return all_results
 
+
 def calculate_iou_2d(box1: tuple[int], box2: tuple[int]):
     """
     Calculates 2D Intersection over Union (IoU) for two upright bounding boxes.
@@ -196,39 +197,6 @@ def calculate_iou_2d(box1: tuple[int], box2: tuple[int]):
 
     return inter_area / union_area
 
-def deduplicate_results_2d(results: list[dict], iou_threshold: float) -> list[dict]:
-    """
-    Removes duplicate detections from overlapping tiles using 2D IoU check.
-    Processes high-confidence boxes first.
-    """
-    if not results:
-        return []
-
-    # Sort results by confidence score descending, then by Y position
-    # results.sort (key=lambda r: (r['image_name'], min(p[1] for p in r['box']), r['confidence']))
-
-    unique_results = []
-    for i, current_res in enumerate(results):
-        is_duplicate = False
-        current_bbox_coords = get_bbox_coords(current_res['box'])
-
-        for unique_res in unique_results:
-            unique_bbox_coords = get_bbox_coords(unique_res['box'])
-            
-            # Use 2D IOU to check overlap in both X and Y dimensions
-            if calculate_iou_2d(current_bbox_coords, unique_bbox_coords) > iou_threshold:
-                # If they overlap significantly, assume they are the same detection.
-                is_duplicate = True
-                break
-
-        if not is_duplicate:
-            # Keep only unique results
-            unique_results.append(current_res)
-
-    # Re-sort unique results top-to-bottom, left-to-right for subsequent merging
-    # sorted_unique_results = natsorted(unique_results, key=lambda r: (r['image_name'], r['number']))
-
-    return unique_results
 
 def merge_overlapping_boxes(results: list[dict], det_merge_threshold: float) -> list[dict]:
     if not results: return []
