@@ -114,7 +114,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             # Filter out sound effects and watermarks
             translated_text = item["translated_text"].replace("(redacted)", "")
 
-            if translated_text == "":
+            if translated_text == "" or translated_text == " ":
                 continue
 
             # Filter out sound effects in original_text
