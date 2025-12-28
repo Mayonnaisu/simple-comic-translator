@@ -13,6 +13,7 @@ from collections import Counter
 from colorama import Fore, Back, Style, init
 
 from _version import __version__
+from app.core.handle import handle_uncaught_exception
 from app.core.config import load_config
 from app.core.model import download_repo_snapshot
 from app.core.image_utils import merge_images_vertically, slice_image_in_tiles_pil, split_image_safely
@@ -50,6 +51,9 @@ formatted_datetime = datetime.now().strftime("%Y-%m-%d_%H.%M")
 
 logger.add(sys.stderr, format="{message}", level=log_level)
 logger.add(f"temp/logs/{formatted_datetime}.log", format="{message}", level="TRACE")
+
+# Assign the custom handler to sys.excepthook
+sys.excepthook = handle_uncaught_exception
 
 # Show app version
 logger.info(f"SCT version: {__version__}\n")
@@ -256,7 +260,6 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             merged_detections = None
             for x in range(det_merge_times):
                 detections = merge_overlapping_boxes(detections, det_merge_threshold)
-                detections = natsorted(detections, key=lambda r: (r['number']))
                 merged_detections = detections
             logger.success(f"Found {len(merged_detections)} detections.")
 
