@@ -129,7 +129,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
     # Define the output path
     relative_path = Path(dirpath).relative_to(args.input)
     output_dir = Path(output_path) / relative_path
-    output_dir.mkdir(parents=True, exist_ok=True) # Create output directory if it doesn't exist
+    output_dir.mkdir(parents=True, exist_ok=True) # Create output directory
 
     logger.info(Style.BRIGHT + Fore.YELLOW + f"\nProcessing '{dirpath}'")
 
