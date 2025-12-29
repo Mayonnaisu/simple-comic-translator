@@ -6,6 +6,6 @@
 - [x] Improve logging
 - [ ] Improve docstrings
 - [ ] Improve comments
-- [ ] Clean up & refactoring
 - [ ] Add GPU mode guide
 - [ ] Add glossary
+- [ ] Clean up & refactoring
