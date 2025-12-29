@@ -316,14 +316,14 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
     retry_delay = retry_delay
     attempts = 0
 
-    while attempts < max_retries:
+    while attempts <= max_retries:
         try:
             translated_text_data = translate_texts_with_gemini(recognitions, target_language, [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], previous_dir, output_dir, log_level)
             break
         except Exception as e:
             attempts += 1
             logger.error(f"\n{Fore.RED}{e}")
-            if attempts < max_retries:
+            if attempts <= max_retries:
                 logger.info(f"({attempts}/{max_retries}) Retrying in {retry_delay} seconds...")
                 time.sleep(retry_delay)
             else:
