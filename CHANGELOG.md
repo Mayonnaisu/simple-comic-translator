@@ -10,11 +10,12 @@
 6. Upgrade PaddleOCR to support PP-OCRv5 model (slower than the older version & doesn't have the built-in slicer anymore :/)
 7. Replace **horizontal-slicing-with-overlap** with **tiling-with-overlap+resizing** function for detection pre-processing
 8. Replace **safe-splitting** with **text-area-cropping+upscaling** function for OCR pre-processing
-9. Improve Gemini input format to reduce the rate in which Gemini returning response with messed-up format
-10. Add automatic retry for translation
-11. Improve filtering by using prompt instead of files
-12. Make Gemini prompt editable in **prompt.yaml**
-13. Remove hashes from **requirements-lock.txt** cuz the installations on Linux & macOS kept nagging me to pin additional transitive dependencies when using hashes, which is so bothersome lol
+9. Add Gemini `max_output_tokens` in **config.json** to prevent `None` response from Gemini
+10. Improve Gemini input format to reduce the rate in which Gemini returning response with messed-up format
+11. Add automatic retry for translation
+12. Improve filtering by using prompt instead of files
+13. Make Gemini prompt editable in **prompt.yaml**
+14. Remove hashes from **requirements-lock.txt** cuz the installations on Linux & macOS kept nagging me to pin additional transitive dependencies when using hashes, which is so bothersome lol
 
 ## v0.4.1
 10/12/2025
