@@ -8,6 +8,7 @@ on:
       - ".github/actions/**"
       - ".github/workflows/**"
       - "app/**"
+      - "main.py"
       - "*.ps1"
       - "*.psm1"
       - "requirements*"
