@@ -132,6 +132,6 @@ def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, ge
     except Exception as e:
         if data_dict:
             logger.debug(f"\n{data_dict}")
-        raise Exception(Fore.RED + f"An error occurred during translation: {e}")
+        raise Exception(Fore.RED + f"TranslationError: {e}")
 
     return text_info_list
