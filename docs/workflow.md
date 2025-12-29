@@ -13,7 +13,7 @@ SCT detects text areas in order to find the areas that need to be cropped out fo
 >
 > Since it will take too long time to process multiple 640x640 tiles, I decided to add option to use the original image width as the tile sizes. This is where the resizing comes into handy. The resizing will get trigerred when the tile sizes aren't equal to 640x640 px. As a result, there will be fewer tiles to process, hence the speed increase.
 
-### 4. Extract Texts with [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) or [Manga OCR](https://github.com/kha-white/manga-ocr)
+### 3. Extract Texts with [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) or [Manga OCR](https://github.com/kha-white/manga-ocr)
 SCT extracts texts from each cropped-out text area.
 
 > [!NOTE]
@@ -21,7 +21,7 @@ SCT extracts texts from each cropped-out text area.
 >
 > Manga OCR is the main reason I decided to replace safe-splitting function with text-area-cropping. It's because it can't accurately recognize the texts if the image is big (normal size actually) and has other objects besides texts. 
 
-### 3. Split Image Safely on Non-Text Areas with [Pillow](https://github.com/python-pillow/Pillow) (depends on step 1)
+### 4. Split Image Safely on Non-Text Areas with [Pillow](https://github.com/python-pillow/Pillow) (depends on step 1)
 SCT splits the merged image into the specified height without overlap while avoiding the detected text areas.
 
 > [!NOTE]
