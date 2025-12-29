@@ -65,6 +65,7 @@ def slice_image_in_tiles_pil(image_path: str, tile_height: int, tile_width: int,
     and returns the scaling factors.
     """
     img_pil, width, height = image_path
+
     tiles = []
 
     stride_y = tile_height - overlap
@@ -121,11 +122,12 @@ def slice_image_in_tiles_cv2(image_path, tile_height, tile_width, target_max_dim
     Returns a list of tile information dictionaries.
     """
     img, width, height = image_path
+
     if img is None:
         raise FileNotFoundError(f"Image not found at {image_path}")
 
     tiles = []
-    
+
     stride_y = tile_height - overlap
     stride_x = tile_width - overlap
     if stride_y <= 0: stride_y = tile_height
@@ -153,8 +155,8 @@ def slice_image_in_tiles_cv2(image_path, tile_height, tile_width, target_max_dim
             # Resize if size is larger than target max dimension
             scale_x = 1
             scale_y = 1
-            if tile_width > target_max_dim or tile_height > target_max_dim:
-                cropped_img = cv2.resize(cropped_img, (target_max_dim, target_max_dim), interpolation=(cv2.INTER_AREA if tile_width > target_max_dim else cv2.INTER_LANCZOS4))
+            if tile_width != target_max_dim or tile_height != target_max_dim:
+                tile_img_np = cv2.resize(tile_img_np, (target_max_dim, target_max_dim), interpolation=(cv2.INTER_AREA if tile_width > target_max_dim else cv2.INTER_LANCZOS4))
 
                 # Calculate scaling factors
                 resized_tile_h, resized_tile_w, _ = img.shape
