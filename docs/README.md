@@ -159,7 +159,7 @@ pip install -r requirements-lock.txt
 1. It can't automatically detect the input language and only supports one language in each process. As a result, you need to manually specify the language in **config.json**.
 2. Some texts, especially non-plain/styled texts, aren't recognized properly if at all.
 3. Some unwanted texts are also detected and recognized, making the result riddled with unnecessary texts and white rectangles.
-4. Gemini itself is prone to throwing ["model overloaded" error](https://github.com/google-gemini/gemini-cli/issues/4360) & returning [`None`](https://github.com/googleapis/python-genai/issues/626) or incomplete response and [response with messed-up format](https://github.com/google-gemini/gemini-cli/issues/10972). When those happens, just retry it manually or increase `max_retries` in **config.json** for automatic retries.
+4. Gemini itself is prone to throwing ["model overloaded" error](https://github.com/google-gemini/gemini-cli/issues/4360) & returning [`None`](https://github.com/googleapis/python-genai/issues/626) or incomplete response and [response with messed-up format](https://github.com/google-gemini/gemini-cli/issues/10972). When those happen, just retry it manually or increase `max_retries` in **config.json** for automatic retries.
 
 ## EXTRA INFO
 ### How to Get Gemini API Key
