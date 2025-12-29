@@ -68,7 +68,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
     """Overlays the detected text boxes and translated texts onto the corresponding safely-splitted images and saves them."""
     if not os.path.exists(output_path): os.makedirs(output_path)
 
-    box_padding, box_fill_color, box_outline_color, box_outline_thickness = box
+    box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness = box
     font_min, font_max, font_color, font_path = font
 
     inclusion = ("i", "you", "we", "they", "he", "she", "it", "ah")
@@ -128,10 +128,16 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             # Adjust points back to be relative to the *current split's* top edge
             relative_points = [[p[0], p[1] - slice_top] for p in original_points]
 
+            # Add offsets to enlarge text areas
             rel_xmin, rel_ymin, rel_xmax, rel_ymax, _ = get_bbox_coords(relative_points)
 
-            box_width = rel_xmax - rel_xmin
-            box_height = rel_ymax - rel_ymin
+            new_xmin = rel_xmin - box_offset
+            new_ymin = rel_ymin - box_offset
+            new_xmax = rel_xmax + box_offset
+            new_ymax = rel_ymax + box_offset
+
+            box_width = new_xmax - new_xmin
+            box_height = new_ymax - new_ymin
 
             # Use textwrap on the *already structured* text from Gemini
             # This acts as a secondary safety measure to prevent spilling
@@ -149,7 +155,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             text_height = bbox[3] - bbox[1]
 
             # Center the text within the target box region
-            target_box_x1, target_box_y1 = (rel_xmin, rel_ymin)
+            target_box_x1, target_box_y1 = (new_xmin, new_ymin)
             target_box_center_x = target_box_x1 + box_width // 2
             target_box_center_y = target_box_y1 + box_height // 2
 
