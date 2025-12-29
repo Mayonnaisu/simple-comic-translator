@@ -116,7 +116,7 @@ detector = TextAreaDetection(model_path="models/detection/ogkalu/comic-text-and-
 det_target_size = 640
 
 if source_language in lang_code_jp:
-    extractor = MangaOCRRecognition(use_cpu=True if args.gpu == False else True)
+    extractor = MangaOCRRecognition(use_cpu=True if args.gpu == False else False)
 else:
     extractor = PaddleOCRRecognition(ocr_version='PP-OCRv5', language=source_language, confidence_threshold=ocr_conf_threshold, use_gpu=args.gpu)
 
