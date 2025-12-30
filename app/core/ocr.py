@@ -6,13 +6,12 @@ import faulthandler
 from tqdm import tqdm
 import concurrent.futures
 from loguru import logger
-from colorama import init, Fore
 from manga_ocr import MangaOcr
 from paddleocr import PaddleOCR
 
 from app.core.image_utils_pil import crop_out_box
 
-init(autoreset=True)
+
 faulthandler.enable()
 lock = threading.Lock()
 

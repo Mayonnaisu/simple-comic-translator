@@ -5,11 +5,9 @@ from PIL import Image
 from tqdm import tqdm
 import onnxruntime as ort
 from loguru import logger
-from colorama import init, Fore
 from concurrent.futures import ThreadPoolExecutor
 
 
-init(autoreset=True)
 lock = threading.Lock()
 
 def get_bbox_coords(points: list[list]):
