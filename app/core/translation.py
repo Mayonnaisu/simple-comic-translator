@@ -9,6 +9,7 @@ from google.genai import types
 from dotenv import load_dotenv
 from colorama import Fore, Style, init
 
+
 init(autoreset=True)
 
 def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, gemini: list[str|float], previous_dir: str, output_dir: str, log_level: str):
@@ -132,6 +133,6 @@ def translate_texts_with_gemini(text_info_list: list[dict], target_lang: str, ge
     except Exception as e:
         if data_dict:
             logger.debug(f"\n{data_dict}")
-        raise Exception(Fore.RED + f"TranslationError: {e}")
+        raise type(e)(Fore.RED + f"{e}")
 
     return text_info_list
