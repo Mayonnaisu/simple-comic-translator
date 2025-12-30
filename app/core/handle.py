@@ -12,7 +12,7 @@ def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
         return
 
     # Log the unhandled exception as an error with full traceback to all sinks
-    logger.opt(exception=(exc_type, exc_value, exc_traceback)).critical("Uncaught exception occured!")
+    logger.opt(exception=(exc_type, exc_value, exc_traceback)).critical("\nUncaught exception occured!")
 
     # Optional: You can also use traceback.format_exception to get a formatted string
     # full_traceback = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
