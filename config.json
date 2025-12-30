@@ -43,7 +43,7 @@
       "offset": 10,
       "padding": 10,
       "fill_color": "white",
-      "outline_color": "red",
+      "outline_color": null,
       "outline_thickness": 1
     },
     "font": {
