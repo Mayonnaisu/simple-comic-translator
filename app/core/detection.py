@@ -1,11 +1,15 @@
 import os
 import threading
 import numpy as np
+from PIL import Image
 from tqdm import tqdm
 import onnxruntime as ort
 from loguru import logger
+from colorama import init, Fore
 from concurrent.futures import ThreadPoolExecutor
 
+
+init(autoreset=True)
 lock = threading.Lock()
 
 def get_bbox_coords(points: list[list]):
@@ -60,84 +64,80 @@ class TextAreaDetection:
         result_list = []
 
         with lock:
-            try:
-                if image_tiled:
-                    slice_img_np = np.array(slice["image"])
-                    top_offset = slice["top_offset"]
-                    left_offset = slice["left_offset"]
-                    scale_x = slice['scale_x']
-                    scale_y = slice['scale_y']
-                else:
-                    logger.info(f"Detecting text areas with ogkalu/comic-text-and-bubble-detector.onnx")
+            if image_tiled:
+                slice_img_np = np.array(slice["image"])
+                top_offset = slice["top_offset"]
+                left_offset = slice["left_offset"]
+                scale_x = slice['scale_x']
+                scale_y = slice['scale_y']
+            else:
+                logger.info(f"Detecting text areas with ogkalu/comic-text-and-bubble-detector.onnx")
 
-                    slice_img_np = np.array(slice)
-                    top_offset = 0
-                    left_offset = 0
-                    scale_x = 1
-                    scale_y = 1
+                slice_img_np = np.array(slice)
+                top_offset = 0
+                left_offset = 0
+                scale_x = 1
+                scale_y = 1
 
-                slice_float32 = slice_img_np.astype(np.float32) / 255.0
-                slice_transposed = slice_float32.transpose(2, 0, 1)
-                slice_batchd = np.expand_dims(slice_transposed, axis=0)
-                # Run inference directly on the NumPy array from cv2
-                results = self.session.run(
-                    self.output_names, {"images": slice_batchd, "orig_target_sizes": np.array([target_sizes], dtype=np.int64)}
-                )
+            slice_float32 = slice_img_np.astype(np.float32) / 255.0
+            slice_transposed = slice_float32.transpose(2, 0, 1)
+            slice_batchd = np.expand_dims(slice_transposed, axis=0)
+            # Run inference directly on the NumPy array from cv2
+            results = self.session.run(
+                self.output_names, {"images": slice_batchd, "orig_target_sizes": np.array([target_sizes], dtype=np.int64)}
+            )
 
-                labels, boxes, scores = results[:3]
+            labels, boxes, scores = results[:3]
 
-                if isinstance(labels, np.ndarray) and labels.ndim == 2 and labels.shape[0] == 1:
-                    labels = labels[0]
-                if isinstance(scores, np.ndarray) and scores.ndim == 2 and scores.shape[0] == 1:
-                    scores = scores[0]
-                if isinstance(boxes, np.ndarray) and boxes.ndim == 3 and boxes.shape[0] == 1:
-                    boxes = boxes[0]
+            if isinstance(labels, np.ndarray) and labels.ndim == 2 and labels.shape[0] == 1:
+                labels = labels[0]
+            if isinstance(scores, np.ndarray) and scores.ndim == 2 and scores.shape[0] == 1:
+                scores = scores[0]
+            if isinstance(boxes, np.ndarray) and boxes.ndim == 3 and boxes.shape[0] == 1:
+                boxes = boxes[0]
 
-                if results:
-                    n = 0
-                    for lab, box, scr in zip(labels, boxes, scores):
-                        # Filter out lower confidence
-                        if float(scr) < float(self.confidence_threshold):
-                            continue
-                        # Skip bubble only detections
-                        if lab == 0:
-                            continue
-                        label_name = self.classes[lab]
-                        # Convert bbox to four-corner coordinates
-                        xmin, ymin, xmax, ymax = box
+            if results:
+                n = 0
+                for lab, box, scr in zip(labels, boxes, scores):
+                    # Filter out lower confidence
+                    if float(scr) < float(self.confidence_threshold):
+                        continue
+                    # Skip bubble only detections
+                    if lab == 0:
+                        continue
+                    label_name = self.classes[lab]
+                    # Convert bbox to four-corner coordinates
+                    xmin, ymin, xmax, ymax = box
 
-                        top_left = [xmin, ymin]
-                        top_right = [xmax, ymin]
-                        bottom_right = [xmax, ymax]
-                        bottom_left = [xmin, ymax]
+                    top_left = [xmin, ymin]
+                    top_right = [xmax, ymin]
+                    bottom_right = [xmax, ymax]
+                    bottom_left = [xmin, ymax]
 
-                        corners = [top_left, top_right, bottom_right, bottom_left]
+                    corners = [top_left, top_right, bottom_right, bottom_left]
 
-                        # Adjust coordinates back to the original slice size (inverse scaling) and then to the original full image coordinate system (offsets)
-                        adjusted_points = [[(int(p[0]) * scale_x) + left_offset, (int(p[1]) * scale_y) + top_offset] for p in corners]
+                    # Adjust coordinates back to the original slice size (inverse scaling) and then to the original full image coordinate system (offsets)
+                    adjusted_points = [[(int(p[0]) * scale_x) + left_offset, (int(p[1]) * scale_y) + top_offset] for p in corners]
 
-                        _, _, _, _, center_y = get_bbox_coords(adjusted_points)
+                    _, _, _, _, center_y = get_bbox_coords(adjusted_points)
 
-                        result = {
-                            "box": np.array(adjusted_points, dtype=np.int32),
-                            "confidence": scr,
-                            "original_text": "",
-                            "text_confidence": 0,
-                            "translated_text": "",
-                            "center_y": center_y,
-                            "image_name": image_name,
-                            "slice_name": "",
-                            "number": number
-                        }
+                    result = {
+                        "box": np.array(adjusted_points, dtype=np.int32),
+                        "confidence": scr,
+                        "original_text": "",
+                        "text_confidence": 0,
+                        "translated_text": "",
+                        "center_y": center_y,
+                        "image_name": image_name,
+                        "slice_name": "",
+                        "number": number
+                    }
 
-                        if log_level == "TRACE":
-                            logger.info(f"({scr:.2f}) {label_name} {adjusted_points}")
-                        n+=1
+                    if log_level == "TRACE":
+                        logger.info(f"({scr:.2f}) {label_name} {adjusted_points}")
+                    n+=1
 
-                        result_list.append(result)
-
-            except Exception as e:
-                logger.error(f"Error processing image: {e}")
+                    result_list.append(result)
 
         return result_list
 
@@ -156,11 +156,8 @@ class TextAreaDetection:
             futures = executor.map(self.detect_text_areas, [image_name]*number, range(number), images, [target_sizes]*number, [log_level]*number, [image_tiled]*number)
 
             for future in tqdm(futures, total=len(images), desc="Detection"):
-                try:
-                    if future:
-                        all_results.extend(future)
-                except Exception as exc:
-                    logger.error(f'{exc}')
+                if future:
+                    all_results.extend(future)
 
         # Return the populated, thread-safe results dictionary
         return all_results
