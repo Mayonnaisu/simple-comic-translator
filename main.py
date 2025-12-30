@@ -67,6 +67,7 @@ if config:
     # For text-area detection
     det_conf_threshold = config['OCR']['confidence_threshold']
     det_merge_threshold = config['DETECTION']['merge_threshold']
+    det_merge_times = config['DETECTION']['merge_times']
     tile_height = config['DETECTION']['tile']['height']
     tile_width = config['DETECTION']['tile']['width']
     tile_overlap = config['DETECTION']['tile']['overlap']
@@ -204,12 +205,16 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             if detection:
                 detections.extend(detection)
 
-        merged_detections = merge_overlapping_boxes(detections, det_merge_threshold)
+        # Merge overlapping boxes by the specified number of times because 1x isn't enough to merge all of them
+        merged_detections = None
+        for x in range(det_merge_times):
+            detections = merge_overlapping_boxes(detections, det_merge_threshold)
+            merged_detections = detections
         logger.success(f"Found {len(merged_detections)} detections.")
 
         # --- Stage 3: Extract Texts with Manga OCR/PaddleOCR
         if source_language in lang_code_jp:
-            recognitions = extractor.batch_threaded2(merged_image.copy(), "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
+            recognitions = extractor.batch_threaded2(merged_image, "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
         else:
             recognitions = extractor.batch_threaded(merged_image, "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
 
@@ -252,7 +257,11 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
                 logger.warning(Fore.YELLOW + "NO DETECTION! Skipping...")
                 continue
 
-            merged_detections = merge_overlapping_boxes(detections, det_merge_threshold)
+            # Merge overlapping boxes by the specified number of times because 1x isn't enough to merge all of them
+            merged_detections = None
+            for x in range(det_merge_times):
+                detections = merge_overlapping_boxes(detections, det_merge_threshold)
+                merged_detections = detections
             logger.success(f"Found {len(merged_detections)} detections.")
 
             # --- Stage 2: Extract Texts with Manga OCR/PaddleOCR
