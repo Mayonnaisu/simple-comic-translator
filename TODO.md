@@ -6,6 +6,8 @@
 - [x] Improve logging
 - [ ] Improve docstrings
 - [ ] Improve comments
-- [ ] Add GPU mode guide
 - [ ] Add glossary
+- [ ] Add translation memory
+- [ ] Add option to translate from memory & glossary
+- [ ] Add GPU mode guide
 - [ ] Clean up & refactoring
