@@ -45,50 +45,47 @@ class PaddleOCRRecognition:
         """Runs PaddleOCR on slices and adjusts coordinates to original image space."""
 
         with lock:
-            try:
-                use_upscaler, upscale_ratio = upscaler
+            use_upscaler, upscale_ratio = upscaler
 
-                box = detection["box"]
+            box = detection["box"]
 
-                xmin = box[0][0]
-                ymin = box[0][1]
-                xmax = box[2][0]
-                ymax = box[2][1]
+            xmin = box[0][0]
+            ymin = box[0][1]
+            xmax = box[2][0]
+            ymax = box[2][1]
 
-                cropped_img_resized = crop_out_box([xmin, ymin, xmax, ymax], image, [use_upscaler, upscale_ratio], output_dir, crop_name, log_level)
+            cropped_img_resized = crop_out_box([xmin, ymin, xmax, ymax], image, [use_upscaler, upscale_ratio], output_dir, crop_name, log_level)
 
-                result = self.ppocr.predict(
-                    np.array(cropped_img_resized)
-                )
+            result = self.ppocr.predict(
+                np.array(cropped_img_resized)
+            )
 
-                recognized_text = ""
-                avg_conf = 0
-                if result:
-                    for line in result:
-                        # Filter out lower confidence
-                        confidence = line['rec_scores']
-                        confidence_number = len(confidence)
-                        if confidence_number > 0:
-                            avg_conf = sum([c for c in confidence]) / confidence_number
-                        else:
-                            avg_conf = 0
+            recognized_text = ""
+            avg_conf = 0
+            if result:
+                for line in result:
+                    # Filter out lower confidence
+                    confidence = line['rec_scores']
+                    confidence_number = len(confidence)
+                    if confidence_number > 0:
+                        avg_conf = sum([c for c in confidence]) / confidence_number
+                    else:
+                        avg_conf = 0
 
-                        if avg_conf < self.confidence_threshold:
-                            continue
+                    if avg_conf < self.confidence_threshold:
+                        continue
 
-                        text = line['rec_texts']
-                        recognized_text = " ".join(text)
+                    text = line['rec_texts']
+                    recognized_text = " ".join(text)
 
-                    detection["original_text"] = recognized_text.strip()
+                detection["original_text"] = recognized_text.strip()
 
-                    detection["text_confidence"] = avg_conf
+                detection["text_confidence"] = avg_conf
 
-                    if log_level == "TRACE" and recognized_text != "":
-                        logger.debug(f"({avg_conf:.2f}) {recognized_text}")
+                if log_level == "TRACE" and recognized_text != "":
+                    logger.debug(f"({avg_conf:.2f}) {recognized_text}")
 
-                    return detection
-            except Exception as e:
-                raise Exception(Fore.RED + f"OCRerror: {e}")
+                return detection
 
     def batch_threaded(self, image: object, number: int, detections: list[dict], upscaler: list[bool | int], output_dir: str, log_level: str):
         """Manages thread pool for batch recognition"""
@@ -106,12 +103,9 @@ class PaddleOCRRecognition:
 
             # Monitor progress and wait for all futures to complete
             for future in tqdm(concurrent.futures.as_completed(future_to_path), total=len(detections), desc="OCR"):
-                try:
-                    result = future.result()
-                    if result:
-                        all_results.append(result)
-                except Exception as exc:
-                    raise Exception(f'{exc}')
+                result = future.result()
+                if result:
+                    all_results.append(result)
 
         # Return the populated, thread-safe results dictionary
         filtered_results = [result for result in all_results if result["original_text"] != ""]
@@ -140,27 +134,23 @@ class MangaOCRRecognition:
         use_upscaler, upscale_ratio = upscaler
 
         with lock:
-            try:
-                box = detection["box"]
+            box = detection["box"]
+            xmin = box[0][0]
+            ymin = box[0][1]
+            xmax = box[2][0]
+            ymax = box[2][1]
 
-                xmin = box[0][0]
-                ymin = box[0][1]
-                xmax = box[2][0]
-                ymax = box[2][1]
+            cropped_img_resized = crop_out_box([xmin, ymin, xmax, ymax], image, [use_upscaler, upscale_ratio], output_dir, crop_name, log_level)
 
-                cropped_img_resized = crop_out_box([xmin, ymin, xmax, ymax], image, [use_upscaler, upscale_ratio], output_dir, crop_name, log_level)
+            text = self.mocr(cropped_img_resized)
 
-                text = self.mocr(cropped_img_resized)
+            if text and text != "．．．":
+                detection["original_text"] = text.strip()
 
-                if text and text != "．．．":
-                    detection["original_text"] = text.strip()
+                if log_level == "TRACE" and text != "":
+                    logger.info(f"{text}")
 
-                    if log_level == "TRACE" and text != "":
-                        logger.info(f"{text}")
-
-                    return detection
-            except Exception as e:
-                logger.error(f"Error processing image: {e}")
+                return detection
 
 
     def batch_threaded2(self, image: object, number: int, detections: list[dict], upscaler: list[bool | int], output_dir: str, log_level: str):
@@ -179,19 +169,12 @@ class MangaOCRRecognition:
 
             # Monitor progress and wait for all futures to complete
             for future in tqdm(concurrent.futures.as_completed(future_to_path), total=len(detections), desc="OCR"):
-                image_path = future_to_path[future]
-                try:
-                    result = future.result()
-                    if result:
-                        all_results.append(result)
-                except Exception as exc:
-                    logger.error(f'{image_path} generated an exception: {exc}')
+                result = future.result()
+                if result:
+                    all_results.append(result)
 
         # Return the populated, thread-safe results dictionary
         filtered_results = [result for result in all_results if result["original_text"] != ""]
-
-        # for rec in filtered_results:
-        #     logger.info(f"{rec}\n")
 
         logger.success(f"Extracted {len(filtered_results)} texts.")
 
