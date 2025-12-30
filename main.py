@@ -47,8 +47,7 @@ output_path = args.output if args.output else f"{input_path}-shitted"
 # Start logging
 logger.remove() # Remove the default handler
 
-log_level = "TRACE"
-"INFO" if args.debug == False else "TRACE"
+log_level = "INFO" if args.debug == False else "TRACE"
 formatted_datetime = datetime.now().strftime("%Y-%m-%d_%H.%M")
 
 logger.add(sys.stderr, format="{message}", level=log_level)
