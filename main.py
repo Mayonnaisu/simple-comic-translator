@@ -1,5 +1,6 @@
 import os
 import re
+# import cv2
 import sys
 import time
 import argparse
@@ -16,8 +17,8 @@ from _version import __version__
 from app.core.handle import handle_uncaught_exception
 from app.core.config import load_config
 from app.core.model import download_repo_snapshot
-from app.core.image_utils import merge_images_vertically, slice_image_in_tiles_pil, slice_image_in_tiles_cv2, split_image_safely
-from app.core.detection import TextAreaDetection, merge_overlapping_boxes, get_bbox_coords
+from app.core.image_utils_pil import merge_images_vertically, slice_image_in_tiles, split_image_safely
+from app.core.detection import TextAreaDetection, merge_overlapping_boxes
 from app.core.ocr import PaddleOCRRecognition, MangaOCRRecognition
 from app.core.translation import translate_texts_with_gemini
 from app.core.overlay import overlay_translated_texts
@@ -46,7 +47,8 @@ output_path = args.output if args.output else f"{input_path}-shitted"
 # Start logging
 logger.remove() # Remove the default handler
 
-log_level = "INFO" if args.debug == False else "TRACE"
+log_level = "TRACE"
+"INFO" if args.debug == False else "TRACE"
 formatted_datetime = datetime.now().strftime("%Y-%m-%d_%H.%M")
 
 logger.add(sys.stderr, format="{message}", level=log_level)
@@ -190,7 +192,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
         tile_overlap_px = int(tile_height * tile_overlap)
 
-        image_slices = slice_image_in_tiles_pil(
+        image_slices = slice_image_in_tiles(
             [merged_image, image_width, image_height], tile_height, tile_width, det_target_size, tile_overlap_px, "", output_dir, log_level
         )
 
@@ -208,7 +210,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
         # --- Stage 3: Extract Texts with Manga OCR/PaddleOCR
         if source_language in lang_code_jp:
-            recognitions = extractor.batch_threaded2(merged_image, "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
+            recognitions = extractor.batch_threaded2(merged_image.copy(), "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
         else:
             recognitions = extractor.batch_threaded(merged_image, "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
 
@@ -237,7 +239,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
                 logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
                 detections = detector.detect_text_areas(image_name, n, image, target_sizes=[det_target_size, det_target_size], log_level=log_level, image_tiled=False)
             else:
-                image_slices = slice_image_in_tiles_pil([image, image_width, image_height], tile_height, tile_width, det_target_size, tile_overlap_px, n, output_dir, log_level)
+                image_slices = slice_image_in_tiles([image, image_width, image_height], tile_height, tile_width, det_target_size, tile_overlap_px, n, output_dir, log_level)
 
                 # detections = detector.batch_threaded(image_name,image_slices, target_sizes=[tile_height, tile_width], log_level=log_level, batch=True)
 

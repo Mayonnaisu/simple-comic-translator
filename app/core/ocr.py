@@ -6,16 +6,13 @@ import faulthandler
 from tqdm import tqdm
 import concurrent.futures
 from loguru import logger
+from colorama import init, Fore
 from manga_ocr import MangaOcr
 from paddleocr import PaddleOCR
 
-from app.core.image_utils import crop_out_box_pil
+from app.core.image_utils_pil import crop_out_box
 
-# suppress PaddleOCR's verbose logging
-os.environ["DISABLE_MODEL_SOURCE_CHECK"] = 'True'
-os.environ['FLAGS_log_level'] = '3'
-logging.getLogger("ppocr").setLevel(logging.ERROR)
-
+init(autoreset=True)
 faulthandler.enable()
 lock = threading.Lock()
 
@@ -58,7 +55,7 @@ class PaddleOCRRecognition:
                 xmax = box[2][0]
                 ymax = box[2][1]
 
-                cropped_img_resized = crop_out_box_pil([xmin, ymin, xmax, ymax], image, [use_upscaler, upscale_ratio], output_dir, crop_name, log_level)
+                cropped_img_resized = crop_out_box([xmin, ymin, xmax, ymax], image, [use_upscaler, upscale_ratio], output_dir, crop_name, log_level)
 
                 result = self.ppocr.predict(
                     np.array(cropped_img_resized)
@@ -91,7 +88,7 @@ class PaddleOCRRecognition:
 
                     return detection
             except Exception as e:
-                logger.error(f"Error processing image: {e}")
+                raise Exception(Fore.RED + f"OCRerror: {e}")
 
     def batch_threaded(self, image: object, number: int, detections: list[dict], upscaler: list[bool | int], output_dir: str, log_level: str):
         """Manages thread pool for batch recognition"""
@@ -109,13 +106,12 @@ class PaddleOCRRecognition:
 
             # Monitor progress and wait for all futures to complete
             for future in tqdm(concurrent.futures.as_completed(future_to_path), total=len(detections), desc="OCR"):
-                image_path = future_to_path[future]
                 try:
                     result = future.result()
                     if result:
                         all_results.append(result)
                 except Exception as exc:
-                    logger.error(f'{image_path} generated an exception: {exc}')
+                    raise Exception(f'{exc}')
 
         # Return the populated, thread-safe results dictionary
         filtered_results = [result for result in all_results if result["original_text"] != ""]
@@ -152,7 +148,7 @@ class MangaOCRRecognition:
                 xmax = box[2][0]
                 ymax = box[2][1]
 
-                cropped_img_resized = crop_out_box_pil([xmin, ymin, xmax, ymax], image, [use_upscaler, upscale_ratio], output_dir, crop_name, log_level)
+                cropped_img_resized = crop_out_box([xmin, ymin, xmax, ymax], image, [use_upscaler, upscale_ratio], output_dir, crop_name, log_level)
 
                 text = self.mocr(cropped_img_resized)
 
