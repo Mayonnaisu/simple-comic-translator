@@ -52,8 +52,7 @@ def merge_images_vertically(images, output_dir, log_level):
         output_path = os.path.join(output_dir, "debug")
         os.makedirs(output_path, exist_ok=True)
         save_path = os.path.join(output_path, "merged_image.png")
-        # OpenCV save (Note: ensure image is BGR for cv2.imwrite)
-        cv2.imwrite(save_path, final_image)
+        cv2.imwrite(save_path, final_image, [cv2.IMWRITE_PNG_COMPRESSION, 0])
 
     return final_image
 
@@ -229,6 +228,6 @@ def split_image_safely(image: tuple, detections: list[dict], max_height: int, ou
         os.makedirs(output_path, exist_ok=True)
         for i, slice in enumerate(chunks):
             image_slice = slice["image"]
-            cv2.imwrite(f"{output_path}/split_{i:02d}.png", image_slice, [cv2.IMWRITE_JPEG_QUALITY, 100])
+            cv2.imwrite(f"{output_path}/split_{i:02d}.png", image_slice, [cv2.IMWRITE_PNG_COMPRESSION, 0])
 
     return chunks, range(len(chunks))
