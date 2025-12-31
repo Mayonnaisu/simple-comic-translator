@@ -5,9 +5,11 @@ from PIL import Image
 from tqdm import tqdm
 import onnxruntime as ort
 from loguru import logger
+from colorama import init, Fore
 from concurrent.futures import ThreadPoolExecutor
 
 
+init(autoreset=True)
 lock = threading.Lock()
 
 def get_bbox_coords(points: list[list]):
@@ -47,6 +49,9 @@ class TextAreaDetection:
             self.providers = ["CPUExecutionProvider"]
 
         self.session = ort.InferenceSession(self.model_path, providers=self.providers)
+
+        if not self.session:
+            raise Exception(Fore.RED + "Failed to initialize detection model!")
 
         self.input_names = [inp.name for inp in self.session.get_inputs()]
         self.output_names = [out.name for out in self.session.get_outputs()]
