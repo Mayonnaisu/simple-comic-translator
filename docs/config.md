@@ -93,4 +93,6 @@
 ```
 
 > [!TIP]
-> - The color values can be color name (e.g. "red"), RGB tuple (e.g. (255,0,0) or (100%,0%,0%)), or hexadecimal strings: (e.g. "#ff0000").
+> - The color values can be color name (e.g. "red"), RGB tuple (e.g. (255,0,0) or (100%,0%,0%)), or hexadecimal strings (e.g. "#ff0000").
+>
+> - Fyi, that font file is used by default because it supports the Latin, Japanese, Korean, & Chinese characters among others. The support for other characters will always be useful because in debug mode the app will also save separate annotated images with the original texts.
