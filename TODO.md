@@ -8,6 +8,7 @@
 - [ ] Improve comments
 - [ ] Add glossary
 - [ ] Add translation memory
-- [ ] Add option to translate from memory & glossary
+- [ ] Add option to translate from memory
+- [ ] Add inpainting
 - [ ] Add GPU mode guide
 - [ ] Clean up & refactoring
