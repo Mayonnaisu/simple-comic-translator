@@ -2,9 +2,6 @@
 $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $True
 
-# temporarily set the policy to 'Bypass' for the current process
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-
 # Suppress the default progress bar because it slows down process in stock PowerShell (5.1). See https://github.com/PowerShell/PowerShell/issues/2138.
 $ProgressPreference = 'SilentlyContinue'
 
@@ -13,7 +10,10 @@ $repoUrl = "https://github.com/Mayonnaisu/simple-comic-translator/archive/refs/h
 $downloadPath = ".\temp\repo.zip"
 
 try {
-    # Import module/s
+    # Unblock module
+    Unblock-File -Path ".\app\extra\downloader.psm1"
+
+    # Import module
     Import-Module ".\app\extra\downloader.psm1"
 
     # Display PowerShell version
