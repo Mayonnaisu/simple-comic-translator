@@ -23,4 +23,9 @@
 
     In real life, I saw that it was also used by some "senior" programmers to insult programmers who rely on 3rd party libraries/packages/modules instead of writing everything from scratch. Heh, pretty accurate, I guess X'D.
 
-    Anyway, if you're so worried, you're free to scan & analyze my app. It's open source and for everyone to check out without anything hidden from my side.
+    Anyway, if you're worried, you're free to scan & analyze my app. It's open source and free for everyone to check out without anything hidden from my side.
+
+5. **Why not just modify the existing programs instead of creating a new one?**
+    I did try, but I had a really hard time understanding their big and complex codebases. You can see my attempts on one of them here: https://github.com/Mayonnaisu/manga-image-translator.
+
+    As you can see, I could only modify it a bit and ended up creating a wrapper around it to make it work like I want it to lol.
