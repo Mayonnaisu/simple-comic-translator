@@ -30,7 +30,7 @@
 
     As you can see, I could only modify it a bit and ended up creating a wrapper around it to make it work like I want lol. So, after a lot of failures in modifying its core functions, I decided that it's better for me to just start anew from something I can at least understand.
 
-6. **Can I contribute to your repo (PR)?**
+6. **Can I contribute to your repo (PR)?**<br>
     Hmm, I'm not sure about that. This is just for my own fun and learning that I do in my free time. Let me think about it.... 
 
     You know what's even better? You can fix the issue in other similar programs that I can't fix. For example, this [important issue](https://github.com/zyddnys/manga-image-translator/issues/1029) in MIT. That repo has so many stars, but the commit has slowed down so much to the point there are lots of issues left unfixed. Nowadays the issues are closed automatically when they are stale.
