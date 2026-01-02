@@ -9,6 +9,8 @@
 
     I'm going to be honest with you, AI may not be perfect and prone to making mistakes here and there, but it has been of such great help to me. It makes me type so much less when I have f*cked-up hands due to injuries I got from working out and doing combat sports back when I was younger. I have tried voice coding, but, damn, it was so hard to get it to correctly type what I want.
 
+    That being said, currently AI's knowledge and abilities are limited and at times outdated in coding. It may be able to help someone like me to some extent, until I have to personally take the matter into my own poor hands. But it seems to be more of a nuisance than help for a lot of senior/advanced programmers. It's cuz they can just write more complex code on their own and still produce the quality results that meet the industry standard instead of wasting their time fixing dumb mistakes from AI.
+
 3. **Where to learn programming/coding?**<br>
     There are a lot of free/paid courses out there. I will just recommend some sites I use/d (free):
     - [Sololearn (app)](https://play.google.com/store/apps/details?id=com.sololearn)
