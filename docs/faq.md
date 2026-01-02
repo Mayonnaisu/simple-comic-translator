@@ -35,4 +35,4 @@
 
     You know what's even better? You can fix the issue in other similar programs that I can't fix. For example, this [important issue](https://github.com/zyddnys/manga-image-translator/issues/1029) in MIT. That repo has so many stars, but the commit has slowed down so much to the point there are lots of issues left unfixed. Nowadays the issues are closed automatically when they are stale.
 
-    Anyway, bug reports are welcome tho. On the other hand, feature requests... not so much 😅. And keep this [Reddit thread](https://www.reddit.com/r/programming/comments/1pik37d/when_a_small_opensource_tool_suddenly_blows_up/) in mind when you want to create an issue anywhere.
+    Anyway, bug reports are welcome tho. On the other hand, feature requests... not so much 😅. More importantly, keep this [Reddit thread](https://www.reddit.com/r/programming/comments/1pik37d/when_a_small_opensource_tool_suddenly_blows_up/) in mind when you want to create an issue anywhere.
