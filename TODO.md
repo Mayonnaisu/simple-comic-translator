@@ -3,12 +3,12 @@
 - [x] Add manga support
 - [x] Update PaddleOCR to support PP-OCRv5 model
 - [ ] Improve error handling
-- [x] Improve logging
+- [ ] Improve logging
 - [ ] Improve docstrings
 - [ ] Improve comments
 - [ ] Add glossary
 - [ ] Add translation memory
 - [ ] Add option to translate from memory
 - [ ] Add inpainting
-- [ ] Add GPU mode guide
+- [ ] Add GPU mode and its guide
 - [ ] Clean up & refactoring
