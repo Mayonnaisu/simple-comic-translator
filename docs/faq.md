@@ -25,7 +25,14 @@
 
     Anyway, if you're worried, you're free to scan & analyze my app. It's open source and free for everyone to check out without anything hidden from my side.
 
-5. **Why not just modify the existing programs instead of creating a new one?**
-    I did try, but I had a really hard time understanding their big and complex codebases. You can see my attempts on one of them here: https://github.com/Mayonnaisu/manga-image-translator.
+5. **Why not just modify the existing programs instead of creating a new one?**<br>
+    I did try, but I had a really hard time understanding their big and complex codebases. Well, I'm not that smart haha. You can see my attempts on one of them here: https://github.com/Mayonnaisu/manga-image-translator.
 
-    As you can see, I could only modify it a bit and ended up creating a wrapper around it to make it work like I want it to lol.
+    As you can see, I could only modify it a bit and ended up creating a wrapper around it to make it work like I want lol. So, after a lot of failures in modifying its core functions, I decided that it's better for me to just start anew from something I can at least understand.
+
+6. **Can I contribute to your repo (PR)?**
+    Hmm, I'm not sure about that. This is just for my own fun and learning that I do in my free time. Let me think about it.... 
+
+    You know what's even better? You can fix the issue in other similar programs that I can't fix. For example, this [important issue](https://github.com/zyddnys/manga-image-translator/issues/1029) in MIT. That repo has so many stars, but the commit has slowed down so much to the point there are lots of issues left unfixed. Nowadays the issues are closed automatically when they are stale.
+
+    Anyway, bug reports are welcome tho. On the other hand, feature requests... not so much 😅. And keep this [Reddit thread](https://www.reddit.com/r/programming/comments/1pik37d/when_a_small_opensource_tool_suddenly_blows_up/) in mind when you want to create an issue anywhere.
