@@ -227,9 +227,9 @@ try {
 
         pyenv --version
 
-        Write-Host "`nPyenv Windows Already Installed." -ForegroundColor Green
+        Write-Host "Pyenv Windows Already Installed." -ForegroundColor Green
     } catch [System.Management.Automation.CommandNotFoundException] {
-        Write-Host "`nPyenv Windows Not Installed." -ForegroundColor Magenta
+        Write-Host "Pyenv Windows Not Installed." -ForegroundColor Magenta
 
         try {
             Write-Host "`nInstalling Pyenv Windows..." -ForegroundColor Yellow
