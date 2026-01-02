@@ -48,7 +48,14 @@ class TextAreaDetection:
         else:
             self.providers = ["CPUExecutionProvider"]
 
-        self.session = ort.InferenceSession(self.model_path, providers=self.providers)
+        # Define the number of threads
+        self.num_threads = os.cpu_count() or 1
+
+        session_options = ort.SessionOptions()
+        session_options.inter_op_num_threads = self.num_threads # For parallel model execution
+        session_options.intra_op_num_threads = self.num_threads # For parallel computation inside each operator
+
+        self.session = ort.InferenceSession(self.model_path, sess_options=session_options, providers=self.providers)
 
         if not self.session:
             raise Exception(Fore.RED + "Failed to initialize detection model!")
@@ -148,14 +155,13 @@ class TextAreaDetection:
         """Manages thread pool for batch detection"""
 
         all_results = []
-        # Get the number of CPU threads and divide it by 2
-        num_threads = int(os.cpu_count()/2)
 
-        logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx in {num_threads} threads.")
+        logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx in {self.num_threads} threads.")
 
         # Use ThreadPoolExecutor for concurrent execution
-        with ThreadPoolExecutor(max_workers=num_threads) as executor:
+        with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
             number = len(images)
+            # Use executor.map() to get results in correct order. It's slower than as_completed() tho.
             futures = executor.map(self.detect_text_areas, [image_name]*number, range(number), images, [target_sizes]*number, [log_level]*number, [image_tiled]*number)
 
             for future in tqdm(futures, total=len(images), desc="Detection"):
