@@ -49,7 +49,7 @@ class TextAreaDetection:
             self.providers = ["CPUExecutionProvider"]
 
         # Define the number of threads
-        self.num_threads = os.cpu_count() or 1
+        self.num_threads = int(os.cpu_count()/2) or 1
 
         session_options = ort.SessionOptions()
         session_options.inter_op_num_threads = self.num_threads # For parallel model execution
