@@ -6,7 +6,7 @@
 - [ ] Improve logging
 - [ ] Improve docstrings
 - [ ] Improve comments
-- [ ] Add glossary
+- [x] Add glossary
 - [ ] Add translation memory
 - [ ] Add option to translate from memory
 - [ ] Add inpainting

@@ -114,16 +114,13 @@ if not os.path.exists(f"{model_path}/{file_name}"):
     download_repo_snapshot(repo_id=repo_id, local_dir=model_path)
 
 # Initialize models
-detector = TextAreaDetection(model_path="models/detection/ogkalu/comic-text-and-bubble-detector/detector.onnx", confidence_threshold=det_conf_threshold, use_gpu=args.gpu)
+detector = TextAreaDetection(model_path=f"{model_path}/{file_name}", confidence_threshold=det_conf_threshold, use_gpu=args.gpu)
 det_target_size = 640
 
 if source_language in lang_code_jp:
     extractor = MangaOCRRecognition(use_cpu=True if args.gpu == False else False)
 else:
     extractor = PaddleOCRRecognition(ocr_version='PP-OCRv5', language=source_language, confidence_threshold=ocr_conf_threshold, use_gpu=args.gpu)
-
-# Define previous directory
-previous_dir = None
 
 # Iterate through all directories using os.walk
 for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
@@ -149,8 +146,6 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
                 break
 
     if already_exist:
-        # Update previous directory
-        previous_dir = output_dir
         continue
 
     # Filter for image files and sort files to ensure consistent merging order
@@ -245,7 +240,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
             else:
                 image_slices = slice_image_in_tiles([image, image_width, image_height], tile_height, tile_width, det_target_size, tile_overlap_px, n, output_dir, log_level)
 
-                # detections = detector.batch_threaded(image_name,image_slices, target_sizes=[tile_height, tile_width], log_level=log_level, batch=True)
+                # detections = detector.batch_threaded(image_name,image_slices, target_sizes=[tile_height, tile_width], log_level=log_level, image_tiled=True)
 
                 logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
                 detections = []
@@ -286,7 +281,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
     while attempts <= max_retries:
         try:
-            translated_text_data = translate_texts_with_gemini(recognitions, target_language, [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], previous_dir, output_dir, log_level)
+            translated_text_data = translate_texts_with_gemini(recognitions, [source_language, target_language], [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], os.path.join(args.input, 'glossary.json'), output_dir, log_level)
             break
         except Exception as e:
             attempts += 1
@@ -299,9 +294,6 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
     # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
     overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
-
-    # Update previous directory
-    previous_dir = output_dir
 
 logger.info(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_path}'.")
 

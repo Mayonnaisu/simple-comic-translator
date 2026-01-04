@@ -1,23 +1,22 @@
 prompt-template: |
-  Summary of Previous Translation:
-  {previous_summary}
+  CURRENT GLOSSARY:
+  {glossary}
 
-  Task 1 (Translation):
-  * Translate the following enumerated list of text items to the ISO language code '{target_language}'.
+  TASK 1 (TRANSLATION):
+  * Translate the following enumerated list of text items to the ISO language code '{target_language}', strictly using CURRENT GLOSSARY if available.
   * Each item is prefixed by its number (e.g., '<|1|> Text').
   * You must maintain the enumeration in your response (e.g., '<|1|> Translated Text').
-  * Translate sound effects/onomatopoeia as (redacted)
+  * Translate gibberish as (redacted)
   * Translate website promotion as (redacted)
   * Do not add any introductory or concluding text, just the list.
-  * Use the Summary of Previous Translation above as additional context if available.
 
-  Task 2 (Summarization):
-  * Please provide a concise summary of the translation in '{target_language}'.
-  * Do not include the enumeration.
-  * Do not add any introductory or concluding text, just the summary.
+  TASK 2 (GLOSSARY):
+  * Analyze the text and extract new key technical terms and proper names NOT in CURRENT GLOSSARY.
+  * Do not add any note or explanation to the term, just the source term and translated term.
+  * Do not add any introductory or concluding text, just the glossary.
 
-  Output Format:
+  OUTPUT FORMAT:
   Format your response strictly as a JSON object matching the requested schema.
 
-  Input List:
+  INPUT LIST:
   {input}

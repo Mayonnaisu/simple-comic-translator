@@ -27,16 +27,13 @@ SCT splits the merged image into the specified height without overlap while avoi
 > [!NOTE]
 > Usually, the original images have some areas where the texts are split (talking about long-strip comics). This step prevents the overlaid text from also getting split. It's because it eliminates the situation where the program attempts to overlay the text to the non-existent part of area which only exists on the next image.
 
-### 5. Translate and Summarize Extracted Texts with [Gemini](https://github.com/googleapis/python-genai)
-SCT sends the extracted texts to Gemini for translation and summarization.
+### 5. Translate Extracted Texts and Build Glossary with [Gemini](https://github.com/googleapis/python-genai)
+SCT sends the extracted texts to Gemini for translation and glossary building.
 
 > [!NOTE]
 > This stage is crucial as I designed it to send all extracted texts from one entire chapter to Gemini instead of the texts from only one page at a time. This is expected to make Gemini yield a better and more contextual translations.
 >
-> This stage also requests Gemini to summarize the texts so that the program can include it as additional context when translating the next chapter.
-
-> [!IMPORTANT]
-> I'm considering removing the summarization function because I found that it does nothing to improve the translation quality. 🤔
+> This stage also requests Gemini to analyze the texts and extract key terms and proper names so that the program can include them as a strict reference for Gemini when translating the next chapter.
 
 ### 6. Redact Text Areas with [Pillow](https://github.com/python-pillow/Pillow)
 SCT whitens text areas by simply overlaying white rectangle with offset on them.
