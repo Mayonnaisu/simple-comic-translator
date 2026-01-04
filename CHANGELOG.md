@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## v0.5.1
+4/1/2026
 16. Replace summary with glossary
 
 ## v0.5.0
