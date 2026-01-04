@@ -150,7 +150,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
 
         # Update existing glossary
         new_glossary = {item["source_term"]: item["translated_term"] for item in data_dict["Glossary"]}
-        logger.info(f"\nGLOSSARY:\n")
+        logger.info(f"\nGLOSSARY:")
 
         added_count = 0
         for source_term, target_term in new_glossary.items():
