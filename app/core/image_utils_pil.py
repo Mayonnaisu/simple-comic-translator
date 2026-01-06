@@ -6,7 +6,7 @@ Image.MAX_IMAGE_PIXELS = None
 from collections import Counter
 
 
-def merge_images_vertically(images, output_dir, log_level):
+def merge_images_vertically(images: list[object], output_dir: str, log_level: str):
     """
     Merges all images in each subfolder into a single image and saves it 
     in the corresponding output subfolder.
@@ -59,13 +59,13 @@ def merge_images_vertically(images, output_dir, log_level):
     return final_image
 
 
-def slice_image_in_tiles(image_path: str, tile_height: int, tile_width: int, target_max_dim: int, overlap: int, number, output_dir, log_level):
+def slice_image_in_tiles(image: list[object|int], tile_height: int, tile_width: int, target_max_dim: int, overlap: int, number: int, output_dir:str, log_level:str) -> list[dict]:
     """
     Generates overlapping image tiles (sliding window) for OCR processing. 
     Resizes tiles to fit within target_max_dim while maintaining aspect ratio,
     and returns the scaling factors.
     """
-    img_pil, width, height = image_path
+    img_pil, width, height = image
 
     tiles = []
 
@@ -117,9 +117,9 @@ def slice_image_in_tiles(image_path: str, tile_height: int, tile_width: int, tar
 
     return tiles
 
-def crop_out_box(box, image, resize, output_dir, crop_name, log_level):
+def crop_out_box(box: list[int], image: object, upscale: list[bool|int|float], output_dir: str, crop_name: str, log_level: str) -> object:
     [xmin, ymin, xmax, ymax] = box
-    use_upscaler, upscale_ratio = resize
+    use_upscaler, upscale_ratio = upscale
 
     # Ensure coordinates are valid for cropping
     xmin, ymin, xmax, ymax = max(0, xmin), max(0, ymin), min(image.size[0], xmax), min(image.size[1], ymax)
@@ -145,9 +145,9 @@ def crop_out_box(box, image, resize, output_dir, crop_name, log_level):
     return cropped_img
 
 
-def split_image_safely(image: list[object | int], detections: list[dict], max_height: int):
+def split_image_safely(image: list[object|int], detections: list[dict], max_height: int) -> tuple[list, range]:
     """
-    Split image on non-text areas, avoiding bounding boxes in the specified maximum height.
+    Split image on non-text areas, avoiding bounding boxes, within the specified maximum height.
     """
     logger.info("\nSplitting image on non-text areas.")
 
