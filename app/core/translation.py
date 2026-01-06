@@ -14,7 +14,7 @@ init(autoreset=True)
 
 def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str], gemini: list[str|float], glossary_path: str, memory_path: str, log_level: str):
     '''
-    Translate all texts from one chapter and summarize them with Gemini
+    Translate all texts from one chapter and build glossary with Gemini
     '''
     if not text_info_list:
         return text_info_list
@@ -188,6 +188,9 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
 
 
 def translate_texts_from_memory(text_info_list: list[dict], languages: list[str], memory_path: str, log_level: str):
+    '''
+    Translate all texts from one chapter with translation memory
+    '''
 
     logger.info(f"\nTranslating from memory: '{memory_path}'")
 
