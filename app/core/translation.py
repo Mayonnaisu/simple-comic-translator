@@ -2,7 +2,6 @@ import os
 import re
 import json
 import yaml
-import sqlite3
 from google import genai
 from loguru import logger
 from google.genai import types
@@ -13,7 +12,7 @@ from app.core.memory import TranslationMemory
 
 init(autoreset=True)
 
-def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str], gemini: list[str|float], glossary_path: str, memory_path: str, output_dir: str, log_level: str):
+def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str], gemini: list[str|float], glossary_path: str, memory_path: str, log_level: str):
     '''
     Translate all texts from one chapter and summarize them with Gemini
     '''
@@ -25,7 +24,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
 
     logger.info(f"\nTranslating texts to ({target_lang.upper()}) with Gemini.")
 
-    memory = TranslationMemory(db_path=f"{memory_path}")
+    memory = TranslationMemory(db_path=memory_path)
 
     data_dict = "data_dict" # define placeholder to prevent error when logging exception
 
@@ -192,7 +191,7 @@ def translate_texts_from_memory(text_info_list: list[dict], languages: list[str]
 
     logger.info(f"\nTranslating from memory: '{memory_path}'")
 
-    memory = TranslationMemory(db_path=f"{memory_path}")
+    memory = TranslationMemory(db_path=memory_path)
     source_lang, target_lang = languages
 
     for info in text_info_list:
