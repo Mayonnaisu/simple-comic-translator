@@ -202,7 +202,7 @@ def translate_texts_from_memory(text_info_list: list[dict], languages: list[str]
         if translation:
             info["translated_text"] = translation
         else:
-            info["translated_text"] = "redacted"
+            info["translated_text"] = ""
         logger.info(f"[{os.path.basename(memory_path)}] {info["original_text"]} ▶▶▶ {info["translated_text"]}")
 
     return text_info_list
