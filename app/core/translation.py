@@ -2,18 +2,18 @@ import os
 import re
 import json
 import yaml
+import sqlite3
 from google import genai
-from pathlib import Path
 from loguru import logger
 from google.genai import types
 from dotenv import load_dotenv
 from colorama import Fore, Style, init
-import sys
 
+from app.core.memory import TranslationMemory
 
 init(autoreset=True)
 
-def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str], gemini: list[str|float], glossary_path: str, output_dir: str, log_level: str):
+def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str], gemini: list[str|float], glossary_path: str, memory_path: str, output_dir: str, log_level: str):
     '''
     Translate all texts from one chapter and summarize them with Gemini
     '''
@@ -24,6 +24,8 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
     model, temperature, top_p, max_out_tokens = gemini
 
     logger.info(f"\nTranslating texts to ({target_lang.upper()}) with Gemini.")
+
+    memory = TranslationMemory(db_path=f"{memory_path}")
 
     data_dict = "data_dict" # define placeholder to prevent error when logging exception
 
@@ -129,7 +131,6 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
             translated_map[item_index] = translated_text
 
         logger.info("\nTRANSLATION:")
-        translation_text_list = []
         for i, info in enumerate(text_info_list):
             if i in translated_map:
                 text_info_list[i]["translated_text"] = translated_map[i]
@@ -141,12 +142,8 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
 
             original_text = info["original_text"]
             translated_text = info["translated_text"]
-            text_pair = f"{original_text} ==> {translated_text}"
-            logger.info(f"[{model}] {text_pair}")
-            translation_text_list.append(text_pair)
-
-        with open(f"{output_dir}/translation.txt", "w", encoding="utf-8") as translation:
-            translation.write("\n".join(translation_text_list))
+            logger.info(f"[{model}] {original_text} ▶▶▶ {translated_text}")
+            memory.add_translation(original_text, source_lang, translated_text, target_lang)
 
         # Update existing glossary
         new_glossary = {item["source_term"]: item["translated_term"] for item in data_dict["Glossary"]}
@@ -187,5 +184,23 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
         if data_dict:
             logger.debug(f"\n{data_dict}")
         raise type(e)(Fore.RED + f"{e}")
+
+    return text_info_list
+
+
+def translate_texts_from_memory(text_info_list: list[dict], languages: list[str], memory_path: str, log_level: str):
+
+    logger.info(f"\nTranslating from memory: '{memory_path}'")
+
+    memory = TranslationMemory(db_path=f"{memory_path}")
+    source_lang, target_lang = languages
+
+    for info in text_info_list:
+        translation = memory.translate(info["original_text"], target_lang)
+        if translation:
+            info["translated_text"] = translation
+        else:
+            info["translated_text"] = "redacted"
+        logger.info(f"[{os.path.basename(memory_path)}] {info["original_text"]} ▶▶▶ {info["translated_text"]}")
 
     return text_info_list

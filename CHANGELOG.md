@@ -1,7 +1,14 @@
 # CHANGELOG
 
-## v0.5.1<br>
+## v0.5.2
+6/1/2026
+
+17. Add option to specify glossary file path in **config.json**
+18. Add translation memory
+
+## v0.5.1
 4/1/2026
+
 16. Replace summary with glossary
 
 ## v0.5.0
@@ -23,15 +30,16 @@
 15. Remove hashes from **requirements-lock.txt** cuz the installations on Linux & macOS kept nagging me to pin additional transitive dependencies when using hashes, which is so bothersome lol
 
 ## v0.4.1
-10/12/2025<br>
+10/12/2025
+
 16. Upgrade `paddlepaddle` for patching vulnerabilities in transitive dependencies ([cd167d3](https://github.com/Mayonnaisu/simple-comic-translator/commit/cd167d36acef6a041aaeeaf0e3a6a7cb8ab36aca))
 17. Add Ccahe installation
 
 ## v0.4.0
 23/11/2025
-1. Remove `ultralytics`, `sahi`, & `huggingface-hub` from dependencies
+1. Remove `ultralytics`, `torchvision`, `sahi`, & `huggingface-hub` from dependencies
 2. Downgrade Python version from 3.12.0 to 3.11.0
-3. Downgrade `torch`, `torchvision`, & `numpy` versions
+3. Downgrade `torch` & `numpy` versions
 4. Use PaddleOCR for detection instead of YOLO
 5. Add installer, launcher, & updater
 6. Add extra module/s

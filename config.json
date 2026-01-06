@@ -36,7 +36,12 @@
       "temperature": 0.5,
       "top_p": 0.8,
       "max_output_tokens": 999999999
-    }
+    },
+    "memory": {
+      "enable": false,
+      "path": "input"
+    },
+    "glossary_path": "input"
   },
 
   "OVERLAY": {

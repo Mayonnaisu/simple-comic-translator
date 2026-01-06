@@ -38,9 +38,9 @@
     *   [FAQ](#faq)
 
 ## NOTICE
-### <mark>Version 0.5.0 has been released! To upgrade from the previous version, see https://github.com/Mayonnaisu/simple-comic-translator/issues/7.</mark>
+### <mark>Update & redownload config.json and prompt.yaml to get the latest features. For more info, see [CHANGELOG](CHANGELOG.md).</mark>
 
-### <mark>All PowerShell scripts (.ps1) are only tested on Windows and may not be compatible with PowerShell Core run *directly* on other OSes.</mark>
+### All PowerShell scripts (.ps1) are only tested on Windows and may not be compatible with PowerShell Core run *directly* on other OSes.
 
 ### For advanced users, use this [guide](docs/README.md).
 

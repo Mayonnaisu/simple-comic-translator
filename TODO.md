@@ -7,8 +7,8 @@
 - [ ] Improve docstrings
 - [ ] Improve comments
 - [x] Add glossary
-- [ ] Add translation memory
-- [ ] Add option to translate from memory
+- [x] Add translation memory
+- [x] Add option to translate from memory
 - [ ] Add inpainting
 - [ ] Add GPU mode and its guide
 - [ ] Clean up & refactoring

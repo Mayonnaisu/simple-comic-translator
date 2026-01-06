@@ -63,7 +63,12 @@
   "temperature": 0.5,           // Gemini temperature
   "top_p": 0.8,                 // Gemini top p
   "max_output_tokens": 999999999  // Gemini max response tokens
-} 
+},
+"memory": {
+  "enable": false,              // Use memory to translate
+  "path": "input"               // path to memory file (.db/.sqlite/.sqlite3)
+},
+"glossary_path": "input"        // path to glossary file (.json)
 ```
 
 > [!TIP]

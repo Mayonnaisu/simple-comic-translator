@@ -20,7 +20,7 @@ from app.core.model import download_repo_snapshot
 from app.core.image_utils_pil import merge_images_vertically, slice_image_in_tiles, split_image_safely
 from app.core.detection import TextAreaDetection, merge_overlapping_boxes
 from app.core.ocr import PaddleOCRRecognition, MangaOCRRecognition
-from app.core.translation import translate_texts_with_gemini
+from app.core.translation import translate_texts_with_gemini, translate_texts_from_memory
 from app.core.overlay import overlay_translated_texts
 
 # Measure time
@@ -64,7 +64,7 @@ config = load_config('config.json')
 if config:
     # For merging images
     merge_images = config['IMAGE_MERGE']['enable']
-    # For text-area detection
+    # For detecting text areas
     det_conf_threshold = config['OCR']['confidence_threshold']
     det_merge_threshold = config['DETECTION']['merge_threshold']
     det_merge_times = config['DETECTION']['merge_times']
@@ -86,6 +86,9 @@ if config:
     gemini_temp = config['TRANSLATION']['gemini']['temperature']
     gemini_top_p = config['TRANSLATION']['gemini']['top_p']
     gemini_max_out_tokens = config['TRANSLATION']['gemini']['max_output_tokens']
+    use_memory = config['TRANSLATION']['memory']['enable']
+    memory_path = config['TRANSLATION']['memory']['path']
+    glossary_path = config['TRANSLATION']['glossary_path']
     # For overlay
     box_offset = config['OVERLAY']['box']['offset']
     box_padding = config['OVERLAY']['box']['padding']
@@ -273,24 +276,30 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
             recognitions.extend(recognition)
 
-    # --- Stage 5/3: Translate Extracted Text with Gemini ---
-    # Use automatic retry in case of any translation errors
-    max_retries = max_retries
-    retry_delay = retry_delay
-    attempts = 0
+    # --- Stage 5/3: Translate Extracted Text with Gemini or from memory ---
+    memory_path = os.path.join(args.input, "memory.db") if memory_path == "input" else memory_path
+    glossary_path = os.path.join(args.input, "glossary.json") if memory_path == "input" else glossary_path
 
-    while attempts <= max_retries:
-        try:
-            translated_text_data = translate_texts_with_gemini(recognitions, [source_language, target_language], [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], os.path.join(args.input, 'glossary.json'), output_dir, log_level)
-            break
-        except Exception as e:
-            attempts += 1
-            logger.error(f"\n{Fore.RED}{type(e).__name__}: {e}")
-            if attempts <= max_retries:
-                logger.info(f"({attempts}/{max_retries}) Retrying in {retry_delay} seconds...")
-                time.sleep(retry_delay)
-            else:
-                raise Exception(Fore.RED + "Max retries reached!")
+    if not use_memory:
+        # Use automatic retry in case of any translation errors
+        max_retries = max_retries
+        retry_delay = retry_delay
+        attempts = 0
+
+        while attempts <= max_retries:
+            try:
+                translated_text_data = translate_texts_with_gemini(recognitions, [source_language, target_language], [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], glossary_path, memory_path, output_dir, log_level)
+                break
+            except Exception as e:
+                attempts += 1
+                logger.error(f"\n{Fore.RED}{type(e).__name__}: {e}")
+                if attempts <= max_retries:
+                    logger.info(f"({attempts}/{max_retries}) Retrying in {retry_delay} seconds...")
+                    time.sleep(retry_delay)
+                else:
+                    raise Exception(Fore.RED + "Max retries reached!")
+    else:
+        translated_text_data = translate_texts_from_memory(recognitions, [source_language, target_language], memory_path, log_level)
 
     # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
     overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
