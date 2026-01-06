@@ -59,18 +59,6 @@ runs:
           GEMINI_API_KEY: ${{ inputs.env }}
       shell: powershell
       run: |
-        # Set the system locale to use UTF-8 (Codepage 65001)
-        $process = Start-Process -FilePath "powershell" -ArgumentList "Set-WinSystemLocale -Locale 'en-US' -GeoId 244; `
-          $psversiontable.psversion.major; `
-          [Console]::OutputEncoding; `
-          [Console]::InputEncoding;" -Verb RunAs -PassThru -WindowStyle Hidden
-        $process | Wait-Process
-
-        # Verify the change in the current process
-        chcp 65001
-        [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-        [Console]::InputEncoding = [System.Text.Encoding]::UTF8
-
         # Run the launcher
         $ErrorLogPath = ".\Temp\log_errors-launcher.txt"
 
