@@ -278,7 +278,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
     # --- Stage 5/3: Translate Extracted Text with Gemini or from memory ---
     memory_path = os.path.join(args.input, "memory.db") if memory_path == "input" else memory_path
-    glossary_path = os.path.join(args.input, "glossary.json") if memory_path == "input" else glossary_path
+    glossary_path = os.path.join(args.input, "glossary.json") if glossary_path == "input" else glossary_path
 
     if not use_memory:
         # Use automatic retry in case of any translation errors

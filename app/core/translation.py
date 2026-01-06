@@ -175,7 +175,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
         if added_count > 0:
             with open(glossary_path, "w", encoding="utf-8") as f:
                 json.dump({"GLOSSARY": existing_glossary}, f, ensure_ascii=False, indent=4)
-            logger.info(f"Appended {added_count} new terms to '{(glossary_path)}'")
+            logger.info(f"Appended {added_count} new terms to '{glossary_path}'")
         else:
             logger.info("No new terms found.")
 
