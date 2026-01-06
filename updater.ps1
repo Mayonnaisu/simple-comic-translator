@@ -48,9 +48,9 @@ try {
         $filesToExclude = @(
             "config.json",
             "prompt.yaml",
-            "filter/manga.txt",
-            "filter/manhwa.txt",
-            "filter/manhua.txt"
+            "filters/manga.txt",
+            "filters/manhwa.txt",
+            "filters/manhua.txt"
         )
 
         foreach ($item in $filesToExclude) {
