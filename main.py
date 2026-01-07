@@ -88,6 +88,7 @@ if config:
     gemini_max_out_tokens = config['TRANSLATION']['gemini']['max_output_tokens']
     use_memory = config['TRANSLATION']['memory']['enable']
     memory_path = config['TRANSLATION']['memory']['path']
+    overwrite_memory = config['TRANSLATION']['memory']['overwrite']
     glossary_path = config['TRANSLATION']['glossary_path']
     # For overlay
     box_offset = config['OVERLAY']['box']['offset']
@@ -288,7 +289,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
         while attempts <= max_retries:
             try:
-                translated_text_data = translate_texts_with_gemini(recognitions, [source_language, target_language], [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], glossary_path, memory_path, log_level)
+                translated_text_data = translate_texts_with_gemini(recognitions, [source_language, target_language], [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], glossary_path, [overwrite_memory, memory_path], log_level)
                 break
             except Exception as e:
                 attempts += 1

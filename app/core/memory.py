@@ -1,7 +1,7 @@
 import sqlite3
 
 class TranslationMemory:
-    def __init__(self, db_path="multi_tm.db"):
+    def __init__(self, db_path: str ="multi_tm.db"):
         self.db_path = db_path
         self.conn = sqlite3.connect(self.db_path)
         self._create_tables()
@@ -25,7 +25,7 @@ class TranslationMemory:
         """)
         self.conn.commit()
 
-    def add_translation(self, text, lang_from, translation, lang_to):
+    def add_translation(self, text: str, lang_from: str, translation: str, lang_to: str, overwrite: bool):
         cursor = self.conn.cursor()
         
         # 1. Find if the concept already exists in any language
@@ -40,17 +40,22 @@ class TranslationMemory:
             concept_id = cursor.lastrowid
             # Add the source text for the source language
             cursor.execute("INSERT INTO translations (concept_id, lang, content) VALUES (?, ?, ?)", 
-                           (concept_id, lang_from, text))
+            (concept_id, lang_from, text))
 
-        # 3. Add the target translation (ignores if already exists for that lang)
-        cursor.execute("""
-            INSERT OR IGNORE INTO translations (concept_id, lang, content) 
+        # 3. Add the target translation (replaces or ignores if already exists for that lang)
+        if overwrite:
+            write = 'REPLACE'
+        else:
+            write = 'IGNORE'
+
+        cursor.execute(f"""
+            INSERT OR {write} INTO translations (concept_id, lang, content) 
             VALUES (?, ?, ?)
         """, (concept_id, lang_to, translation))
         
         self.conn.commit()
 
-    def translate(self, text, target_lang):
+    def translate(self, text: str, target_lang: str):
         """Translates text to target_lang regardless of original source direction."""
         cursor = self.conn.cursor()
         # Find the concept ID of the input text, then find its translation in target_lang

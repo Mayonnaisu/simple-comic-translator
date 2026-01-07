@@ -66,7 +66,8 @@
 },
 "memory": {
   "enable": false,              // Use memory to translate
-  "path": "input"               // path to memory file (.db/.sqlite/.sqlite3)
+  "overwrite": false,           // overwite existing texts in memory
+  "path": "input"               // path to memory file (.db/.db3/.sqlite/.sqlite3)
 },
 "glossary_path": "input"        // path to glossary file (.json)
 ```

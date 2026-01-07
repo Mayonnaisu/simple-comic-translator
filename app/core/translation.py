@@ -12,7 +12,7 @@ from app.core.memory import TranslationMemory
 
 init(autoreset=True)
 
-def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str], gemini: list[str|float], glossary_path: str, memory_path: str, log_level: str):
+def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str], gemini: list[str|float], glossary_path: str, memory: list[str|bool], log_level: str):
     '''
     Translate all texts from one chapter and build glossary with Gemini
     '''
@@ -21,6 +21,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
 
     source_lang, target_lang = languages
     model, temperature, top_p, max_out_tokens = gemini
+    overwrite_memory, memory_path = memory
 
     logger.info(f"\nTranslating texts to ({target_lang.upper()}) with Gemini.")
 
@@ -142,7 +143,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
             original_text = info["original_text"]
             translated_text = info["translated_text"]
             logger.info(f"[{model}] {original_text} ▶▶▶ {translated_text}")
-            memory.add_translation(original_text, source_lang, translated_text, target_lang)
+            memory.add_translation(original_text, source_lang, translated_text, target_lang, overwrite_memory)
 
         # Update existing glossary
         new_glossary = {item["source_term"]: item["translated_term"] for item in data_dict["Glossary"]}

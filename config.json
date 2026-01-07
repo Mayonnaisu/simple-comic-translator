@@ -39,6 +39,7 @@
     },
     "memory": {
       "enable": false,
+      "overwrite": false,
       "path": "input"
     },
     "glossary_path": "input"
