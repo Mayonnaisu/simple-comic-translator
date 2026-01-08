@@ -1,8 +1,7 @@
 import os
-import cv2
 from PIL import Image
-from loguru import logger
 Image.MAX_IMAGE_PIXELS = None
+from loguru import logger
 from collections import Counter
 
 
