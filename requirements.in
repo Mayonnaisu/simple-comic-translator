@@ -7,7 +7,7 @@ paddlepaddle==3.2.2
 huggingface-hub==0.36.0
 pyyaml==6.0.2
 python-dotenv==1.2.1
-google-genai==1.50.1
+google-genai==1.57.0
 natsort==8.4.0
 colorama==0.4.6
 loguru==0.7.3
