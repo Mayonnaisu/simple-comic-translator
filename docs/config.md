@@ -6,8 +6,8 @@
 "debug_mode": false,            // use DEBUG mode
 "result": {
   "overwrite": false,           // overwrite existing output images
-  "use_json": false,            // load existing result.json
-  "json_path": "input"          // path to result.json: "input"/"output"
+  "load_json": false,           // load existing result.json
+  "json_path": "output"         // path to result.json: "input"/"output"
 }
 ```
 
@@ -84,9 +84,9 @@
 "memory": {
   "enable": false,              // Use memory to translate
   "overwrite": false,           // overwite existing texts in memory
-  "path": "input"               // path to memory file (.db/.db3/.sqlite/.sqlite3): "input"/"output"/path
+  "path": "output"              // path to memory file (.db/.db3/.sqlite/.sqlite3): "input"/"output"/path
 },
-"glossary_path": "input"        // path to glossary file (.json)
+"glossary_path": "output"       // path to glossary file (.json)
 ```
 
 > [!TIP]

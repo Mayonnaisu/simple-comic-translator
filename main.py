@@ -41,7 +41,7 @@ parser.add_argument("--output", type=str, help="(str): path to output folder")
 parser.add_argument("--gpu", action='store_true', help="use GPU")
 parser.add_argument("--debug", action='store_true', help="enable debug mode")
 parser.add_argument("--overwrite", action='store_true', help="overwrite existing output images")
-parser.add_argument("--use_json", action='store_true', help="load existing result.json")
+parser.add_argument("--load_json", action='store_true', help="load existing result.json")
 
 args = parser.parse_args()
 
@@ -52,7 +52,7 @@ if config:
     gpu_mode = config['GENERAL']['gpu_mode']
     debug_mode = config['GENERAL']['debug_mode']
     overwrite_result = config['GENERAL']['result']['overwrite']
-    use_result_json = config['GENERAL']['result']['use_json']
+    use_result_json = config['GENERAL']['result']['load_json']
     result_json_path = config['GENERAL']['result']['json_path']
     # For merging images
     merge_images = config['IMAGE_MERGE']['enable']
@@ -205,7 +205,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
         image_width, image_height = merged_image.size
 
         # Use existing result.json if set and exists
-        if (use_result_json or args.use_json) and os.path.exists(result_json_path):
+        if (use_result_json or args.load_json) and os.path.exists(result_json_path):
             recognitions = load_result_json(result_json_path, [memory, overwrite_memory, source_language, target_language])
         else:
             # --- Stage 2: Detect Text Areas with ogkalu/comic-text-and-bubble-detector.onnx
@@ -245,7 +245,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
         image_chunks, chunks_number = split_image_safely([merged_image, image_width, image_height], recognitions, max_height)
     else:
         # Use existing result.json if set and exists
-        if (use_result_json or args.use_json) and os.path.exists(result_json_path):
+        if (use_result_json or args.load_json) and os.path.exists(result_json_path):
             recognitions = load_result_json(result_json_path, [memory, overwrite_memory, source_language, target_language])
 
             image_chunks = []
@@ -316,7 +316,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
 
     # --- Stage 5/3: Translate Extracted Text with Gemini or from memory ---
     # Use existing result.json if set and exists
-    if (use_result_json or args.use_json) and os.path.exists(result_json_path):
+    if (use_result_json or args.load_json) and os.path.exists(result_json_path):
         translated_text_data = recognitions
     else:
         glossary_path = os.path.join(input_path, "glossary.json") if glossary_path == "input" else os.path.join(output_path, "glossary.json") if glossary_path == "output" else glossary_path
