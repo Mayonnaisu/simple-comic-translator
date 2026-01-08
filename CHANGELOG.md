@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v0.5.3
+8/1/2026
+
+19. Add general settings to **config.json**
+    - GPU mode
+    - DEBUG mode
+    - overwrite existing result
+    - use existing **result.json**
+    - specify **result.json** path
+20. Update arguments
+
 ## v0.5.2
 6/1/2026
 

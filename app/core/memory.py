@@ -1,7 +1,11 @@
+import json
 import sqlite3
+import numpy as np
+from loguru import logger
+
 
 class TranslationMemory:
-    def __init__(self, db_path: str ="multi_tm.db"):
+    def __init__(self, db_path: str ="memory.db"):
         self.db_path = db_path
         self.conn = sqlite3.connect(self.db_path)
         self._create_tables()
@@ -67,3 +71,37 @@ class TranslationMemory:
         cursor.execute(query, (text, target_lang))
         result = cursor.fetchone()
         return result[0] if result else None
+
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        # Convert NumPy arrays to lists
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        # Convert NumPy integers (int32, int64) to Python int
+        if isinstance(obj, np.integer):
+            return int(obj)
+        # Convert NumPy floats (float32, float64) to Python float
+        if isinstance(obj, np.floating):
+            return float(obj)
+        return super().default(obj)
+
+
+def load_result_json(result_json_path: str, memory: list[object|str|bool]):
+    logger.info(f"\nLoading existing result.json")
+
+    tm, overwrite_memory, source_language, target_language = memory
+
+    with open(result_json_path, "r", encoding="utf-8") as f:
+        loaded_result_json = json.load(f)
+
+    for item in loaded_result_json:
+        # Convert bounding boxes back to NumPy arrays
+        item["box"] = np.array(item["box"], dtype=np.int32)
+        # Overwrite or keep translation memory
+        if overwrite_memory:
+            tm.add_translation(item["original_text"], source_language, item["translated_text"], target_language, overwrite_memory)
+
+    logger.success(f"Existing result.json loaded.")
+
+    return loaded_result_json

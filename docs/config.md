@@ -1,5 +1,22 @@
 ## CONFIG OPTIONS
 
+### GENERAL
+```jsonc
+"gpu_mode": false,              // use GPU mode
+"debug_mode": false,            // use DEBUG mode
+"result": {
+  "overwrite": false,           // overwrite existing output images
+  "use_json": false,            // load existing result.json
+  "json_path": "input"          // path to result.json: "input"/"output"
+}
+```
+
+> [!IMPORTANT]
+> I'm not done with GPU mode, so don't use it cuz it won't work.
+
+> [!TIP]
+> You can use either **config.json** or arguments to enable the settings above. If any of the settings is set to `true` in either of the methods, it will be enabled. However, to disable the setting, you need to disable it in both of the methods.
+
 ### IMAGE_MERGE
 ```jsonc
 "enable": true                  // enable or disable merging, including IMAGE_SPLIT
@@ -67,7 +84,7 @@
 "memory": {
   "enable": false,              // Use memory to translate
   "overwrite": false,           // overwite existing texts in memory
-  "path": "input"               // path to memory file (.db/.db3/.sqlite/.sqlite3)
+  "path": "input"               // path to memory file (.db/.db3/.sqlite/.sqlite3): "input"/"output"/path
 },
 "glossary_path": "input"        // path to glossary file (.json)
 ```

@@ -1,4 +1,14 @@
 {
+  "GENERAL": {
+    "gpu_mode": false,
+    "debug_mode": false,
+    "result": {
+      "overwrite": false,
+      "use_json": false,
+      "json_path": "output"
+    }
+  },
+
   "IMAGE_MERGE": {
     "enable": true
   },
@@ -40,9 +50,9 @@
     "memory": {
       "enable": false,
       "overwrite": false,
-      "path": "input"
+      "path": "output"
     },
-    "glossary_path": "input"
+    "glossary_path": "output"
   },
 
   "OVERLAY": {

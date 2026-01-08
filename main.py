@@ -2,6 +2,7 @@ import os
 import re
 # import cv2
 import sys
+import json
 import time
 import argparse
 from PIL import Image
@@ -21,6 +22,7 @@ from app.core.image_utils_pil import merge_images_vertically, slice_image_in_til
 from app.core.detection import TextAreaDetection, merge_overlapping_boxes
 from app.core.ocr import PaddleOCRRecognition, MangaOCRRecognition
 from app.core.translation import translate_texts_with_gemini, translate_texts_from_memory
+from app.core.memory import TranslationMemory, NumpyEncoder, load_result_json
 from app.core.overlay import overlay_translated_texts
 
 # Measure time
@@ -38,30 +40,20 @@ parser.add_argument("--input", type=str, help="(str): path to your comic folder"
 parser.add_argument("--output", type=str, help="(str): path to output folder")
 parser.add_argument("--gpu", action='store_true', help="use GPU")
 parser.add_argument("--debug", action='store_true', help="enable debug mode")
+parser.add_argument("--overwrite", action='store_true', help="overwrite existing output images")
+parser.add_argument("--use_json", action='store_true', help="load existing result.json")
 
 args = parser.parse_args()
-
-input_path = args.input
-output_path = args.output if args.output else f"{input_path}-shitted"
-
-# Start logging
-logger.remove() # Remove the default handler
-
-log_level = "INFO" if args.debug == False else "TRACE"
-formatted_datetime = datetime.now().strftime("%Y-%m-%d_%H.%M")
-
-logger.add(sys.stderr, format="{message}", level=log_level)
-logger.add(f"temp/logs/{formatted_datetime}.log", format="{message}", level="TRACE")
-
-# Assign the custom handler to sys.excepthook
-sys.excepthook = handle_uncaught_exception
-
-# Show app version
-logger.info(f"SCT version: {__version__}\n")
 
 # Load configurations from config.json
 config = load_config('config.json')
 if config:
+    # For general settings
+    gpu_mode = config['GENERAL']['gpu_mode']
+    debug_mode = config['GENERAL']['debug_mode']
+    overwrite_result = config['GENERAL']['result']['overwrite']
+    use_result_json = config['GENERAL']['result']['use_json']
+    result_json_path = config['GENERAL']['result']['json_path']
     # For merging images
     merge_images = config['IMAGE_MERGE']['enable']
     # For detecting text areas
@@ -101,13 +93,32 @@ if config:
     font_color = config['OVERLAY']['font']['color']
     font_path = config['OVERLAY']['font']['path']
 
+# Start logging
+logger.remove() # Remove the default handler
+
+log_level = "INFO" if args.debug == False and debug_mode == False else "TRACE"
+formatted_datetime = datetime.now().strftime("%Y-%m-%d_%H.%M")
+
+logger.add(sys.stderr, format="{message}", level=log_level)
+logger.add(f"temp/logs/{formatted_datetime}.log", format="{message}", level="TRACE")
+
+# Assign the custom handler to sys.excepthook
+sys.excepthook = handle_uncaught_exception
+
+# Show app version
+logger.info(f"SCT version: {__version__}\n")
+
 # --- Main Execution ---
+input_path = args.input
+output_path = args.output if args.output else f"{input_path}-shitted"
+os.makedirs(output_path, exist_ok=True)
+
 image_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')
 lang_code_jp = ("japanese", "japan", "jpn", "jp", "ja")
 
 # Check if input path exists
-if not os.path.exists(args.input):
-    raise Exception(Fore.RED + f"{args.input} does not exist!")
+if not os.path.exists(input_path):
+    raise Exception(Fore.RED + f"{input_path} does not exist!")
 
 # Download detection model if not exist
 repo_id="ogkalu/comic-text-and-bubble-detector"
@@ -118,25 +129,28 @@ if not os.path.exists(f"{model_path}/{file_name}"):
     download_repo_snapshot(repo_id=repo_id, local_dir=model_path)
 
 # Initialize models
-detector = TextAreaDetection(model_path=f"{model_path}/{file_name}", confidence_threshold=det_conf_threshold, use_gpu=args.gpu)
+detector = TextAreaDetection(model_path=f"{model_path}/{file_name}", confidence_threshold=det_conf_threshold, use_gpu=True if args.gpu or gpu_mode else False)
 det_target_size = 640
 
 if source_language in lang_code_jp:
-    extractor = MangaOCRRecognition(use_cpu=True if args.gpu == False else False)
+    extractor = MangaOCRRecognition(use_cpu=True if args.gpu == False and gpu_mode == False else False)
 else:
-    extractor = PaddleOCRRecognition(ocr_version='PP-OCRv5', language=source_language, confidence_threshold=ocr_conf_threshold, use_gpu=args.gpu)
+    extractor = PaddleOCRRecognition(ocr_version='PP-OCRv5', language=source_language, confidence_threshold=ocr_conf_threshold, use_gpu=True if args.gpu or gpu_mode else False)
+
+memory_path = os.path.join(input_path, "memory.db") if memory_path == "input" else os.path.join(output_path, "memory.db") if memory_path == "output" else memory_path
+memory = TranslationMemory(memory_path)
 
 # Iterate through all directories using os.walk
-for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
+for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
 
     # Define the output path
-    relative_path = Path(dirpath).relative_to(args.input)
+    relative_path = Path(dirpath).relative_to(input_path)
     output_dir = Path(output_path) / relative_path
     output_dir.mkdir(parents=True, exist_ok=True) # Create output directory
 
     logger.info(Style.BRIGHT + Fore.YELLOW + f"\nProcessing '{dirpath}'")
 
-    # Skip if output files already exist
+    # Skip or overwrite if output files already exist
     already_exist = False
     regex_pattern = r"^image_.*"
 
@@ -145,18 +159,24 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
         if re.match(regex_pattern, filename):
             if os.path.exists(full_path):
-                logger.info(Fore.GREEN + f"- Files already exist in '{output_dir}'. Skipping.")
                 already_exist = True
                 break
 
     if already_exist:
-        continue
+        if not overwrite_result:
+            logger.info(Fore.GREEN + f"- Files already exist in '{output_dir}'. SKIPPING.")
+            continue
+        else:
+            logger.info(Fore.GREEN + f"- Files already exist in '{output_dir}'. OVERWRITING.")
+
+    # Define result.json path
+    result_json_path = os.path.join(dirpath, "result.json") if result_json_path == "input" else os.path.join(output_dir, "result.json") if result_json_path == "output" else result_json_path
 
     # Filter for image files and sort files to ensure consistent merging order
     image_files = [os.path.join(dirpath, f) for f in natsorted(filenames) if f.lower().endswith(image_extensions)]
 
     if not image_files:
-        logger.info(Fore.BLUE + f"- No image in '{dirpath}'. Skipping.")
+        logger.info(Fore.BLUE + f"- No image in '{dirpath}'. SKIPPING.")
         continue
 
     images = []
@@ -184,77 +204,29 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
 
         image_width, image_height = merged_image.size
 
-        # --- Stage 2: Detect Text Areas with ogkalu/comic-text-and-bubble-detector.onnx
-        tile_width = image_width if tile_width == "original" else tile_width
-
-        tile_height = tile_width if tile_height == "tile_width" else tile_height
-
-        tile_overlap_px = int(tile_height * tile_overlap)
-
-        image_slices = slice_image_in_tiles(
-            [merged_image, image_width, image_height], tile_height, tile_width, det_target_size, tile_overlap_px, "", output_dir, log_level
-        )
-
-        # detections = detector.batch_threaded("", image_slices, target_sizes=[tile_height, tile_width], log_level=log_level, image_tiled=True)
-
-        logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
-        detections = []
-        for i, slice in enumerate(tqdm(image_slices)):
-            detection = detector.detect_text_areas("", i, slice, target_sizes=[det_target_size, det_target_size], log_level=log_level, image_tiled=True)
-            if detection:
-                detections.extend(detection)
-
-        # Merge overlapping boxes by the specified number of times because 1x isn't enough to merge all of them
-        merged_detections = None
-        for x in range(det_merge_times):
-            detections = merge_overlapping_boxes(detections, det_merge_threshold)
-            merged_detections = detections
-        logger.success(f"Found {len(merged_detections)} detections.")
-
-        # --- Stage 3: Extract Texts with Manga OCR/PaddleOCR
-        if source_language in lang_code_jp:
-            recognitions = extractor.batch_threaded2(merged_image, "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
+        # Use existing result.json if set and exists
+        if (use_result_json or args.use_json) and os.path.exists(result_json_path):
+            recognitions = load_result_json(result_json_path, [memory, overwrite_memory, source_language, target_language])
         else:
-            recognitions = extractor.batch_threaded(merged_image, "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
-
-        # --- Stage 4: Split Image Safely on Non-Text Areas ---
-        image_chunks, chunks_number = split_image_safely([merged_image, image_width, image_height], recognitions, max_height)
-    else:
-        image_chunks = []
-        recognitions = []
-
-        for n, image in enumerate(images):
-            image_width, image_height = image.size
-            image_name = f"image_{n:02d}"
-            image_chunks.append({
-                "image_name": image_name,
-                "image": image
-            })
-
-            # --- Stage 1: Detect Text Areas ogkalu/comic-text-and-bubble-detector.onnx
+            # --- Stage 2: Detect Text Areas with ogkalu/comic-text-and-bubble-detector.onnx
             tile_width = image_width if tile_width == "original" else tile_width
 
             tile_height = tile_width if tile_height == "tile_width" else tile_height
 
             tile_overlap_px = int(tile_height * tile_overlap)
 
-            if image_width == det_target_size and tile_width == det_target_size:
-                logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
-                detections = detector.detect_text_areas(image_name, n, image, target_sizes=[det_target_size, det_target_size], log_level=log_level, image_tiled=False)
-            else:
-                image_slices = slice_image_in_tiles([image, image_width, image_height], tile_height, tile_width, det_target_size, tile_overlap_px, n, output_dir, log_level)
+            image_slices = slice_image_in_tiles(
+                [merged_image, image_width, image_height], tile_height, tile_width, det_target_size, tile_overlap_px, "", output_dir, log_level
+            )
 
-                # detections = detector.batch_threaded(image_name,image_slices, target_sizes=[tile_height, tile_width], log_level=log_level, image_tiled=True)
+            # detections = detector.batch_threaded("", image_slices, target_sizes=[tile_height, tile_width], log_level=log_level, image_tiled=True)
 
-                logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
-                detections = []
-                for i, slice in enumerate(tqdm(image_slices)):
-                    detection = detector.detect_text_areas(image_name, i, slice, target_sizes=[det_target_size, det_target_size], log_level=log_level, image_tiled=True)
+            logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
+            detections = []
+            for i, slice in enumerate(tqdm(image_slices)):
+                detection = detector.detect_text_areas("", i, slice, target_sizes=[det_target_size, det_target_size], log_level=log_level, image_tiled=True)
+                if detection:
                     detections.extend(detection)
-
-            if not detections:
-                logger.warning(Fore.YELLOW + "NO DETECTION! Skipping...")
-                continue
 
             # Merge overlapping boxes by the specified number of times because 1x isn't enough to merge all of them
             merged_detections = None
@@ -263,44 +235,116 @@ for dirpath, dirnames, filenames in natsorted(os.walk(args.input)):
                 merged_detections = detections
             logger.success(f"Found {len(merged_detections)} detections.")
 
-            # --- Stage 2: Extract Texts with Manga OCR/PaddleOCR
+            # --- Stage 3: Extract Texts with Manga OCR/PaddleOCR
             if source_language in lang_code_jp:
-                recognition = extractor.batch_threaded2(image, n, merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
-
-                # recognition = []
-                # for i, detection in enumerate(merged_detections):
-                #     rec = extractor.run_mangaocr_on_detections(image, f"crop{n}_{i:02d}.png", detection, [use_upscaler, upscale_ratio], output_dir, log_level)
-                #     if rec:
-                #         recognition.append(rec)
+                recognitions = extractor.batch_threaded2(merged_image, "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
             else:
-                recognition = extractor.batch_threaded(image, n, merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
+                recognitions = extractor.batch_threaded(merged_image, "", merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
 
-            recognitions.extend(recognition)
+        # --- Stage 4: Split Image Safely on Non-Text Areas ---
+        image_chunks, chunks_number = split_image_safely([merged_image, image_width, image_height], recognitions, max_height)
+    else:
+        # Use existing result.json if set and exists
+        if (use_result_json or args.use_json) and os.path.exists(result_json_path):
+            recognitions = load_result_json(result_json_path, [memory, overwrite_memory, source_language, target_language])
+
+            image_chunks = []
+            for n, image in enumerate(images):
+                image_width, image_height = image.size
+                image_name = f"image_{n:02d}"
+                image_chunks.append({
+                    "image_name": image_name,
+                    "image": image
+                })
+        else:
+            image_chunks = []
+            recognitions = []
+
+            for n, image in enumerate(images):
+                image_width, image_height = image.size
+                image_name = f"image_{n:02d}"
+                image_chunks.append({
+                    "image_name": image_name,
+                    "image": image
+                })
+
+                # --- Stage 1: Detect Text Areas ogkalu/comic-text-and-bubble-detector.onnx
+                tile_width = image_width if tile_width == "original" else tile_width
+
+                tile_height = tile_width if tile_height == "tile_width" else tile_height
+
+                tile_overlap_px = int(tile_height * tile_overlap)
+
+                if image_width == det_target_size and tile_width == det_target_size:
+                    logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
+                    detections = detector.detect_text_areas(image_name, n, image, target_sizes=[det_target_size, det_target_size], log_level=log_level, image_tiled=False)
+                else:
+                    image_slices = slice_image_in_tiles([image, image_width, image_height], tile_height, tile_width, det_target_size, tile_overlap_px, n, output_dir, log_level)
+
+                    # detections = detector.batch_threaded(image_name,image_slices, target_sizes=[tile_height, tile_width], log_level=log_level, image_tiled=True)
+
+                    logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
+                    detections = []
+                    for i, slice in enumerate(tqdm(image_slices)):
+                        detection = detector.detect_text_areas(image_name, i, slice, target_sizes=[det_target_size, det_target_size], log_level=log_level, image_tiled=True)
+                        detections.extend(detection)
+
+                if not detections:
+                    logger.warning(Fore.YELLOW + "NO DETECTION! SKIPPING.")
+                    continue
+
+                # Merge overlapping boxes by the specified number of times because 1x isn't enough to merge all of them
+                merged_detections = None
+                for x in range(det_merge_times):
+                    detections = merge_overlapping_boxes(detections, det_merge_threshold)
+                    merged_detections = detections
+                logger.success(f"Found {len(merged_detections)} detections.")
+
+                # --- Stage 2: Extract Texts with Manga OCR/PaddleOCR
+                if source_language in lang_code_jp:
+                    recognition = extractor.batch_threaded2(image, n, merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
+
+                    # recognition = []
+                    # for i, detection in enumerate(merged_detections):
+                    #     rec = extractor.run_mangaocr_on_detections(image, f"crop{n}_{i:02d}.png", detection, [use_upscaler, upscale_ratio], output_dir, log_level)
+                    #     if rec:
+                    #         recognition.append(rec)
+                else:
+                    recognition = extractor.batch_threaded(image, n, merged_detections, [use_upscaler, upscale_ratio], output_dir, log_level)
+
+                recognitions.extend(recognition)
 
     # --- Stage 5/3: Translate Extracted Text with Gemini or from memory ---
-    memory_path = os.path.join(args.input, "memory.db") if memory_path == "input" else memory_path
-    glossary_path = os.path.join(args.input, "glossary.json") if glossary_path == "input" else glossary_path
-
-    if not use_memory:
-        # Use automatic retry in case of any translation errors
-        max_retries = max_retries
-        retry_delay = retry_delay
-        attempts = 0
-
-        while attempts <= max_retries:
-            try:
-                translated_text_data = translate_texts_with_gemini(recognitions, [source_language, target_language], [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], glossary_path, [overwrite_memory, memory_path], log_level)
-                break
-            except Exception as e:
-                attempts += 1
-                logger.error(f"\n{Fore.RED}{type(e).__name__}: {e}")
-                if attempts <= max_retries:
-                    logger.info(f"({attempts}/{max_retries}) Retrying in {retry_delay} seconds...")
-                    time.sleep(retry_delay)
-                else:
-                    raise Exception(Fore.RED + "Max retries reached!")
+    # Use existing result.json if set and exists
+    if (use_result_json or args.use_json) and os.path.exists(result_json_path):
+        translated_text_data = recognitions
     else:
-        translated_text_data = translate_texts_from_memory(recognitions, [source_language, target_language], memory_path, log_level)
+        glossary_path = os.path.join(input_path, "glossary.json") if glossary_path == "input" else os.path.join(output_path, "glossary.json") if glossary_path == "output" else glossary_path
+
+        if not use_memory:
+            # Use automatic retry in case of any translation errors
+            max_retries = max_retries
+            retry_delay = retry_delay
+            attempts = 0
+
+            while attempts <= max_retries:
+                try:
+                    translated_text_data = translate_texts_with_gemini(recognitions, [source_language, target_language], [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], glossary_path, [memory, overwrite_memory], log_level)
+                    break
+                except Exception as e:
+                    attempts += 1
+                    logger.error(f"\n{Fore.RED}{type(e).__name__}: {e}")
+                    if attempts <= max_retries:
+                        logger.info(f"({attempts}/{max_retries}) Retrying in {retry_delay} seconds...")
+                        time.sleep(retry_delay)
+                    else:
+                        raise Exception(Fore.RED + "Max retries reached!")
+        else:
+            translated_text_data = translate_texts_from_memory(recognitions, [source_language, target_language], memory, log_level)
+
+        # Save result to result.json
+        with open(result_json_path, 'w', encoding='utf-8') as f:
+            json.dump(translated_text_data, f, cls=NumpyEncoder, ensure_ascii=False, indent=4)
 
     # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
     overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)

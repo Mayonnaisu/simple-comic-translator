@@ -12,7 +12,7 @@ from app.core.memory import TranslationMemory
 
 init(autoreset=True)
 
-def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str], gemini: list[str|float], glossary_path: str, memory: list[str|bool], log_level: str):
+def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str], gemini: list[str|float], glossary_path: str, memory: list[object|bool], log_level: str):
     '''
     Translate all texts from one chapter and build glossary with Gemini
     '''
@@ -21,11 +21,9 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
 
     source_lang, target_lang = languages
     model, temperature, top_p, max_out_tokens = gemini
-    overwrite_memory, memory_path = memory
+    tm, overwrite_memory = memory
 
     logger.info(f"\nTranslating texts to ({target_lang.upper()}) with Gemini.")
-
-    memory = TranslationMemory(db_path=memory_path)
 
     data_dict = "data_dict" # define placeholder to prevent error when logging exception
 
@@ -143,7 +141,7 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
             original_text = info["original_text"]
             translated_text = info["translated_text"]
             logger.info(f"[{model}] {original_text} ▶▶▶ {translated_text}")
-            memory.add_translation(original_text, source_lang, translated_text, target_lang, overwrite_memory)
+            tm.add_translation(original_text, source_lang, translated_text, target_lang, overwrite_memory)
 
         # Update existing glossary
         new_glossary = {item["source_term"]: item["translated_term"] for item in data_dict["Glossary"]}
@@ -188,14 +186,14 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
     return text_info_list
 
 
-def translate_texts_from_memory(text_info_list: list[dict], languages: list[str], memory_path: str, log_level: str):
+def translate_texts_from_memory(text_info_list: list[dict], languages: list[str], memory: object, log_level: str):
     '''
     Translate all texts from one chapter with translation memory
     '''
+    memory_name = os.path.basename(memory.db_path)
 
-    logger.info(f"\nTranslating from memory: '{memory_path}'")
+    logger.info(f"\nTranslating from memory: '{memory_name}'")
 
-    memory = TranslationMemory(db_path=memory_path)
     source_lang, target_lang = languages
 
     for info in text_info_list:
@@ -204,6 +202,6 @@ def translate_texts_from_memory(text_info_list: list[dict], languages: list[str]
             info["translated_text"] = translation
         else:
             info["translated_text"] = ""
-        logger.info(f"[{os.path.basename(memory_path)}] {info["original_text"]} ▶▶▶ {info["translated_text"]}")
+        logger.info(f"[{memory_name}] {info["original_text"]} ▶▶▶ {info["translated_text"]}")
 
     return text_info_list

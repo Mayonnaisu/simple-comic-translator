@@ -66,22 +66,25 @@ def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_siz
 
 def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_results: list[dict], box: list[int | str | tuple], font: list[int | str], image_extension: str, source_language: str, output_path: str, log_level: str):
     """Overlays the detected text boxes and translated texts onto the corresponding safely-splitted images and saves them."""
+
+    logger.info("\nOverlaying translated texts.")
+
     if not os.path.exists(output_path): os.makedirs(output_path)
 
     box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness = box
     font_min, font_max, font_color, font_path = font
 
-    inclusion = ("i", "you", "we", "they", "he", "she", "it", "ah")
+    # inclusion = ("i", "you", "we", "they", "he", "she", "it", "ah")
 
-    # Set filter according to source source_language
-    source_language, lang_code_jp = source_language
+    # # Set filter according to source source_language
+    # source_language, lang_code_jp = source_language
 
-    if source_language in lang_code_jp:
-        filter_path = "filters/manga.txt"
-    elif source_language == "korean":
-        filter_path = "filters/manhwa.txt"
-    elif source_language == "ch":
-        filter_path = "filters/manhua.txt"
+    # if source_language in lang_code_jp:
+    #     filter_path = "filters/manga.txt"
+    # elif source_language == "korean":
+    #     filter_path = "filters/manhwa.txt"
+    # elif source_language == "ch":
+    #     filter_path = "filters/manhua.txt"
 
     for i, image_info in enumerate(images):
         image_name = f"image_{i:02d}"
@@ -215,4 +218,5 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             logger.success(f"Saved annotated result to {output_path}")
             annotation_image.close()
 
-    logger.success(Fore.GREEN + f"Translated images saved to {output_path}.")
+    logger.success("Translated texts overlaid.")
+    logger.success(Fore.GREEN + f"\nTranslated images saved to {output_path}.")
