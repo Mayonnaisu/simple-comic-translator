@@ -133,13 +133,12 @@ class TextAreaDetection:
 
                     result = {
                         "box": np.array(adjusted_points, dtype=np.int32),
-                        "confidence": scr,
+                        "confidence": float(scr),
                         "original_text": "",
                         "text_confidence": 0,
                         "translated_text": "",
                         "center_y": center_y,
                         "image_name": image_name,
-                        "slice_name": "",
                         "number": number
                     }
 
