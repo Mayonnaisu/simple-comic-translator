@@ -214,11 +214,34 @@ try {
     try {
         Write-Host "`nInstalling Ccache..." -ForegroundColor Yellow
 
-        winget install --id Ccache.Ccache --source winget --exact --force
+        winget install --id Ccache.Ccache --source winget --exact --force --accept-package-agreements --accept-source-agreements
 
         Write-Host "`nCcache Installed Successfully." -ForegroundColor DarkGreen
     } catch {
         Throw "`nFailed to Install Ccache!`nERROR: $($_.Exception.Message)"
+    }
+
+    # Install Git
+    try {
+        Write-Host "`nChecking Git..." -ForegroundColor Yellow
+
+        git --version
+
+        Write-Host "Git Already Installed." -ForegroundColor Green
+    } catch [System.Management.Automation.CommandNotFoundException] {
+        Write-Host "Git Not Installed." -ForegroundColor Magenta
+
+        try {
+            Write-Host "`nInstalling Git..." -ForegroundColor Yellow
+
+            winget install --id Git.Git --source winget --exact --force --accept-package-agreements --accept-source-agreements
+
+            Write-Host "`nGit Installed Successfully." -ForegroundColor DarkGreen
+        } catch {
+            Throw "$($_.Exception.Message)"
+        }
+    } catch {
+        Throw "Failed to Install Git!`nERROR: $($_.Exception.Message)"
     }
 
     # Install Pyenv Windows
@@ -255,7 +278,7 @@ try {
             Throw "$($_.Exception.Message)"
         }
     } catch {
-        Throw "`nFailed to Install Pyenv Windows!`nERROR: $($_.Exception.Message)"
+        Throw "Failed to Install Pyenv Windows!`nERROR: $($_.Exception.Message)"
     }
 
     # Since it's required to reopen PowerShell after installing Pyenv Windows, I'll just launch PowerShell in a new window to install Python 3.12.0 with Pyenv, set up Python virtual environment, & install SCT dependencies.
