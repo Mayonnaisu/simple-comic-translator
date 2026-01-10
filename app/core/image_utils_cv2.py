@@ -52,7 +52,7 @@ def merge_images_vertically(images, output_dir, log_level):
         output_path = os.path.join(output_dir, "debug")
         os.makedirs(output_path, exist_ok=True)
         save_path = os.path.join(output_path, "merged_image.png")
-        cv2.imwrite(save_path, final_image, [cv2.IMWRITE_PNG_COMPRESSION, 0])
+        cv2.imwrite(save_path, final_image)
 
     return final_image
 
@@ -129,8 +129,8 @@ def slice_image_in_tiles(image_path, tile_height, tile_width, target_max_dim, ov
         os.makedirs(output_path, exist_ok=True)
         for i, slice in enumerate(tiles):
             image_slice = slice["image"]
-            save_path = f"{output_path}/tile{number}_{i:02d}.png"
-            cv2.imwrite(save_path, image_slice, [cv2.IMWRITE_PNG_COMPRESSION, 0])
+            save_path = f"{output_path}/tile{number}_{i:02d}.jpg"
+            cv2.imwrite(save_path, image_slice, [cv2.IMWRITE_JPEG_QUALITY, 100])
 
     return tiles
 
@@ -160,7 +160,7 @@ def crop_out_box(box, image, resize, output_dir, crop_name, log_level):
     if log_level == "TRACE":
         save_path = f"{output_dir}/debug/crop"
         os.makedirs(save_path, exist_ok=True)
-        cv2.imwrite(f"{save_path}/{crop_name}", cropped_img, [cv2.IMWRITE_PNG_COMPRESSION, 0])
+        cv2.imwrite(f"{save_path}/{crop_name}", cropped_img, [cv2.IMWRITE_JPEG_QUALITY, 100])
 
     return cropped_img
 
@@ -221,13 +221,5 @@ def split_image_safely(image: tuple, detections: list[dict], max_height: int, ou
             })
 
     logger.info(f"Image split into {len(chunks)} parts.")
-
-    # Save image tiles if debug mode is on
-    if log_level == "TRACE":
-        output_path = f"{output_dir}/debug/split"
-        os.makedirs(output_path, exist_ok=True)
-        for i, slice in enumerate(chunks):
-            image_slice = slice["image"]
-            cv2.imwrite(f"{output_path}/split_{i:02d}.png", image_slice, [cv2.IMWRITE_PNG_COMPRESSION, 0])
 
     return chunks, range(len(chunks))

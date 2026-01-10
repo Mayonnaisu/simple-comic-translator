@@ -98,7 +98,7 @@ class PaddleOCRRecognition:
         # Use ThreadPoolExecutor for concurrent execution
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
             # Submit all images for processing
-            future_to_path = {executor.submit(self.run_paddleocr_on_detections, image, f"crop{number}_{i:02d}.png", detection, upscaler, output_dir, log_level): detection for i, detection in enumerate(detections)}
+            future_to_path = {executor.submit(self.run_paddleocr_on_detections, image, f"crop{number}_{i:02d}.jpg", detection, upscaler, output_dir, log_level): detection for i, detection in enumerate(detections)}
 
             # Monitor progress and wait for all futures to complete
             for future in tqdm(concurrent.futures.as_completed(future_to_path), total=len(detections), desc="OCR"):
@@ -164,7 +164,7 @@ class MangaOCRRecognition:
         # Use ThreadPoolExecutor for concurrent execution
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
             # Submit all images for processing
-            future_to_path = {executor.submit(self.run_mangaocr_on_detections, image, f"crop{number}_{i:02d}.png", detection, upscaler, output_dir, log_level): detection for i, detection in enumerate(detections)}
+            future_to_path = {executor.submit(self.run_mangaocr_on_detections, image, f"crop{number}_{i:02d}.jpg", detection, upscaler, output_dir, log_level): detection for i, detection in enumerate(detections)}
 
             # Monitor progress and wait for all futures to complete
             for future in tqdm(concurrent.futures.as_completed(future_to_path), total=len(detections), desc="OCR"):
