@@ -225,7 +225,7 @@ def split_image_safely(image: tuple, detections: list[dict], max_height: int, ou
     return chunks, range(len(chunks))
 
 
-def create_inpainting_mask(image: object, box: list[int]):
+def create_inpainting_mask(image: np.ndarray, box: list[int]):
     """
     Creates a binary mask for inpainting from a bounding box.
     """
