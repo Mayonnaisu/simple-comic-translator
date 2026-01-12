@@ -1,5 +1,6 @@
 numpy==2.3.5
 torch==2.9.1
+torchvision==0.24.1
 manga-ocr==0.1.14
 onnxruntime==1.23.2
 paddleocr==3.3.2
@@ -8,6 +9,7 @@ huggingface-hub==0.36.0
 pyyaml==6.0.2
 python-dotenv==1.2.1
 google-genai==1.57.0
+git+https://github.com/Mayonnaisu/simple-lama-inpainting
 natsort==8.4.0
 colorama==0.4.6
 loguru==0.7.3
