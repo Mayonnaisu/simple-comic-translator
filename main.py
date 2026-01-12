@@ -13,6 +13,7 @@ from datetime import datetime
 from natsort import natsorted
 from collections import Counter
 from colorama import Fore, Back, Style, init
+from simple_lama_inpainting import SimpleLama
 
 from _version import __version__
 from app.core.handle import handle_uncaught_exception
@@ -88,6 +89,7 @@ if config:
     box_fill_color = config['OVERLAY']['box']['fill_color']
     box_outline_color = config['OVERLAY']['box']['outline_color']
     box_outline_thickness = config['OVERLAY']['box']['outline_thickness']
+    use_inpainting = config['OVERLAY']['box']['inpaint']
     font_min = config['OVERLAY']['font']['min_size']
     font_max = config['OVERLAY']['font']['max_size']
     font_color = config['OVERLAY']['font']['color']
@@ -139,6 +141,11 @@ else:
 
 memory_path = os.path.join(input_path, "memory.db") if memory_path == "input" else os.path.join(output_path, "memory.db") if memory_path == "output" else memory_path
 memory = TranslationMemory(memory_path)
+
+if use_inpainting:
+    simple_lama = SimpleLama()
+else:
+    simple_lama = None
 
 # Iterate through all directories using os.walk
 for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
@@ -306,7 +313,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
 
                     # recognition = []
                     # for i, detection in enumerate(merged_detections):
-                    #     rec = extractor.run_mangaocr_on_detections(image, f"crop{n}_{i:02d}.png", detection, [use_upscaler, upscale_ratio], output_dir, log_level)
+                    #     rec = extractor.run_mangaocr_on_detections(image, f"crop{n}_{i:02d}.jpg", detection, [use_upscaler, upscale_ratio], output_dir, log_level)
                     #     if rec:
                     #         recognition.append(rec)
                 else:
@@ -347,7 +354,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
             json.dump(translated_text_data, f, cls=NumpyEncoder, ensure_ascii=False, indent=4)
 
     # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
-    overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
+    overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness], [use_inpainting, simple_lama], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
 
 logger.info(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_path}'.")
 

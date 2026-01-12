@@ -223,3 +223,23 @@ def split_image_safely(image: tuple, detections: list[dict], max_height: int, ou
     logger.info(f"Image split into {len(chunks)} parts.")
 
     return chunks, range(len(chunks))
+
+
+def create_inpainting_mask(image: object, box: list[int]):
+    """
+    Creates a binary mask for inpainting from a bounding box.
+    """
+
+    xmin, ymin, xmax, ymax = box
+
+    # Create a black mask image with the same height and width as the original image
+    # and a single channel (grayscale)
+    mask = np.zeros(image.shape[:2], dtype=np.uint8)
+
+    # Fill the specified bounding box region with white pixels (255)
+    # With numpy slicing
+    mask[ymin:ymax, xmin:xmax] = 255
+    # Or with cv2.rectangle
+    # cv2.rectangle(mask, (xmin, ymin), (xmax, ymax), 255, -1)
+
+    return mask

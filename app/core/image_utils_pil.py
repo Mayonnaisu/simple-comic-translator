@@ -1,8 +1,8 @@
 import os
-from PIL import Image
-Image.MAX_IMAGE_PIXELS = None
 from loguru import logger
 from collections import Counter
+from PIL import Image, ImageDraw
+Image.MAX_IMAGE_PIXELS = None
 
 
 def merge_images_vertically(images: list[object], output_dir: str, log_level: str):
@@ -53,7 +53,7 @@ def merge_images_vertically(images: list[object], output_dir: str, log_level: st
         output_path = f"{output_dir}/debug"
         os.makedirs(output_path, exist_ok=True)
         save_path = f"{output_path}/merged_image.png"
-        final_image.save(save_path, quality=100)
+        final_image.save(save_path)
 
     return final_image
 
@@ -111,7 +111,7 @@ def slice_image_in_tiles(image: list[object|int], tile_height: int, tile_width: 
         os.makedirs(output_path, exist_ok=True)
         for i, slice in enumerate(tiles):
             image_slice = slice["image"]
-            save_path = f"{output_path}/tile{number}_{i:02d}.png"
+            save_path = f"{output_path}/tile{number}_{i:02d}.jpg"
             image_slice.save(save_path, quality=100)
 
     return tiles
@@ -205,3 +205,27 @@ def split_image_safely(image: list[object|int], detections: list[dict], max_heig
     logger.info(f"Image splitted into {chunks_total} parts.")
 
     return chunks, chunks_number
+
+
+def create_inpainting_mask(image: object, box: list[int]):
+    """
+    Create mask image for inpainting
+    """
+
+    xmin, ymin, xmax, ymax = box
+
+    # 1.Get the original image dimensions
+    width, height = image.size
+
+    # Create a new black image ('L' mode for 8-bit grayscale)
+    # 0 is black (don't change), 255 is white (inpaint this)
+    mask = Image.new("L", (width, height), 0)
+    
+    # Initialize the drawing tool
+    draw = ImageDraw.Draw(mask)
+
+    # Draw shapes to define areas for removal
+    # Example: A rectangle (left, top, right, bottom)
+    draw.rectangle([xmin, ymin, xmax, ymax], fill=255)
+
+    return mask

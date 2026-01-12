@@ -61,7 +61,8 @@
       "padding": 10,
       "fill_color": "white",
       "outline_color": null,
-      "outline_thickness": 1
+      "outline_thickness": 1,
+      "inpaint": false
     },
     "font": {
       "min_size": 11,

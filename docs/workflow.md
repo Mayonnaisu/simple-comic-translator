@@ -36,10 +36,10 @@ SCT sends the extracted texts to Gemini for translation and glossary building.
 > This stage also requests Gemini to analyze the texts and extract key terms and proper names so that the program can include them as a strict reference for Gemini when translating the next chapter.
 
 ### 6. Redact Text Areas with [Pillow](https://github.com/python-pillow/Pillow)
-SCT whitens text areas by simply overlaying white rectangle with offset on them.
+SCT whitens text areas by inpainting or simply overlaying white rectangle with offset on them.
 
 > [!NOTE]
-> Whitening is used because it's simpler and lighter, thus faster compared to inpainting. It also results in better readability in a way as it overlays bigger white boxes to the original text areas, in case the translated texts overflow from their original text areas. The downside is that it doesn't look as pretty and clean as inpainting.
+> Overlay is used by default because it's simpler and lighter, thus faster compared to inpainting. It also results in better readability in a way as it overlays bigger white boxes to the original text areas, in case the translated texts overflow from their original text areas. The downside is that it doesn't look as pretty and clean as inpainting.
 
 ### 7 Overlay Translated Texts with [Pillow](https://github.com/python-pillow/Pillow)
 SCT overlays translated texts to the offset whitened areas while attempting to auto resize the fonts to fit into the areas.

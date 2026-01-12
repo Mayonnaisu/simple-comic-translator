@@ -6,15 +6,16 @@ from colorama import Fore, Style, init
 from PIL import Image, ImageDraw, ImageFont
 
 from app.core.detection import get_bbox_coords
+from app.core.inpainting import inpaint_image_with_lama
 
 init(autoreset=True)
 
-def is_string_in_file(file_path: int, search_string: str):
-    with open(file_path, 'r', encoding="utf-8") as file:
-        for line in file:
-            if search_string in line:
-                return True
-    return False
+# def is_string_in_file(file_path: int, search_string: str):
+#     with open(file_path, 'r', encoding="utf-8") as file:
+#         for line in file:
+#             if search_string in line:
+#                 return True
+#     return False
 
 
 def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_size: int, max_size: int, font_path: int):
@@ -64,7 +65,7 @@ def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_siz
     return fitted_size, best_wrapped_text
 
 
-def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_results: list[dict], box: list[int | str | tuple], font: list[int | str], image_extension: str, source_language: str, output_path: str, log_level: str):
+def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_results: list[dict], box: list[int | str | tuple], inpainting: list[bool|object], font: list[int | str], image_extension: str, source_language: str, output_path: str, log_level: str):
     """Overlays the detected text boxes and translated texts onto the corresponding safely-splitted images and saves them."""
 
     logger.info("\nOverlaying translated texts.")
@@ -72,6 +73,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
     if not os.path.exists(output_path): os.makedirs(output_path)
 
     box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness = box
+    inpaint, inpainter = inpainting
     font_min, font_max, font_color, font_path = font
 
     # inclusion = ("i", "you", "we", "they", "he", "she", "it", "ah")
@@ -165,13 +167,18 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             text_x = target_box_center_x - text_width // 2
             text_y = target_box_center_y - text_height // 2
 
-            # Draw the target bounding box
-            draw.rectangle(
-                (target_box_x1, target_box_y1, target_box_x1 + box_width, target_box_y1 + box_height),
-                fill=box_fill_color,
-                outline=box_outline_color,
-                width=box_outline_thickness
-            )
+            # Inpaint or overlay the target bounding box
+            if inpaint:
+                image = inpaint_image_with_lama(inpainter, image, [rel_xmin, rel_ymin, rel_xmax, rel_ymax],output_path, i, log_level)
+
+                draw = ImageDraw.Draw(image)
+            else:
+                draw.rectangle(
+                    (target_box_x1, target_box_y1, target_box_x1 + box_width, target_box_y1 + box_height),
+                    fill=box_fill_color,
+                    outline=box_outline_color,
+                    width=box_outline_thickness
+                )
 
             # Draw the text
             text_position = (text_x, text_y-box_padding)
@@ -214,8 +221,9 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             full_output_path = f'{output_path}/debug/annotation'
             os.makedirs(full_output_path, exist_ok=True)
             annotation_image = image_info['image']
-            annotation_image.save(f'{full_output_path}/annotation_{i:02d}.jpg', quality=100)
-            logger.success(f"Saved annotated result to {output_path}")
+            annotation_name = f"annotated_{i:02d}.jpg"
+            annotation_image.save(f'{full_output_path}/{annotation_name}', quality=100)
+            logger.success(f"Saved {annotation_name}.")
             annotation_image.close()
 
     logger.success("Translated texts overlaid.")

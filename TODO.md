@@ -9,6 +9,7 @@
 - [x] Add glossary
 - [x] Add translation memory
 - [x] Add option to translate from memory
-- [ ] Add inpainting
+- [x] Add inpainting
 - [ ] Add GPU mode and its guide
+- [ ] Improve & optimize performance
 - [ ] Clean up & refactoring

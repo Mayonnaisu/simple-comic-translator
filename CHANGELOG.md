@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.5.4
+11/1/2026
+
+20. Add `torchvision` & `simple-lama-inpainting` to dependencies
+21. Add inpainting (slow as hell lmao)
+
 ## v0.5.3
 8/1/2026
 
