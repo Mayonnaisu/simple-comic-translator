@@ -38,7 +38,7 @@ colorlog==6.10.1
     # via paddlex
 distro==1.9.0
     # via google-genai
-filelock==3.20.2
+filelock==3.20.3
     # via
     #   huggingface-hub
     #   modelscope
@@ -248,7 +248,9 @@ torch==2.9.1
     #   simple-lama-inpainting
     #   torchvision
 torchvision==0.24.1
-    # via simple-lama-inpainting
+    # via
+    #   -r requirements.in
+    #   simple-lama-inpainting
 tqdm==4.67.1
     # via
     #   aistudio-sdk
