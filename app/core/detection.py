@@ -62,9 +62,6 @@ class TextAreaDetection:
 
         self.input_names = [inp.name for inp in self.session.get_inputs()]
         self.output_names = [out.name for out in self.session.get_outputs()]
-    
-        logger.debug(f"INPUT NAMES: {self.input_names}")
-        logger.debug(f"OUTPUT NAMES: {self.output_names}")
 
         logger.info("Detection model initialized.\n")
 
@@ -92,7 +89,7 @@ class TextAreaDetection:
             slice_float32 = slice_img_np.astype(np.float32) / 255.0
             slice_transposed = slice_float32.transpose(2, 0, 1)
             slice_batchd = np.expand_dims(slice_transposed, axis=0)
-            # Run inference directly on the NumPy array from cv2
+            # Run inference
             results = self.session.run(
                 self.output_names, {"images": slice_batchd, "orig_target_sizes": np.array([target_sizes], dtype=np.int64)}
             )
