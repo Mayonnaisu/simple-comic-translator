@@ -1,0 +1,9 @@
+## API KEY REFERENCES
+
+```
+# .env
+GEMINI_API_KEY='YourAPIkey'
+OPENAI_API_KEY='YourAPIkey'
+OPENROUTER_API_KEY='YourAPIkey'
+OLLAMA_API_KEY='ollama'
+```
