@@ -39,7 +39,7 @@
     *   [FAQ](#faq)
 
 ## NOTICE
-### <mark>Version 0.5.0 has been released! To upgrade from the previous version, see https://github.com/Mayonnaisu/simple-comic-translator/issues/7.</mark>
+### <mark>Update & redownload config.json and prompt.yaml to get the latest features. For more info, see [CHANGELOG](CHANGELOG.md).</mark>
 
 ## ABOUT
 ### Full Name
