@@ -12,7 +12,7 @@
 ```
 
 > [!IMPORTANT]
-> I'm not done with GPU mode, so don't use it cuz it won't work.
+> I'm not done with GPU mode yet, so it won't work completely. It works partially tho.
 
 > [!TIP]
 > You can use either **config.json** or arguments to enable the settings above. If any of the settings is set to `true` in either of the methods, it will be enabled. However, to disable the setting, you need to disable it in both of the methods.
