@@ -79,7 +79,7 @@
 "translator": {
   "provider": "gemini",         // provider: "gemini", "openai", "operouter", "ollama", etc
   "model": "gemini-2.5-flash",  // model ID
-  "base_url": null,             // base url: "base-url"/null
+  "base_url": null,             // base url: "url"/null
   "temperature": 0.5,           // temperature
   "top_p": 0.8,                 // top p
   "max_output_tokens": 999999999  // max response tokens: number/null
@@ -93,7 +93,7 @@
 ```
 
 >[!NOTE]
-> Base url is only required for some of providers that are self-hosted, custom, or Open-AI compatible endpoints.
+> Base url is only required for some of providers that are self-hosted, custom, or Open-AI compatible endpoints. To find out which ones specifically, you need to check out https://docs.litellm.ai/docs/providers for your selected provider.
 
 > [!TIP]
 > - You can use ISO language codes for brevity when setting `"target_language"`. For more ISO language codes, see https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes#Table.
