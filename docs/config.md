@@ -93,18 +93,18 @@
 ```
 
 >[!NOTE]
-> Base url is only required for some of providers that are self-hosted, custom, or Open-AI compatible endpoints. To find out which ones specifically, you need to check out https://docs.litellm.ai/docs/providers for your selected provider.
+> Base url is only required by some of providers that are self-hosted, custom, or Open-AI compatible endpoints. For example, `"http://localhost:11434"` for `"ollama"`.
 
 > [!TIP]
-> - You can use ISO language codes for brevity when setting `"target_language"`. For more ISO language codes, see https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes#Table.
+> - You can use ISO language codes for brevity when setting `target_language`. For more ISO language codes, see https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes#Table.
 >
 > - When changing retry-related configs, you need to take into account the RPM (request per minute) limit for the selected model. 
 >
 > - To see Gemini model IDs, visit https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions#gemini-auto-updated.
 >
-> - To see the other providers, see [LiteLLM Supported Providers](https://github.com/BerriAI/litellm?tab=readme-ov-file#supported-providers-website-supported-models--docs).
+> - To see the other providers, check out [LiteLLM Supported Providers](https://github.com/BerriAI/litellm?tab=readme-ov-file#supported-providers-website-supported-models--docs).
 >
-> - For `max_ouput_tokens`, 999999999 may not work for the other providers.
+> - For `max_ouput_tokens`, 999999999 may not work for the other providers. In that case, you need to make sure it doesn't exceed the limit set by the provider, or just set it to `null`.
 
 ### OVERLAY
 ```jsonc
