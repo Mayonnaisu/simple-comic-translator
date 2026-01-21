@@ -56,7 +56,7 @@ runs:
 
     - name: Run launcher.ps1
       env:
-          GEMINI_API_KEY: ${{ inputs.env }}
+          GOOGLEAI_API_KEY: ${{ inputs.env }}
       shell: powershell
       run: |
         # Run the launcher

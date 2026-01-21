@@ -21,10 +21,9 @@ from app.core.config import load_config
 from app.core.model import download_repo_snapshot
 from app.core.image_utils_pil import merge_images_vertically, slice_image_in_tiles, split_image_safely
 from app.core.detection import TextAreaDetection, merge_overlapping_boxes
-from app.core.ocr import PaddleOCRRecognition, MangaOCRRecognition
-from app.core.translation import translate_texts_with_gemini, translate_texts_from_memory
-from app.core.memory import TranslationMemory, NumpyEncoder, load_result_json
+from app.core.translation.memory import TranslationMemory, translate_texts_from_memory
 from app.core.overlay import overlay_translated_texts
+from app.core.result import NumpyEncoder, load_result_json
 
 # Measure time
 start_time = time.perf_counter()
@@ -73,12 +72,14 @@ if config:
     max_height = config['IMAGE_SPLIT']['max_height']
     # For translation
     target_language = config['TRANSLATION']['target_language']
+    timeout = config['TRANSLATION']['timeout']
     max_retries = config['TRANSLATION']['max_retries']
     retry_delay = config['TRANSLATION']['retry_delay']
-    gemini_model = config['TRANSLATION']['gemini']['model']
-    gemini_temp = config['TRANSLATION']['gemini']['temperature']
-    gemini_top_p = config['TRANSLATION']['gemini']['top_p']
-    gemini_max_out_tokens = config['TRANSLATION']['gemini']['max_output_tokens']
+    translator_name = config['TRANSLATION']['translator']['name']
+    translator_model = config['TRANSLATION']['translator']['model']
+    translator_temp = config['TRANSLATION']['translator']['temperature']
+    translator_top_p = config['TRANSLATION']['translator']['top_p']
+    translator_max_out_tokens = config['TRANSLATION']['translator']['max_output_tokens']
     use_memory = config['TRANSLATION']['memory']['enable']
     memory_path = config['TRANSLATION']['memory']['path']
     overwrite_memory = config['TRANSLATION']['memory']['overwrite']
@@ -113,7 +114,6 @@ logger.info(f"SCT version: {__version__}\n")
 # --- Main Execution ---
 input_path = args.input
 output_path = args.output if args.output else f"{input_path}-shitted"
-os.makedirs(output_path, exist_ok=True)
 
 image_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')
 lang_code_jp = ("japanese", "japan", "jpn", "jp", "ja")
@@ -121,6 +121,8 @@ lang_code_jp = ("japanese", "japan", "jpn", "jp", "ja")
 # Check if input path exists
 if not os.path.exists(input_path):
     raise Exception(Fore.RED + f"{input_path} does not exist!")
+else:
+    os.makedirs(output_path, exist_ok=True)
 
 # Download detection model if not exist
 repo_id="ogkalu/comic-text-and-bubble-detector"
@@ -135,8 +137,10 @@ detector = TextAreaDetection(model_path=f"{model_path}/{file_name}", confidence_
 det_target_size = 640
 
 if source_language in lang_code_jp:
+    from app.core.ocr.mangaocr import MangaOCRRecognition
     extractor = MangaOCRRecognition(use_cpu=True if args.gpu == False and gpu_mode == False else False)
 else:
+    from app.core.ocr.paddleocr import PaddleOCRRecognition
     extractor = PaddleOCRRecognition(ocr_version='PP-OCRv5', language=source_language, confidence_threshold=ocr_conf_threshold, use_gpu=True if args.gpu or gpu_mode else False)
 
 memory_path = os.path.join(input_path, "memory.db") if memory_path == "input" else os.path.join(output_path, "memory.db") if memory_path == "output" else memory_path
@@ -253,8 +257,6 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
     else:
         # Use existing result.json if set and exists
         if (use_result_json or args.load_json) and os.path.exists(result_json_path):
-            recognitions = load_result_json(result_json_path, [memory, overwrite_memory, source_language, target_language])
-
             image_chunks = []
             for n, image in enumerate(images):
                 image_width, image_height = image.size
@@ -263,6 +265,8 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
                     "image_name": image_name,
                     "image": image
                 })
+
+            recognitions = load_result_json(result_json_path, [memory, overwrite_memory, source_language, target_language])
         else:
             image_chunks = []
             recognitions = []
@@ -329,6 +333,11 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
         glossary_path = os.path.join(input_path, "glossary.json") if glossary_path == "input" else os.path.join(output_path, "glossary.json") if glossary_path == "output" else glossary_path
 
         if not use_memory:
+            if translator_name == "googleai":
+                from app.core.translation.googleai import translate_texts_and_build_glossary
+            elif translator_name == "openai" or translator_name == "openrouter" or translator_name == "ollama":
+                from app.core.translation.openai import translate_texts_and_build_glossary
+
             # Use automatic retry in case of any translation errors
             max_retries = max_retries
             retry_delay = retry_delay
@@ -336,7 +345,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
 
             while attempts <= max_retries:
                 try:
-                    translated_text_data = translate_texts_with_gemini(recognitions, [source_language, target_language], [gemini_model, gemini_temp, gemini_top_p, gemini_max_out_tokens], glossary_path, [memory, overwrite_memory], log_level)
+                    translated_text_data = translate_texts_and_build_glossary(recognitions, [source_language, target_language], [translator_name, translator_model, translator_temp, translator_top_p, translator_max_out_tokens, timeout], glossary_path, [memory, overwrite_memory], log_level)
                     break
                 except Exception as e:
                     attempts += 1

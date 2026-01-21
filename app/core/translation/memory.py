@@ -1,6 +1,5 @@
-import json
+import os
 import sqlite3
-import numpy as np
 from loguru import logger
 
 
@@ -73,35 +72,22 @@ class TranslationMemory:
         return result[0] if result else None
 
 
-class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        # Convert NumPy arrays to lists
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        # Convert NumPy integers (int32, int64) to Python int
-        if isinstance(obj, np.integer):
-            return int(obj)
-        # Convert NumPy floats (float32, float64) to Python float
-        if isinstance(obj, np.floating):
-            return float(obj)
-        return super().default(obj)
+def translate_texts_from_memory(text_info_list: list[dict], languages: list[str], memory: object, log_level: str):
+    '''
+    Translate all texts from one chapter with translation memory
+    '''
+    memory_name = os.path.basename(memory.db_path)
 
+    logger.info(f"\nTranslating from memory: '{memory_name}'")
 
-def load_result_json(result_json_path: str, memory: list[object|str|bool]):
-    logger.info(f"\nLoading existing result.json")
+    source_lang, target_lang = languages
 
-    tm, overwrite_memory, source_language, target_language = memory
+    for info in text_info_list:
+        translation = memory.translate(info["original_text"], target_lang)
+        if translation:
+            info["translated_text"] = translation
+        else:
+            info["translated_text"] = ""
+        logger.info(f"[{memory_name}] {info["original_text"]} ▶▶▶ {info["translated_text"]}")
 
-    with open(result_json_path, "r", encoding="utf-8") as f:
-        loaded_result_json = json.load(f)
-
-    for item in loaded_result_json:
-        # Convert bounding boxes back to NumPy arrays
-        item["box"] = np.array(item["box"], dtype=np.int32)
-        # Overwrite or keep translation memory
-        if overwrite_memory:
-            tm.add_translation(item["original_text"], source_language, item["translated_text"], target_language, overwrite_memory)
-
-    logger.success(f"Existing result.json loaded.")
-
-    return loaded_result_json
+    return text_info_list

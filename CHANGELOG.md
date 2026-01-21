@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.5.5
+20/1/2026
+
+22. Add `openai` to dependencies
+23. Add OpenAI, OpenRouter, & Ollama translators
+24. Add translation timeout
+25. Separate PaddleOCR & Manga OCR modules
+26. Rename environment variable: `GEMINI_API_KEY` to `GOOGLEAI_API_KEY`
+
 ## v0.5.4
 11/1/2026
 

@@ -40,7 +40,7 @@ runs:
 
     - name: Run Simple Comic Translator
       env:
-          GEMINI_API_KEY: ${{ inputs.env }}
+          GOOGLEAI_API_KEY: ${{ inputs.env }}
       shell: bash
       run: |
         # Activate venv

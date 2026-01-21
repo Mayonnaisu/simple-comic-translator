@@ -94,7 +94,7 @@ exit 0
 
 # Define .env file content
 $envFile = @"
-GEMINI_API_KEY=''
+GOOGLEAI_API_KEY=''
 "@
 
 # Start the installation

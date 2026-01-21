@@ -8,22 +8,23 @@ from google.genai import types
 from dotenv import load_dotenv
 from colorama import Fore, Style, init
 
-from app.core.memory import TranslationMemory
+from app.core.translation.glossary import load_glossary, update_glossary
+
 
 init(autoreset=True)
 
-def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str], gemini: list[str|float], glossary_path: str, memory: list[object|bool], log_level: str):
+def translate_texts_and_build_glossary(text_info_list: list[dict], languages: list[str], gemini: list[str|float], glossary_path: str, memory: list[object|bool], log_level: str):
     '''
-    Translate all texts from one chapter and build glossary with Gemini
+    Translate all texts from one chapter and build glossary with Google AI
     '''
     if not text_info_list:
         return text_info_list
 
     source_lang, target_lang = languages
-    model, temperature, top_p, max_out_tokens = gemini
+    _, model, temperature, top_p, max_out_tokens, timeout = gemini
     tm, overwrite_memory = memory
 
-    logger.info(f"\nTranslating texts to ({target_lang.upper()}) with Gemini.")
+    logger.info(f"\nTranslating texts to ({target_lang.upper()}) with Google AI.")
 
     data_dict = "data_dict" # define placeholder to prevent error when logging exception
 
@@ -31,12 +32,12 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
     load_dotenv()
 
     # Get the API key from the environment variables
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("GOOGLEAI_API_KEY")
 
     try:
         client = genai.Client(api_key=api_key)
     except Exception as e:
-        raise Exception(Fore.RED + f"Failed to initialize Gemini client: {e}")
+        raise Exception(Fore.RED + f"Failed to initialize Google AI client: {e}")
 
     response_schema={
         "type": "object",
@@ -67,24 +68,14 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
     my_config = types.GenerateContentConfig(
         temperature=temperature,
         top_p=top_p,
+        http_options=types.HttpOptions(timeout=timeout),
         max_output_tokens=max_out_tokens,
         response_mime_type="application/json",
         response_schema=response_schema
     )
 
     # Load existing glossary file
-    if os.path.exists(glossary_path):
-        with open(glossary_path, "r", encoding="utf-8") as glossary:
-            existing_glossary = json.load(glossary)["GLOSSARY"]
-
-        # Create a lookup map for AI context: { "source term": "target term" }
-        ex_glossary_map = {item[source_lang]: item[target_lang] for item in existing_glossary if source_lang in item and target_lang in item}
-
-        glossary_context = json.dumps(ex_glossary_map, ensure_ascii=False)
-    else:
-        existing_glossary = []
-        ex_glossary_map = {}
-        glossary_context = "Not Available"
+    existing_glossary, ex_glossary_map, glossary_context = load_glossary(glossary_path, source_lang, target_lang)
 
     # Format input text as list separated by number tag
     enumerated_input = ""
@@ -144,64 +135,11 @@ def translate_texts_with_gemini(text_info_list: list[dict], languages: list[str]
             tm.add_translation(original_text, source_lang, translated_text, target_lang, overwrite_memory)
 
         # Update existing glossary
-        new_glossary = {item["source_term"]: item["translated_term"] for item in data_dict["Glossary"]}
-        logger.info(f"\nGLOSSARY:")
-
-        added_count = 0
-        for source_term, target_term in new_glossary.items():
-            logger.info(f"{source_term}: {target_term}")
-            # Add new dict if source and target terms do not exist
-            if source_term and source_term not in ex_glossary_map and target_term and target_term not in ex_glossary_map:
-                # Format: {"en": "...", "es": "..."},
-                new_item = {
-                    source_lang: source_term,
-                    target_lang: target_term
-                }
-                existing_glossary.append(new_item)
-                added_count += 2
-
-        for dict in existing_glossary:
-            for source_term, target_term in new_glossary.items():
-                # Add target term if not exist and source term exists
-                if source_term and source_term in dict.values() and target_lang not in dict:
-                    dict[target_lang] = target_term
-                    added_count += 1
-                # Add source term if not exist and target term exists
-                elif target_term and target_term in dict.values() and source_lang not in dict:
-                    dict[source_lang] = source_term
-                    added_count += 1
-
-        if added_count > 0:
-            with open(glossary_path, "w", encoding="utf-8") as f:
-                json.dump({"GLOSSARY": existing_glossary}, f, ensure_ascii=False, indent=4)
-            logger.info(f"Appended {added_count} new terms to '{glossary_path}'")
-        else:
-            logger.info("No new terms found.")
+        update_glossary(data_dict, existing_glossary, ex_glossary_map, glossary_path, source_lang, target_lang)
 
     except Exception as e:
         if data_dict:
             logger.debug(f"\n{data_dict}")
         raise type(e)(Fore.RED + f"{e}")
-
-    return text_info_list
-
-
-def translate_texts_from_memory(text_info_list: list[dict], languages: list[str], memory: object, log_level: str):
-    '''
-    Translate all texts from one chapter with translation memory
-    '''
-    memory_name = os.path.basename(memory.db_path)
-
-    logger.info(f"\nTranslating from memory: '{memory_name}'")
-
-    source_lang, target_lang = languages
-
-    for info in text_info_list:
-        translation = memory.translate(info["original_text"], target_lang)
-        if translation:
-            info["translated_text"] = translation
-        else:
-            info["translated_text"] = ""
-        logger.info(f"[{memory_name}] {info["original_text"]} ▶▶▶ {info["translated_text"]}")
 
     return text_info_list

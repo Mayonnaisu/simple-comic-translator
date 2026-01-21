@@ -33,9 +33,7 @@
 *   [USAGE](#usage)
 *   [UPDATE](#update)
 *   [LIMITATIONS](#limitations)
-*   [EXTRA INFO](extra-info)
-    *   [How to Get Gemini API Key](#how-to-get-gemini-api-key)
-    *   [FAQ](#faq)
+*   [FAQ](#faq)
 
 ## NOTICE
 ### <mark>Update & redownload config.json and prompt.yaml to get the latest features. For more info, see [CHANGELOG](CHANGELOG.md).</mark>
@@ -119,8 +117,10 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
 ## CONFIGURATION
 ### Required
 1. Open **.env** file with text/code editor (Notepad, VS Code, etc).
-2. Paste your [Gemini API key](#how-to-get-gemini-api-key) between the quotation marks.
+2. Paste your [Gemini API key](docs/api-keys.md#gemini) between the quotation marks.
 3. Save.
+
+For other available API keys, see [API Key References](docs/api-keys.md#google-ai).
 
 ### Optional
 1. Open **config.json** with text/code editor.
@@ -152,35 +152,5 @@ For more info, see [config options](docs/config.md).
 3. Some unwanted texts may also be detected and recognized, making the result riddled with unnecessary texts and white rectangles.
 4. Gemini itself is prone to throwing ["model overloaded" error](https://github.com/google-gemini/gemini-cli/issues/4360) & returning [`None`](https://github.com/googleapis/python-genai/issues/626) or incomplete response and [response with messed-up format](https://github.com/google-gemini/gemini-cli/issues/10972). When those happen, just retry it manually or increase `max_retries` in **config.json** for more automatic retries.
 
-## EXTRA INFO
-### How to Get Gemini API Key
-1. Visit https://aistudio.google.com/app/apikey.
-2. Accept the Terms and Conditions.
-3. Click "Create API key".
-4. Name your key.
-5. Choose project > Create project.
-6. Select the newly created project.
-7. Click "Create key".
-8. Click the code in the "Key" column.
-9. Click "Copy key".
-> [!TIP]
-> Gemini API Free Tier has rate limits, see: https://ai.google.dev/gemini-api/docs/rate-limits.
->
-> **To check your quota:**
-> 1. Visit https://aistudio.google.com/app/usage
-> 2. Make sure you are on the right account & project.
-> 2. Click "Open in Cloud Console" on the bottom.
-> 3. Scroll down > Click "Quotas & System Limits".
-> 4. Scroll down > You will see your model quota usage on the top result. If you don't see it, use Filter to search it.
->
-> For example: 
-	<details>
-		<summary>View image</summary>
-			<p align="center">
-				<img alt="Gemini Free Tier Quota"
-	title="Gemini Free Tier Quota" src="assets/images/gemini-quota.png" />
-			</p>
-	</details>
-
-### FAQ
+## FAQ
 Go to [here](docs/faq.md).

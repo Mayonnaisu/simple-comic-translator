@@ -17,7 +17,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        GOOGLEAI_API_KEY: ${{ secrets.GOOGLEAI_API_KEY }}
 
     strategy:
       fail-fast: false
@@ -42,16 +42,16 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: ./.github/actions/windows
       with:
-        env: ${{ env.GEMINI_API_KEY }}
+        env: ${{ env.GOOGLEAI_API_KEY }}
 
     - name: Setup Linux
       if: matrix.os == 'ubuntu-latest'
       uses: ./.github/actions/linux
       with:
-        env: ${{ env.GEMINI_API_KEY }}
+        env: ${{ env.GOOGLEAI_API_KEY }}
 
     - name: Setup macOS
       if: matrix.os == 'macos-latest'
       uses: ./.github/actions/macos
       with:
-        env: ${{ env.GEMINI_API_KEY }}
+        env: ${{ env.GOOGLEAI_API_KEY }}

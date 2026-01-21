@@ -12,3 +12,5 @@ def load_config(config_file_path):
         raise FileNotFoundError("\033[31m" + f"Error: Configuration file '{config_file_path}' not found!")
     except json.JSONDecodeError:
         raise json.JSONDecodeError(f"Error: Invalid JSON format in '{config_file_path}'!")
+
+

@@ -1,6 +1,6 @@
 ## FAQ
 1. **How to change detector, ocr, translator, etc?**<br>
-    You can't, unless you modify the source code yourself. Or just use the aforementioned alternatives. You can change [Gemini model](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions#gemini-auto-updated) in **config.json** tho.
+    You can't, unless you modify the source code yourself. Or just use the aforementioned alternatives. You can choose from the available [translator options](config.md#translation) and change the model in **config.json** tho.
 
 2. **Is the app vibe coded?**<br>
     Yeah, mostly. I still have to manually review, modify, fix, and assemble the parts to the best of my abilities, as someone with basic programming skills tho. Also, I didn't use any coding agent. Instead, I search for the functions I need on Google and then check out the AI Overview or AI Mode when necessary. I also didn't one-shot it, but built it gradually on different occasions.

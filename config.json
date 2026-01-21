@@ -3,7 +3,7 @@
     "gpu_mode": false,
     "debug_mode": false,
     "result": {
-      "overwrite": false,
+      "overwrite": true,
       "load_json": false,
       "json_path": "output"
     }
@@ -39,9 +39,11 @@
 
   "TRANSLATION": {
     "target_language": "en",
+    "timeout": 300,
     "max_retries": 3,
     "retry_delay": 30,
-    "gemini": {
+    "translator": {
+      "name": "googleai",
       "model": "gemini-2.5-flash",
       "temperature": 0.5,
       "top_p": 0.8,
