@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## v0.5.6
-20/1/2026
+21/1/2026
 
 27. Add LiteLLM
     - Add `litellm` to dependencies
