@@ -120,14 +120,14 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
 2. Paste your [Gemini API key/s](docs/api-keys.md#gemini) between the quotation marks.
 3. Save.
 
-For more info, see [API Key References](docs/api-keys.md#google-ai).
+For more info, see [API Key References](docs/api-keys.md).
 
 ### Optional
 1. Open **config.json** with text/code editor.
 2. Change the settings as you see fit.
 3. Save.
 
-For more info, see [config options](docs/config.md).
+For more info, see [Config Options](docs/config.md).
 
 ## USAGE
 1. Right click on **launcher.ps1**.

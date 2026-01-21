@@ -123,7 +123,7 @@ For more info, see [API Key References](api-keys.md).
 2. Change the settings as you see fit.
 3. Save.
 
-For more info, see [config options](config.md).
+For more info, see [Config Options](config.md).
 
 ## USAGE
 ```powershell
