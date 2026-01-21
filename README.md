@@ -36,7 +36,7 @@
 *   [FAQ](#faq)
 
 ## NOTICE
-### <mark>Update & redownload config.json and prompt.yaml to get the latest features. For more info, see [CHANGELOG](CHANGELOG.md).</mark>
+### <mark>Update, redownload config.json and prompt.yaml, & rename GEMINI_API_KEY in .env file to API_KEYS to get the latest features. For more info, see [CHANGELOG](CHANGELOG.md).</mark>
 
 ### All PowerShell scripts (.ps1) are only tested on Windows and may not be compatible with PowerShell Core run *directly* on other OSes.
 
