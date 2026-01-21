@@ -3,7 +3,7 @@
 ## v0.5.6
 21/1/2026
 
-27. Add LiteLLM
+27. Add [LiteLLM](https://github.com/BerriAI/litellm)
     - Add `litellm` to dependencies
     - Replace Gemini and OpenAI with LiteLLM package
     - Add multiple API keys support
