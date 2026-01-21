@@ -2,7 +2,7 @@ import os
 import re
 import json
 import yaml
-from openai import OpenAI
+import litellm
 from loguru import logger
 from dotenv import load_dotenv
 from colorama import Fore, Style, init
@@ -14,42 +14,75 @@ init(autoreset=True)
 
 def translate_texts_and_build_glossary(text_info_list: list[dict], languages: list[str], openai: list[str|float], glossary_path: str, memory: list[object|bool], log_level: str):
     '''
-    Translate all texts from one chapter and build glossary with OpenAI-compatible API enpoints (OpenAI, Ollama, OpenRouter, etc)
+    Translate all texts from one chapter and build glossary with LiteLLM
     '''
     if not text_info_list:
         return text_info_list
 
     source_lang, target_lang = languages
-    name, model, temperature, top_p, max_out_tokens, timeout = openai
+    provider, model, base_url, temperature, top_p, max_out_tokens, timeout = openai
     tm, overwrite_memory = memory
+    single_key_providers = ("ollama")
 
-    logger.info(f"\nTranslating texts to ({target_lang.upper()}) with OpenAI.")
+    logger.info(f"\nTranslating texts to ({target_lang.upper()}) with {provider.upper()}.")
 
-    data_dict = "data_dict" # define placeholder to prevent error when logging exception
+    # Load existing glossary file
+    existing_glossary, ex_glossary_map, glossary_context = load_glossary(glossary_path, source_lang, target_lang)
+
+    # Format input text as list separated by number tag
+    enumerated_input = ""
+    for i, info in enumerate(text_info_list):
+        enumerated_input += f"<|{i+1}|> {info['original_text']} "
+
+    # Load prompt template from the YAML file
+    with open('prompt.yaml', 'r', encoding="utf-8") as file:
+        template = yaml.safe_load(file)['prompt-template']
+
+    ## Inject variables into the template with simple replace method
+    prompt = template.replace("{glossary}", glossary_context) \
+                     .replace("{target_language}", target_lang) \
+                     .replace("{input}", enumerated_input)
+
+    logger.info(f"\nPROMPT:\n{prompt}")
 
     # Load environment variables from .env file
     load_dotenv()
 
     # Get the API key from the environment variables
-    if name == "openai":
-        api_key = os.getenv("OPENAI_API_KEY")
-        base_url = "https://api.openai.com/v1"
-    elif name == "openrouter":
-        api_key = os.getenv("OPENROUTER_API_KEY")
-        base_url = "https://openrouter.ai/api/v1"
-    elif name == "ollama":
-        api_key = os.getenv("OLLAMA_API_KEY")
-        base_url = "http://localhost:11434/v1"
+    api_keys = os.getenv("API_KEYS", "").split(",")
 
-    try:
-        client = OpenAI(
-            base_url=base_url,
-            api_key=api_key
+    if not provider in single_key_providers:
+        # Create a model list for the Router
+        # Each entry is a "deployment" the router can choose from
+        model_list = [
+            {
+                "model_name": "multi-keys", # Internal alias for the router
+                "litellm_params": {
+                    "model": f"{provider}/{model}",
+                    "base_url": base_url,
+                    "api_key": key,
+                    "temperature": temperature,
+                    "top_p": top_p,
+                    "timeout": timeout,
+                    "max_tokens": max_out_tokens,
+                },
+            }
+            for key in api_keys
+        ]
+
+        # Initialize the Router with a rotation strategy
+        router = litellm.Router(
+            model_list=model_list,
+            routing_strategy="simple-shuffle",
+            set_verbose=False
         )
-    except Exception as e:
-        raise Exception(Fore.RED + f"Failed to initialize OpenAI client: {e}")
 
-    json_schema={
+    messages = [
+        {"role": "system", "content": "You are a professional translator and terminologist."},
+        {"role": "user", "content": f"{prompt}"}
+    ]
+
+    json_schema = {
         "name": "result",
         "strict": True,
         "schema": {
@@ -79,41 +112,30 @@ def translate_texts_and_build_glossary(text_info_list: list[dict], languages: li
         }
     }
 
-    # Load existing glossary file
-    existing_glossary, ex_glossary_map, glossary_context = load_glossary(glossary_path, source_lang, target_lang)
-
-    # Format input text as list separated by number tag
-    enumerated_input = ""
-    for i, info in enumerate(text_info_list):
-        enumerated_input += f"<|{i+1}|> {info['original_text']} "
-
-    # Load prompt template from the YAML file
-    with open('prompt.yaml', 'r', encoding="utf-8") as file:
-        template = yaml.safe_load(file)['prompt-template']
-
-    ## Inject variables into the template with simple replace method
-    prompt = template.replace("{glossary}", glossary_context) \
-                     .replace("{target_language}", target_lang) \
-                     .replace("{input}", enumerated_input)
-
-    logger.info(f"\nPROMPT:\n{prompt}")
-
     try:
-        response = client.chat.completions.create(
-            model=model,
-            temperature=temperature,
-            top_p=top_p,
-            timeout=timeout,
-            max_completion_tokens=max_out_tokens,
-            messages=[
-                {"role": "system", "content": "You are a professional translator and terminologist."},
-                {"role": "user", "content": f"{prompt}"}
-            ],
-            response_format={
-                "type": "json_schema",
-                "json_schema": json_schema
-            }
-        )
+        if not provider in single_key_providers:
+            response = router.completion(
+                model="multi-keys",
+                messages=messages,
+                response_format={
+                    "type": "json_schema",
+                    "json_schema": json_schema
+                }
+            )
+        else:
+            response = litellm.completion(
+                model=f"{provider}/{model}",
+                base_url=base_url,
+                temperature=temperature,
+                top_p=top_p,
+                timeout=timeout,
+                max_completion_tokens=max_out_tokens,
+                messages=messages,
+                response_format={
+                    "type": "json_schema",
+                    "json_schema": json_schema
+                }
+            )
 
         data_dict = json.loads(response.choices[0].message.content)
 
@@ -154,8 +176,8 @@ def translate_texts_and_build_glossary(text_info_list: list[dict], languages: li
         update_glossary(data_dict, existing_glossary, ex_glossary_map, glossary_path, source_lang, target_lang)
 
     except Exception as e:
-        if data_dict:
-            logger.debug(f"\n{data_dict}")
+        if response:
+            logger.debug(f"\n{response.choices[0].message.content}")
         raise type(e)(Fore.RED + f"{e}")
 
     return text_info_list

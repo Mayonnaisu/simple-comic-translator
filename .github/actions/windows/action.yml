@@ -24,13 +24,6 @@ runs:
 
         (Get-Content -Path $filePath -Raw) -replace $findPattern, $replaceText | Set-Content -Path $filePath
 
-        # Replace the use of .env file with GitHub Secrets
-        $filePath = ".\app\core\translation.py"
-        $findPattern = 'api_key=api_key'
-        $replaceText = ''
-
-        (Get-Content -Path $filePath -Raw) -replace $findPattern, $replaceText | Set-Content -Path $filePath
-
     - name: Run installer.ps1
       shell: powershell
       run: |
@@ -56,7 +49,7 @@ runs:
 
     - name: Run launcher.ps1
       env:
-          GOOGLEAI_API_KEY: ${{ inputs.env }}
+          API_KEYS: ${{ inputs.env }}
       shell: powershell
       run: |
         # Run the launcher

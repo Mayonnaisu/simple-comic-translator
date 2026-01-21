@@ -77,8 +77,9 @@
 "retry_delay": 30,              // retry delay in seconds
 "timeout": 300,                 // timeout in seconds
 "translator": {
-  "name": "googleai",           // provider: "googleai"/"openai"/"operouter"/"ollama"
+  "provider": "gemini",         // provider: "gemini", "openai", "operouter", "ollama", etc
   "model": "gemini-2.5-flash",  // model ID
+  "base_url": null,             // base url: "base-url"/null
   "temperature": 0.5,           // temperature
   "top_p": 0.8,                 // top p
   "max_output_tokens": 999999999  // max response tokens: number/null
@@ -91,16 +92,19 @@
 "glossary_path": "output"       // path to glossary file (.json)
 ```
 
+>[!NOTE]
+> Base url is only required for some of providers that are self-hosted, custom, or Open-AI compatible endpoints.
+
 > [!TIP]
 > - You can use ISO language codes for brevity when setting `"target_language"`. For more ISO language codes, see https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes#Table.
 >
 > - When changing retry-related configs, you need to take into account the RPM (request per minute) limit for the selected model. 
 >
-> - To see Gemini model IDs, visit https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions#gemini-auto-updated 
+> - To see Gemini model IDs, visit https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions#gemini-auto-updated.
 >
-> - To learn more about Gemini parameters, see https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/prompts/adjust-parameter-values.
+> - To see the other providers, see [LiteLLM Supported Providers](https://github.com/BerriAI/litellm?tab=readme-ov-file#supported-providers-website-supported-models--docs).
 >
-> - For `max_ouput_tokens`, 999999999 may not work for the other translation providers.
+> - For `max_ouput_tokens`, 999999999 may not work for the other providers.
 
 ### OVERLAY
 ```jsonc

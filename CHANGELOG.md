@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v0.5.6
+20/1/2026
+
+27. Add LiteLLM
+    - Add `litellm` to dependencies
+    - Replace Gemini and OpenAI with LiteLLM package
+    - Add multiple API keys support
+    - Rename environment variable: `GOOGLEAI_API_KEY` to `API_KEYS`
+> [!NOTE]
+> Tested and worked with Gemini, OpenRouter, & Ollama
+28. Move fonts to assets/
+
 ## v0.5.5
 20/1/2026
 

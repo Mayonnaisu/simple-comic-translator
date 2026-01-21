@@ -3,7 +3,7 @@
     "gpu_mode": false,
     "debug_mode": false,
     "result": {
-      "overwrite": true,
+      "overwrite": false,
       "load_json": false,
       "json_path": "output"
     }
@@ -43,8 +43,9 @@
     "max_retries": 3,
     "retry_delay": 30,
     "translator": {
-      "name": "googleai",
+      "provider": "gemini",
       "model": "gemini-2.5-flash",
+      "base_url": null,
       "temperature": 0.5,
       "top_p": 0.8,
       "max_output_tokens": 999999999
@@ -70,7 +71,7 @@
       "min_size": 11,
       "max_size": 40,
       "color": "black",
-      "path": "fonts/NotoSerifKR-Bold.ttf"
+      "path": "assets/fonts/NotoSerifKR-Bold.ttf"
     }
   }
 }

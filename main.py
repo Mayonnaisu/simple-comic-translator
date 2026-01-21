@@ -21,6 +21,7 @@ from app.core.config import load_config
 from app.core.model import download_repo_snapshot
 from app.core.image_utils_pil import merge_images_vertically, slice_image_in_tiles, split_image_safely
 from app.core.detection import TextAreaDetection, merge_overlapping_boxes
+from app.core.translation.engine import translate_texts_and_build_glossary
 from app.core.translation.memory import TranslationMemory, translate_texts_from_memory
 from app.core.overlay import overlay_translated_texts
 from app.core.result import NumpyEncoder, load_result_json
@@ -75,8 +76,9 @@ if config:
     timeout = config['TRANSLATION']['timeout']
     max_retries = config['TRANSLATION']['max_retries']
     retry_delay = config['TRANSLATION']['retry_delay']
-    translator_name = config['TRANSLATION']['translator']['name']
+    translator_provider = config['TRANSLATION']['translator']['provider']
     translator_model = config['TRANSLATION']['translator']['model']
+    translator_base_url = config['TRANSLATION']['translator']['base_url']
     translator_temp = config['TRANSLATION']['translator']['temperature']
     translator_top_p = config['TRANSLATION']['translator']['top_p']
     translator_max_out_tokens = config['TRANSLATION']['translator']['max_output_tokens']
@@ -333,11 +335,6 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
         glossary_path = os.path.join(input_path, "glossary.json") if glossary_path == "input" else os.path.join(output_path, "glossary.json") if glossary_path == "output" else glossary_path
 
         if not use_memory:
-            if translator_name == "googleai":
-                from app.core.translation.googleai import translate_texts_and_build_glossary
-            elif translator_name == "openai" or translator_name == "openrouter" or translator_name == "ollama":
-                from app.core.translation.openai import translate_texts_and_build_glossary
-
             # Use automatic retry in case of any translation errors
             max_retries = max_retries
             retry_delay = retry_delay
@@ -345,7 +342,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
 
             while attempts <= max_retries:
                 try:
-                    translated_text_data = translate_texts_and_build_glossary(recognitions, [source_language, target_language], [translator_name, translator_model, translator_temp, translator_top_p, translator_max_out_tokens, timeout], glossary_path, [memory, overwrite_memory], log_level)
+                    translated_text_data = translate_texts_and_build_glossary(recognitions, [source_language, target_language], [translator_provider, translator_model, translator_base_url, translator_temp, translator_top_p, translator_max_out_tokens, timeout], glossary_path, [memory, overwrite_memory], log_level)
                     break
                 except Exception as e:
                     attempts += 1

@@ -17,7 +17,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     env:
-        GOOGLEAI_API_KEY: ${{ secrets.GOOGLEAI_API_KEY }}
+        API_KEYS: ${{ secrets.API_KEYS }}
 
     strategy:
       fail-fast: false
@@ -42,16 +42,16 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: ./.github/actions/windows
       with:
-        env: ${{ env.GOOGLEAI_API_KEY }}
+        env: ${{ env.API_KEYS }}
 
     - name: Setup Linux
       if: matrix.os == 'ubuntu-latest'
       uses: ./.github/actions/linux
       with:
-        env: ${{ env.GOOGLEAI_API_KEY }}
+        env: ${{ env.API_KEYS }}
 
     - name: Setup macOS
       if: matrix.os == 'macos-latest'
       uses: ./.github/actions/macos
       with:
-        env: ${{ env.GOOGLEAI_API_KEY }}
+        env: ${{ env.API_KEYS }}

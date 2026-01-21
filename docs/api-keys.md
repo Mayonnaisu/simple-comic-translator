@@ -1,12 +1,12 @@
 # API KEY REFERENCES
 
 ## Environment Variables
+> [!TIP]
+> You can use multiple API keys separated by commas. But they have to be from the same provider.
+
 ```
 # .env
-GOOGLEAI_API_KEY='YourAPIkey'
-OPENAI_API_KEY='YourAPIkey'
-OPENROUTER_API_KEY='YourAPIkey'
-OLLAMA_API_KEY='ollama'
+API_KEYS='API-Key-1,API-key-2,API-key-3'
 ```
 
 ## How to Get API Keys

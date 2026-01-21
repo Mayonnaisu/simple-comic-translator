@@ -117,10 +117,10 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
 ## CONFIGURATION
 ### Required
 1. Open **.env** file with text/code editor (Notepad, VS Code, etc).
-2. Paste your [Gemini API key](docs/api-keys.md#gemini) between the quotation marks.
+2. Paste your [Gemini API key/s](docs/api-keys.md#gemini) between the quotation marks.
 3. Save.
 
-For other available API keys, see [API Key References](docs/api-keys.md#google-ai).
+For more info, see [API Key References](docs/api-keys.md#google-ai).
 
 ### Optional
 1. Open **config.json** with text/code editor.

@@ -109,14 +109,14 @@ pip install -r requirements-lock.txt
 
 ## CONFIGURATION
 ### Required
-1. Get your [Gemini API key](api-keys.md#google-ai).
+1. Get your [Gemini API key/s](api-keys.md#google-ai).
 2. Create **.env** file in the program root directory:
 ```powershell
 # powershell/bash/zsh/etc
-echo "GOOGLEAI_API_KEY='YourGeminiAPIkey'" > .env
+echo "API_KEYS='Your-Gemini-API-Key'" > .env
 ```
 
-For other available API keys, see [API Key References](api-keys.md).
+For more info, see [API Key References](api-keys.md).
 
 ### Optional
 1. Open **config.json**.

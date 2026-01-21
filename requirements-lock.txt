@@ -4,15 +4,25 @@
 #
 #    pip-compile --allow-unsafe --output-file=requirements-lock.txt requirements.in
 #
+aiohappyeyeballs==2.6.1
+    # via aiohttp
+aiohttp==3.13.3
+    # via litellm
+aiosignal==1.4.0
+    # via aiohttp
 aistudio-sdk==0.3.8
     # via paddlex
 annotated-types==0.7.0
     # via pydantic
 anyio==4.12.1
     # via
-    #   google-genai
     #   httpx
     #   openai
+attrs==25.4.0
+    # via
+    #   aiohttp
+    #   jsonschema
+    #   referencing
 bce-python-sdk==0.9.59
     # via aistudio-sdk
 certifi==2026.1.4
@@ -25,7 +35,10 @@ chardet==5.2.0
 charset-normalizer==3.4.4
     # via requests
 click==8.3.1
-    # via aistudio-sdk
+    # via
+    #   aistudio-sdk
+    #   litellm
+    #   typer-slim
 colorama==0.4.6
     # via
     #   -r requirements.in
@@ -38,9 +51,9 @@ coloredlogs==15.0.1
 colorlog==6.10.1
     # via paddlex
 distro==1.9.0
-    # via
-    #   google-genai
-    #   openai
+    # via openai
+fastuuid==0.14.0
+    # via litellm
 filelock==3.20.3
     # via
     #   huggingface-hub
@@ -54,6 +67,10 @@ fire==0.7.1
     #   simple-lama-inpainting
 flatbuffers==25.12.19
     # via onnxruntime
+frozenlist==1.8.0
+    # via
+    #   aiohttp
+    #   aiosignal
 fsspec==2026.1.0
     # via
     #   huggingface-hub
@@ -62,17 +79,15 @@ fugashi==1.5.2
     # via manga-ocr
 future==1.0.0
     # via bce-python-sdk
-google-auth[requests]==2.47.0
-    # via google-genai
-google-genai==1.59.0
-    # via -r requirements.in
+grpcio==1.76.0
+    # via litellm
 h11==0.16.0
     # via httpcore
 httpcore==1.0.9
     # via httpx
 httpx==0.28.1
     # via
-    #   google-genai
+    #   litellm
     #   openai
     #   paddlepaddle
 huggingface-hub==0.36.0
@@ -88,14 +103,25 @@ idna==3.11
     #   anyio
     #   httpx
     #   requests
+    #   yarl
 imagesize==1.4.1
     # via paddlex
+importlib-metadata==8.7.1
+    # via litellm
 jaconv==0.4.1
     # via manga-ocr
 jinja2==3.1.6
-    # via torch
+    # via
+    #   litellm
+    #   torch
 jiter==0.12.0
     # via openai
+jsonschema==4.26.0
+    # via litellm
+jsonschema-specifications==2025.9.1
+    # via jsonschema
+litellm==1.81.0
+    # via -r requirements.in
 loguru==0.7.3
     # via
     #   -r requirements.in
@@ -108,6 +134,10 @@ modelscope==1.34.0
     # via paddlex
 mpmath==1.3.0
     # via sympy
+multidict==6.7.0
+    # via
+    #   aiohttp
+    #   yarl
 natsort==8.4.0
     # via -r requirements.in
 networkx==3.6.1
@@ -132,7 +162,7 @@ numpy==2.3.5
 onnxruntime==1.23.2
     # via -r requirements.in
 openai==2.15.0
-    # via -r requirements.in
+    # via litellm
 opencv-contrib-python==4.10.0.84
     # via paddlex
 opencv-python==4.13.0.90
@@ -166,6 +196,10 @@ prettytable==3.17.0
     # via
     #   aistudio-sdk
     #   paddlex
+propcache==0.4.1
+    # via
+    #   aiohttp
+    #   yarl
 protobuf==6.33.4
     # via
     #   onnxruntime
@@ -174,19 +208,13 @@ psutil==7.2.1
     # via aistudio-sdk
 py-cpuinfo==9.0.0
     # via paddlex
-pyasn1==0.6.2
-    # via
-    #   pyasn1-modules
-    #   rsa
-pyasn1-modules==0.4.2
-    # via google-auth
 pyclipper==1.4.0
     # via paddlex
 pycryptodome==3.23.0
     # via bce-python-sdk
 pydantic==2.12.5
     # via
-    #   google-genai
+    #   litellm
     #   openai
     #   paddlex
 pydantic-core==2.41.5
@@ -202,7 +230,9 @@ python-bidi==0.6.7
 python-dateutil==2.9.0.post0
     # via pandas
 python-dotenv==1.2.1
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   litellm
 pytz==2025.2
     # via pandas
 pyyaml==6.0.2
@@ -212,20 +242,27 @@ pyyaml==6.0.2
     #   paddleocr
     #   paddlex
     #   transformers
+referencing==0.37.0
+    # via
+    #   jsonschema
+    #   jsonschema-specifications
 regex==2026.1.15
-    # via transformers
+    # via
+    #   tiktoken
+    #   transformers
 requests==2.32.5
     # via
     #   aistudio-sdk
-    #   google-auth
-    #   google-genai
     #   huggingface-hub
     #   modelscope
     #   paddleocr
     #   paddlex
+    #   tiktoken
     #   transformers
-rsa==4.9.1
-    # via google-auth
+rpds-py==0.30.0
+    # via
+    #   jsonschema
+    #   referencing
 ruamel-yaml==0.19.1
     # via paddlex
 safetensors==0.7.0
@@ -241,19 +278,19 @@ six==1.17.0
     #   bce-python-sdk
     #   python-dateutil
 sniffio==1.3.1
-    # via
-    #   google-genai
-    #   openai
+    # via openai
 sympy==1.14.0
     # via
     #   onnxruntime
     #   torch
-tenacity==9.1.2
-    # via google-genai
 termcolor==3.3.0
     # via fire
+tiktoken==0.12.0
+    # via litellm
 tokenizers==0.22.2
-    # via transformers
+    # via
+    #   litellm
+    #   transformers
 torch==2.9.1
     # via
     #   -r requirements.in
@@ -275,8 +312,9 @@ transformers==4.57.6
     # via manga-ocr
 typing-extensions==4.15.0
     # via
+    #   aiosignal
     #   anyio
-    #   google-genai
+    #   grpcio
     #   huggingface-hub
     #   openai
     #   paddleocr
@@ -284,7 +322,9 @@ typing-extensions==4.15.0
     #   paddlex
     #   pydantic
     #   pydantic-core
+    #   referencing
     #   torch
+    #   typer-slim
     #   typing-inspection
 typing-inspection==0.4.2
     # via pydantic
@@ -300,10 +340,12 @@ urllib3==2.6.3
     #   requests
 wcwidth==0.2.14
     # via prettytable
-websockets==15.0.1
-    # via google-genai
 win32-setctime==1.2.0
     # via loguru
+yarl==1.22.0
+    # via aiohttp
+zipp==3.23.0
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 setuptools==80.9.0
