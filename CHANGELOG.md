@@ -11,6 +11,7 @@
 > [!NOTE]
 > Tested and worked with Gemini, OpenRouter, & Ollama
 28. Move fonts to assets/
+29. Add `pip-tools` installation for update improvement
 
 ## v0.5.5
 20/1/2026

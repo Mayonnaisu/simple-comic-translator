@@ -96,7 +96,9 @@ try {
             Throw "Path '$requirementsPath' does not exist!"
         }
 
-        pip install -r $requirementsPath
+        pip install pip-tools==7.5.2
+
+        pip-sync $requirementsPath
 
         if ($LASTEXITCODE -ne 0) {
             Throw "`nFailed to Install New Dependencies!`nEXIT CODE: $LASTEXITCODE"

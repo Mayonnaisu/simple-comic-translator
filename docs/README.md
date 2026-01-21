@@ -151,8 +151,11 @@ venv/Scripts/activate
 ## For Linux & macOS
 source venv/bin/activate
 
+# Install pip-tools if not already
+pip install pip-tools==7.5.2
+
 # Install new dependencies
-pip install -r requirements-lock.txt
+pip-sync requirements-lock.txt
 ```
 
 ## LIMITATIONS
