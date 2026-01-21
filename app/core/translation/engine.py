@@ -22,9 +22,11 @@ def translate_texts_and_build_glossary(text_info_list: list[dict], languages: li
     source_lang, target_lang = languages
     provider, model, base_url, temperature, top_p, max_out_tokens, timeout = openai
     tm, overwrite_memory = memory
-    single_key_providers = ("ollama")
 
     logger.info(f"\nTranslating texts to ({target_lang.upper()}) with {provider.upper()}.")
+
+    # Define placeholder to prevent error when logging exception
+    data_dict = "data_dict"
 
     # Load existing glossary file
     existing_glossary, ex_glossary_map, glossary_context = load_glossary(glossary_path, source_lang, target_lang)
@@ -51,31 +53,30 @@ def translate_texts_and_build_glossary(text_info_list: list[dict], languages: li
     # Get the API key from the environment variables
     api_keys = os.getenv("API_KEYS", "").split(",")
 
-    if not provider in single_key_providers:
-        # Create a model list for the Router
-        # Each entry is a "deployment" the router can choose from
-        model_list = [
-            {
-                "model_name": "multi-keys", # Internal alias for the router
-                "litellm_params": {
-                    "model": f"{provider}/{model}",
-                    "base_url": base_url,
-                    "api_key": key,
-                    "temperature": temperature,
-                    "top_p": top_p,
-                    "timeout": timeout,
-                    "max_tokens": max_out_tokens,
-                },
-            }
-            for key in api_keys
-        ]
+    # Create a model list for the Router
+    # Each entry is a "deployment" the router can choose from
+    model_list = [
+        {
+            "model_name": "multi-keys", # Internal alias for the router
+            "litellm_params": {
+                "model": f"{provider}/{model}",
+                "base_url": base_url,
+                "api_key": key,
+                "temperature": temperature,
+                "top_p": top_p,
+                "timeout": timeout,
+                "max_tokens": max_out_tokens,
+            },
+        }
+        for key in api_keys
+    ]
 
-        # Initialize the Router with a rotation strategy
-        router = litellm.Router(
-            model_list=model_list,
-            routing_strategy="simple-shuffle",
-            set_verbose=False
-        )
+    # Initialize the Router with a rotation strategy
+    router = litellm.Router(
+        model_list=model_list,
+        routing_strategy="simple-shuffle",
+        set_verbose=False
+    )
 
     messages = [
         {"role": "system", "content": "You are a professional translator and terminologist."},
@@ -113,29 +114,14 @@ def translate_texts_and_build_glossary(text_info_list: list[dict], languages: li
     }
 
     try:
-        if not provider in single_key_providers:
-            response = router.completion(
-                model="multi-keys",
-                messages=messages,
-                response_format={
-                    "type": "json_schema",
-                    "json_schema": json_schema
-                }
-            )
-        else:
-            response = litellm.completion(
-                model=f"{provider}/{model}",
-                base_url=base_url,
-                temperature=temperature,
-                top_p=top_p,
-                timeout=timeout,
-                max_completion_tokens=max_out_tokens,
-                messages=messages,
-                response_format={
-                    "type": "json_schema",
-                    "json_schema": json_schema
-                }
-            )
+        response = router.completion(
+            model="multi-keys",
+            messages=messages,
+            response_format={
+                "type": "json_schema",
+                "json_schema": json_schema
+            }
+        )
 
         data_dict = json.loads(response.choices[0].message.content)
 
@@ -176,8 +162,8 @@ def translate_texts_and_build_glossary(text_info_list: list[dict], languages: li
         update_glossary(data_dict, existing_glossary, ex_glossary_map, glossary_path, source_lang, target_lang)
 
     except Exception as e:
-        if response:
-            logger.debug(f"\n{response.choices[0].message.content}")
+        if data_dict:
+            logger.debug(f"\n{data_dict}")
         raise type(e)(Fore.RED + f"{e}")
 
     return text_info_list
