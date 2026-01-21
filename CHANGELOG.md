@@ -6,7 +6,7 @@
 27. Add [LiteLLM](https://github.com/BerriAI/litellm)
     - Add `litellm` to dependencies
     - Replace Gemini and OpenAI with LiteLLM package
-    - Add multiple API keys support
+    - Add [multiple API keys support](docs/api-keys.md)
     - Rename environment variable: `GOOGLEAI_API_KEY` to `API_KEYS`
 > [!NOTE]
 > Tested and worked with Gemini, OpenRouter, & Ollama
