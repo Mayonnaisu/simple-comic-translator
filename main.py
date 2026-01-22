@@ -54,7 +54,7 @@ if config:
     debug_mode = config['GENERAL']['debug_mode']
     overwrite_result = config['GENERAL']['result']['overwrite']
     use_result_json = config['GENERAL']['result']['load_json']
-    result_json_path = config['GENERAL']['result']['json_path']
+    result_json_path_ = config['GENERAL']['result']['json_path']
     # For merging images
     merge_images = config['IMAGE_MERGE']['enable']
     # For detecting text areas
@@ -85,7 +85,7 @@ if config:
     use_memory = config['TRANSLATION']['memory']['enable']
     memory_path = config['TRANSLATION']['memory']['path']
     overwrite_memory = config['TRANSLATION']['memory']['overwrite']
-    glossary_path = config['TRANSLATION']['glossary_path']
+    glossary_path_ = config['TRANSLATION']['glossary_path']
     # For overlay
     box_offset = config['OVERLAY']['box']['offset']
     box_padding = config['OVERLAY']['box']['padding']
@@ -183,7 +183,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
             logger.info(Fore.GREEN + f"- Files already exist in '{output_dir}'. OVERWRITING.")
 
     # Define result.json path
-    result_json_path = os.path.join(dirpath, "result.json") if result_json_path == "input" else os.path.join(output_dir, "result.json") if result_json_path == "output" else result_json_path
+    result_json_path = os.path.join(dirpath, "result.json") if result_json_path_ == "input" else os.path.join(output_dir, "result.json") if result_json_path_ == "output" else os.path.join(output_dir, "result.json")
 
     # Filter for image files and sort files to ensure consistent merging order
     image_files = [os.path.join(dirpath, f) for f in natsorted(filenames) if f.lower().endswith(image_extensions)]
@@ -332,7 +332,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
     if (use_result_json or args.load_json) and os.path.exists(result_json_path):
         translated_text_data = recognitions
     else:
-        glossary_path = os.path.join(input_path, "glossary.json") if glossary_path == "input" else os.path.join(output_path, "glossary.json") if glossary_path == "output" else glossary_path
+        glossary_path = os.path.join(input_path, "glossary.json") if glossary_path_ == "input" else os.path.join(output_path, "glossary.json") if glossary_path_ == "output" else glossary_path_
 
         if not use_memory:
             # Use automatic retry in case of any translation errors
