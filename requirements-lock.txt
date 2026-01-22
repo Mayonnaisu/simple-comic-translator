@@ -38,7 +38,6 @@ click==8.3.1
     # via
     #   aistudio-sdk
     #   litellm
-    #   typer-slim
 colorama==0.4.6
     # via
     #   -r requirements.in
@@ -83,6 +82,8 @@ grpcio==1.76.0
     # via litellm
 h11==0.16.0
     # via httpcore
+hf-xet==1.2.0
+    # via -r requirements.in
 httpcore==1.0.9
     # via httpx
 httpx==0.28.1
@@ -324,7 +325,6 @@ typing-extensions==4.15.0
     #   pydantic-core
     #   referencing
     #   torch
-    #   typer-slim
     #   typing-inspection
 typing-inspection==0.4.2
     # via pydantic
