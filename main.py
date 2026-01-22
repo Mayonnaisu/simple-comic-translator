@@ -24,7 +24,7 @@ from app.core.detection import TextAreaDetection, merge_overlapping_boxes
 from app.core.translation.engine import translate_texts_and_build_glossary
 from app.core.translation.memory import TranslationMemory, translate_texts_from_memory
 from app.core.overlay import overlay_translated_texts
-from app.core.result import NumpyEncoder, load_result_json
+from app.core.result import save_result_json, load_result_json
 
 # Measure time
 start_time = time.perf_counter()
@@ -356,8 +356,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
             translated_text_data = translate_texts_from_memory(recognitions, [source_language, target_language], memory, log_level)
 
         # Save result to result.json
-        with open(result_json_path, 'w', encoding='utf-8') as f:
-            json.dump(translated_text_data, f, cls=NumpyEncoder, ensure_ascii=False, indent=4)
+        save_result_json(result_json_path, translated_text_data)
 
     # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
     overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness], [use_inpainting, simple_lama], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
