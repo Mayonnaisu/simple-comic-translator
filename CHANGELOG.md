@@ -9,7 +9,7 @@
     - Add [multiple API keys support](docs/api-keys.md)
     - Rename environment variable: `GOOGLEAI_API_KEY` to `API_KEYS`
 > [!NOTE]
-> Tested and worked with Gemini, OpenRouter, & Ollama
+> Tested and worked with Gemini, OpenRouter, HuggingFace, & Ollama
 28. Move fonts to assets/
 29. Add `pip-tools` installation for update improvement
 
