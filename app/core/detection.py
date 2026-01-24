@@ -8,6 +8,8 @@ from loguru import logger
 from colorama import init, Fore
 from concurrent.futures import ThreadPoolExecutor
 
+from app.core.model import download_repo_snapshot
+
 
 init(autoreset=True)
 lock = threading.Lock()
@@ -28,13 +30,21 @@ class TextAreaDetection:
 
     :return: A list of dictionary containing bounding boxes among others.
     """
-    def __init__(self, model_path: str, confidence_threshold: float, use_gpu: bool):
+    def __init__(self, confidence_threshold: float, use_gpu: bool):
         """
         Initializes detection model.
         """
         logger.info(f"Initializing detection model.")
 
-        self.model_path = model_path
+        self.repo_id="ogkalu/comic-text-and-bubble-detector"
+        self.file_name="detector.onnx"
+        self.snapshot_path=f"models/detection/{self.repo_id}"
+        self.model_path=f"{self.snapshot_path}/{self.file_name}"
+
+        # Download detection model if not exist
+        if not os.path.exists(self.model_path):
+            download_repo_snapshot(repo_id=self.repo_id, local_dir=self.snapshot_path)
+
         self.confidence_threshold = confidence_threshold
 
         self.classes = {
@@ -66,84 +76,84 @@ class TextAreaDetection:
         logger.info("Detection model initialized.\n")
 
     def detect_text_areas(self, image_name: str, number: int, slice: dict | object, target_sizes: list[int], log_level: str, image_tiled: bool) -> list[dict]:
-        """Runs PaddleOCR on slices and adjusts coordinates to original image space."""
+        """Runs detection on each tile and adjusts coordinates to original image space."""
 
         result_list = []
 
-        with lock:
-            if image_tiled:
-                slice_img_np = np.array(slice["image"])
-                top_offset = slice["top_offset"]
-                left_offset = slice["left_offset"]
-                scale_x = slice['scale_x']
-                scale_y = slice['scale_y']
-            else:
-                logger.info(f"Detecting text areas with ogkalu/comic-text-and-bubble-detector.onnx")
+        # with lock:
+        if image_tiled:
+            slice_img_np = np.array(slice["image"])
+            top_offset = slice["top_offset"]
+            left_offset = slice["left_offset"]
+            scale_x = slice['scale_x']
+            scale_y = slice['scale_y']
+        else:
+            logger.info(f"Detecting text areas with ogkalu/comic-text-and-bubble-detector.onnx")
 
-                slice_img_np = np.array(slice)
-                top_offset = 0
-                left_offset = 0
-                scale_x = 1
-                scale_y = 1
+            slice_img_np = np.array(slice)
+            top_offset = 0
+            left_offset = 0
+            scale_x = 1
+            scale_y = 1
 
-            slice_float32 = slice_img_np.astype(np.float32) / 255.0
-            slice_transposed = slice_float32.transpose(2, 0, 1)
-            slice_batchd = np.expand_dims(slice_transposed, axis=0)
-            # Run inference
-            results = self.session.run(
-                self.output_names, {"images": slice_batchd, "orig_target_sizes": np.array([target_sizes], dtype=np.int64)}
-            )
+        slice_float32 = slice_img_np.astype(np.float32) / 255.0
+        slice_transposed = slice_float32.transpose(2, 0, 1)
+        slice_batchd = np.expand_dims(slice_transposed, axis=0)
+        # Run inference
+        results = self.session.run(
+            self.output_names, {"images": slice_batchd, "orig_target_sizes": np.array([target_sizes], dtype=np.int64)}
+        )
 
-            labels, boxes, scores = results[:3]
+        labels, boxes, scores = results[:3]
 
-            if isinstance(labels, np.ndarray) and labels.ndim == 2 and labels.shape[0] == 1:
-                labels = labels[0]
-            if isinstance(scores, np.ndarray) and scores.ndim == 2 and scores.shape[0] == 1:
-                scores = scores[0]
-            if isinstance(boxes, np.ndarray) and boxes.ndim == 3 and boxes.shape[0] == 1:
-                boxes = boxes[0]
+        if isinstance(labels, np.ndarray) and labels.ndim == 2 and labels.shape[0] == 1:
+            labels = labels[0]
+        if isinstance(scores, np.ndarray) and scores.ndim == 2 and scores.shape[0] == 1:
+            scores = scores[0]
+        if isinstance(boxes, np.ndarray) and boxes.ndim == 3 and boxes.shape[0] == 1:
+            boxes = boxes[0]
 
-            if results:
-                n = 0
-                for lab, box, scr in zip(labels, boxes, scores):
-                    # Filter out lower confidence
-                    if float(scr) < float(self.confidence_threshold):
-                        continue
-                    # Skip bubble only detections
-                    if lab == 0:
-                        continue
-                    label_name = self.classes[lab]
-                    # Convert bbox to four-corner coordinates
-                    xmin, ymin, xmax, ymax = box
+        if results:
+            n = 0
+            for lab, box, scr in zip(labels, boxes, scores):
+                # Filter out lower confidence
+                if float(scr) < float(self.confidence_threshold):
+                    continue
+                # Skip bubble only detections
+                if lab == 0:
+                    continue
+                label_name = self.classes[lab]
+                # Convert bbox to four-corner coordinates
+                xmin, ymin, xmax, ymax = box
 
-                    top_left = [xmin, ymin]
-                    top_right = [xmax, ymin]
-                    bottom_right = [xmax, ymax]
-                    bottom_left = [xmin, ymax]
+                top_left = [xmin, ymin]
+                top_right = [xmax, ymin]
+                bottom_right = [xmax, ymax]
+                bottom_left = [xmin, ymax]
 
-                    corners = [top_left, top_right, bottom_right, bottom_left]
+                corners = [top_left, top_right, bottom_right, bottom_left]
 
-                    # Adjust coordinates back to the original slice size (inverse scaling) and then to the original full image coordinate system (offsets)
-                    adjusted_points = [[(int(p[0]) * scale_x) + left_offset, (int(p[1]) * scale_y) + top_offset] for p in corners]
+                # Adjust coordinates back to the original slice size (inverse scaling) and then to the original full image coordinate system (offsets)
+                adjusted_points = [[(int(p[0]) * scale_x) + left_offset, (int(p[1]) * scale_y) + top_offset] for p in corners]
 
-                    _, _, _, _, center_y = get_bbox_coords(adjusted_points)
+                _, _, _, _, center_y = get_bbox_coords(adjusted_points)
 
-                    result = {
-                        "box": np.array(adjusted_points, dtype=np.int32),
-                        "confidence": float(scr),
-                        "original_text": "",
-                        "text_confidence": 0,
-                        "translated_text": "",
-                        "center_y": center_y,
-                        "image_name": image_name,
-                        "number": number
-                    }
+                result = {
+                    "box": np.array(adjusted_points, dtype=np.int32),
+                    "confidence": float(scr),
+                    "original_text": "",
+                    "text_confidence": 0,
+                    "translated_text": "",
+                    "center_y": center_y,
+                    "image_name": image_name,
+                    "number": number
+                }
 
-                    if log_level == "TRACE":
-                        logger.info(f"({scr:.2f}) {label_name} {adjusted_points}")
-                    n+=1
+                if log_level == "TRACE":
+                    logger.info(f"({scr:.2f}) {label_name} {adjusted_points}")
+                n+=1
 
-                    result_list.append(result)
+                result_list.append(result)
 
         return result_list
 

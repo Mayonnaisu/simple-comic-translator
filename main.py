@@ -126,16 +126,8 @@ if not os.path.exists(input_path):
 else:
     os.makedirs(output_path, exist_ok=True)
 
-# Download detection model if not exist
-repo_id="ogkalu/comic-text-and-bubble-detector"
-file_name="detector.onnx"
-model_path=f"./models/detection/{repo_id}"
-
-if not os.path.exists(f"{model_path}/{file_name}"):
-    download_repo_snapshot(repo_id=repo_id, local_dir=model_path)
-
 # Initialize models
-detector = TextAreaDetection(model_path=f"{model_path}/{file_name}", confidence_threshold=det_conf_threshold, use_gpu=True if args.gpu or gpu_mode else False)
+detector = TextAreaDetection(confidence_threshold=det_conf_threshold, use_gpu=True if args.gpu or gpu_mode else False)
 det_target_size = 640
 
 if source_language in lang_code_jp:
