@@ -54,7 +54,9 @@ class TextAreaDetection:
         }
 
         if use_gpu:
-            self.providers = ["CUDAExecutionProvider", "MIGraphXExecutionProvider", "OpenVINOExecutionProvider", "QNNExecutionProvider", "CPUExecutionProvider"]
+            self.providers = [
+                "CUDAExecutionProvider", "TensorrtExecutionProvider", "MIGraphXExecutionProvider", "OpenVINOExecutionProvider", "QNNExecutionProvider", "CPUExecutionProvider"
+            ]
         else:
             self.providers = ["CPUExecutionProvider"]
 
