@@ -16,6 +16,8 @@
 > - Under construction 🛠️
 > - Unstable ⚠️
 > - Not thoroughly tested yet ⁉️
+> - Slow development (busy)
+> - Works fine for manhwa/hua, [not so much for manga](https://github.com/Mayonnaisu/simple-comic-translator/issues/15)
 
 ## DIRECTORY
 *   [NOTICE](#notice)
