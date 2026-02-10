@@ -12,7 +12,7 @@ from app.core.translation.glossary import load_glossary, update_glossary
 
 init(autoreset=True)
 
-def translate_texts_and_build_glossary(text_info_list: list[dict], languages: list[str], openai: list[str|float], glossary_path: str, memory: list[object|bool], log_level: str):
+def translate_texts_and_build_glossary(text_info_list: list[dict], languages: list[str], translator: list[str|float], glossary_path: str, memory: list[object|bool], log_level: str):
     '''
     Translate all texts from one chapter and build glossary with LiteLLM
     '''
@@ -20,7 +20,7 @@ def translate_texts_and_build_glossary(text_info_list: list[dict], languages: li
         return text_info_list
 
     source_lang, target_lang = languages
-    provider, model, base_url, temperature, top_p, max_out_tokens, timeout = openai
+    provider, model, base_url, temperature, top_p, max_out_tokens, timeout = translator
     tm, overwrite_memory = memory
 
     logger.info(f"\nTranslating texts to ({target_lang.upper()}) with {provider.upper()}.")
