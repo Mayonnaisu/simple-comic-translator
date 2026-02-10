@@ -144,8 +144,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             box_width = new_xmax - new_xmin
             box_height = new_ymax - new_ymin
 
-            # Use textwrap on the *already structured* text from Gemini
-            # This acts as a secondary safety measure to prevent spilling
+            # Use textwrap as a safety measure to prevent spilling
             optimal_size, wrapped_text = get_fitted_font_and_text(
                 translated_text, box_width, box_height, font_min, font_max, font_path
             )
