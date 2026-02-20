@@ -186,7 +186,7 @@ paddlex[ocr-core]==3.3.13
     #   paddleocr
 pandas==2.3.3
     # via paddlex
-pillow==12.1.0
+pillow==12.1.1
     # via
     #   manga-ocr
     #   paddlepaddle
@@ -201,7 +201,7 @@ propcache==0.4.1
     # via
     #   aiohttp
     #   yarl
-protobuf==6.33.4
+protobuf==6.33.5
     # via
     #   onnxruntime
     #   paddlepaddle
