@@ -11,7 +11,7 @@ def merge_images_vertically(images, output_dir, log_level):
     'images' is expected to be a list of numpy arrays (OpenCV images).
     """
     image_count = len(images)
-    logger.info(f"\nMerging {image_count} images into one.")
+    logger.info(f"\nMerging {image_count} images into one...")
 
     # In OpenCV, size is accessed via img.shape -> (height, width, channels)
     widths = [img.shape[1] for img in images]
@@ -169,7 +169,7 @@ def split_image_safely(image: tuple, detections: list[dict], max_height: int, ou
     """
     Split image using cv2 (NumPy slicing) on non-text areas.
     """
-    logger.info("\nSplitting image on non-text areas using OpenCV.")
+    logger.info("\nSplitting image on non-text areas using OpenCV...")
 
     image_array, width, height = image
     split_points = [0]

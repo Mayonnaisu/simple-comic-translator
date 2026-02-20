@@ -23,7 +23,7 @@ def save_result_json(result_json_path: str, translated_text_data: list[dict]):
 
 
 def load_result_json(result_json_path: str, memory: list[object|str|bool]):
-    logger.info(f"\nLoading existing result.json.")
+    logger.info(f"\nLoading existing result.json...")
 
     tm, overwrite_memory, source_language, target_language = memory
 

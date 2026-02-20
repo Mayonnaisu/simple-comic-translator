@@ -78,7 +78,7 @@ def translate_texts_from_memory(text_info_list: list[dict], languages: list[str]
     '''
     memory_name = os.path.basename(memory.db_path)
 
-    logger.info(f"\nTranslating from memory: '{memory_name}'")
+    logger.info(f"\nTranslating from memory: '{memory_name}'...")
 
     source_lang, target_lang = languages
 

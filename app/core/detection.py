@@ -14,6 +14,7 @@ from app.core.model import download_repo_snapshot
 init(autoreset=True)
 lock = threading.Lock()
 
+
 def get_bbox_coords(points: list[list]):
     """Helper to get min/max coordinates and center from points."""
     points_np = np.array(points)
@@ -21,6 +22,7 @@ def get_bbox_coords(points: list[list]):
     max_x, max_y = np.max(points_np, axis=0)
     center_y = (min_y + max_y) / 2
     return min_x, min_y, max_x, max_y, center_y
+
 
 class TextAreaDetection:
     """
@@ -30,16 +32,17 @@ class TextAreaDetection:
 
     :return: A list of dictionary containing bounding boxes among others.
     """
+
     def __init__(self, confidence_threshold: float, use_gpu: bool):
         """
         Initializes detection model.
         """
-        logger.info(f"Initializing detection model.")
+        logger.info(f"Initializing detection model...")
 
-        self.repo_id="ogkalu/comic-text-and-bubble-detector"
-        self.file_name="detector.onnx"
-        self.snapshot_path=f"models/detection/{self.repo_id}"
-        self.model_path=f"{self.snapshot_path}/{self.file_name}"
+        self.repo_id = "ogkalu/comic-text-and-bubble-detector"
+        self.file_name = "detector.onnx"
+        self.snapshot_path = f"models/detection/{self.repo_id}"
+        self.model_path = f"{self.snapshot_path}/{self.file_name}"
 
         # Download detection model if not exist
         if not os.path.exists(self.model_path):
@@ -47,11 +50,7 @@ class TextAreaDetection:
 
         self.confidence_threshold = confidence_threshold
 
-        self.classes = {
-            0: 'bubble',
-            1: 'text_bubble',
-            2: 'text_free'
-        }
+        self.classes = {0: "bubble", 1: "text_bubble", 2: "text_free"}
 
         if use_gpu:
             self.providers = [
@@ -60,19 +59,25 @@ class TextAreaDetection:
                 "MIGraphXExecutionProvider",
                 "OpenVINOExecutionProvider",
                 "QNNExecutionProvider",
-                "CPUExecutionProvider"
+                "CPUExecutionProvider",
             ]
         else:
             self.providers = ["CPUExecutionProvider"]
 
         # Define the number of threads
-        self.num_threads = int(os.cpu_count()/2) or 1
+        self.num_threads = int(os.cpu_count() / 2) or 1
 
         session_options = ort.SessionOptions()
-        session_options.inter_op_num_threads = self.num_threads # For parallel model execution
-        session_options.intra_op_num_threads = self.num_threads # For parallel computation inside each operator
+        session_options.inter_op_num_threads = (
+            self.num_threads
+        )  # For parallel model execution
+        session_options.intra_op_num_threads = (
+            self.num_threads
+        )  # For parallel computation inside each operator
 
-        self.session = ort.InferenceSession(self.model_path, sess_options=session_options, providers=self.providers)
+        self.session = ort.InferenceSession(
+            self.model_path, sess_options=session_options, providers=self.providers
+        )
 
         if not self.session:
             raise Exception(Fore.RED + "Failed to initialize detection model!")
@@ -82,7 +87,15 @@ class TextAreaDetection:
 
         logger.info("Detection model initialized.\n")
 
-    def detect_text_areas(self, image_name: str, number: int, slice: dict | object, target_sizes: list[int], log_level: str, image_tiled: bool) -> list[dict]:
+    def detect_text_areas(
+        self,
+        image_name: str,
+        number: int,
+        slice: dict | object,
+        target_sizes: list[int],
+        log_level: str,
+        image_tiled: bool,
+    ) -> list[dict]:
         """Runs detection on each tile and adjusts coordinates to original image space."""
 
         result_list = []
@@ -92,10 +105,12 @@ class TextAreaDetection:
             slice_img_np = np.array(slice["image"])
             top_offset = slice["top_offset"]
             left_offset = slice["left_offset"]
-            scale_x = slice['scale_x']
-            scale_y = slice['scale_y']
+            scale_x = slice["scale_x"]
+            scale_y = slice["scale_y"]
         else:
-            logger.info(f"Detecting text areas with ogkalu/comic-text-and-bubble-detector.onnx")
+            logger.info(
+                f"Detecting text areas with ogkalu/comic-text-and-bubble-detector.onnx..."
+            )
 
             slice_img_np = np.array(slice)
             top_offset = 0
@@ -108,7 +123,11 @@ class TextAreaDetection:
         slice_batchd = np.expand_dims(slice_transposed, axis=0)
         # Run inference
         results = self.session.run(
-            self.output_names, {"images": slice_batchd, "orig_target_sizes": np.array([target_sizes], dtype=np.int64)}
+            self.output_names,
+            {
+                "images": slice_batchd,
+                "orig_target_sizes": np.array([target_sizes], dtype=np.int64),
+            },
         )
 
         labels, boxes, scores = results[:3]
@@ -141,7 +160,13 @@ class TextAreaDetection:
                 corners = [top_left, top_right, bottom_right, bottom_left]
 
                 # Adjust coordinates back to the original slice size (inverse scaling) and then to the original full image coordinate system (offsets)
-                adjusted_points = [[(int(p[0]) * scale_x) + left_offset, (int(p[1]) * scale_y) + top_offset] for p in corners]
+                adjusted_points = [
+                    [
+                        (int(p[0]) * scale_x) + left_offset,
+                        (int(p[1]) * scale_y) + top_offset,
+                    ]
+                    for p in corners
+                ]
 
                 _, _, _, _, center_y = get_bbox_coords(adjusted_points)
 
@@ -153,29 +178,46 @@ class TextAreaDetection:
                     "translated_text": "",
                     "center_y": center_y,
                     "image_name": image_name,
-                    "number": number
+                    "number": number,
                 }
 
                 if log_level == "TRACE":
                     logger.info(f"({scr:.2f}) {label_name} {adjusted_points}")
-                n+=1
+                n += 1
 
                 result_list.append(result)
 
         return result_list
 
-    def batch_threaded(self, image_name: str, images: dict | object, target_sizes: list[int], log_level: str, image_tiled: bool):
+    def batch_threaded(
+        self,
+        image_name: str,
+        images: dict | object,
+        target_sizes: list[int],
+        log_level: str,
+        image_tiled: bool,
+    ):
         """Manages thread pool for batch detection"""
 
         all_results = []
 
-        logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx in {self.num_threads} threads.")
+        logger.info(
+            f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx in {self.num_threads} threads..."
+        )
 
         # Use ThreadPoolExecutor for concurrent execution
         with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
             number = len(images)
             # Use executor.map() to get results in correct order. It's slower than as_completed() tho.
-            futures = executor.map(self.detect_text_areas, [image_name]*number, range(number), images, [target_sizes]*number, [log_level]*number, [image_tiled]*number)
+            futures = executor.map(
+                self.detect_text_areas,
+                [image_name] * number,
+                range(number),
+                images,
+                [target_sizes] * number,
+                [log_level] * number,
+                [image_tiled] * number,
+            )
 
             for future in tqdm(futures, total=len(images), desc="Detection"):
                 if future:
@@ -210,36 +252,77 @@ def calculate_iou_2d(box1: tuple[int], box2: tuple[int]):
 
     # Calculate the union area
     union_area = area1 + area2 - inter_area
-    
+
     if union_area == 0:
         return 0.0
 
     return inter_area / union_area
 
 
-def merge_overlapping_boxes(results: list[dict], det_merge_threshold: float) -> list[dict]:
-    if not results: return []
+def merge_overlapping_boxes(
+    results: list[dict], det_merge_threshold: float
+) -> list[dict]:
+    if not results:
+        return []
 
     merged_blocks = []
     for current in results:
         merged = False
-        current_bbox_coords = get_bbox_coords(current['box'])
+        current_bbox_coords = get_bbox_coords(current["box"])
         c_min_x, c_min_y, c_max_x, c_max_y, _ = current_bbox_coords
         for existing_block in merged_blocks:
-            existing_bbox_coords = get_bbox_coords(existing_block['box'])
+            existing_bbox_coords = get_bbox_coords(existing_block["box"])
             e_min_x, e_min_y, e_max_x, e_max_y, _ = existing_bbox_coords
 
             IoU = calculate_iou_2d(current_bbox_coords, existing_bbox_coords)
 
             if IoU > det_merge_threshold:
-                existing_block['original_text'] += " " + current['original_text']
+                existing_block["original_text"] += " " + current["original_text"]
                 new_min_x, new_min_y = min(e_min_x, c_min_x), min(e_min_y, c_min_y)
                 new_max_x, new_max_y = max(e_max_x, c_max_x), max(e_max_y, c_max_y)
-                existing_block['box'] = [[new_min_x, new_min_y], [new_max_x, new_min_y], [new_max_x, new_max_y], [new_min_x, new_max_y]]
-                existing_block['center_y'] = (new_min_y + new_max_y) / 2
+                existing_block["box"] = [
+                    [new_min_x, new_min_y],
+                    [new_max_x, new_min_y],
+                    [new_max_x, new_max_y],
+                    [new_min_x, new_max_y],
+                ]
+                existing_block["center_y"] = (new_min_y + new_max_y) / 2
                 merged = True
                 break
         if not merged:
             merged_blocks.append(current)
 
     return merged_blocks
+
+
+def get_bbox_orientation(
+    xmin: int, ymin: int, xmax: int, ymax: int, threshold: float | int = 0.5
+):
+    """
+    Determines orientation using an aspect ratio threshold.
+
+    Args:
+        xmin, ymin, xmax, ymax (float or int): Coordinates.
+        threshold (float): The aspect ratio boundary for classification.
+
+    Returns:
+        str: 'horizontal', 'vertical', or 'neutral'
+    """
+    width = xmax - xmin
+    height = ymax - ymin
+
+    # Avoid division by zero for invalid boxes
+    if height == 0:
+        raise Exception("Invalid box!") if width == 0 else "horizontal"
+
+    aspect_ratio = width / height
+
+    if aspect_ratio > threshold:
+        orientation = "horizontal"
+    elif aspect_ratio < threshold:  # Check if inverse is below threshold
+        orientation = "vertical"
+        width, height = height, width
+    else:
+        orientation = "neutral"  # Or 'square', 'close to square'
+
+    return orientation, width, height

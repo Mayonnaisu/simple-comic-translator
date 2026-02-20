@@ -12,7 +12,7 @@ def merge_images_vertically(images: list[object], output_dir: str, log_level: st
     """
 
     image_count = len(images)
-    logger.info(f"\nMerging {image_count} images into one.")
+    logger.info(f"\nMerging {image_count} images into one...")
 
     # Determine the dimensions for the combined image (vertical stacking)
     widths, heights = zip(*(i.size for i in images))
@@ -148,7 +148,7 @@ def split_image_safely(image: list[object|int], detections: list[dict], max_heig
     """
     Split image on non-text areas, avoiding bounding boxes, within the specified maximum height.
     """
-    logger.info("\nSplitting image on non-text areas.")
+    logger.info("\nSplitting image on non-text areas...")
 
     img, width, height = image
     split_points = [0]

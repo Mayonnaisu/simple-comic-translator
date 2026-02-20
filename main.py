@@ -153,7 +153,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
     output_dir = Path(output_path) / relative_path
     output_dir.mkdir(parents=True, exist_ok=True) # Create output directory
 
-    logger.info(Style.BRIGHT + Fore.YELLOW + f"\nProcessing '{dirpath}'")
+    logger.info(Style.BRIGHT + Fore.YELLOW + f"\nProcessing '{dirpath}'...")
 
     # Skip or overwrite if output files already exist
     already_exist = False
@@ -169,10 +169,10 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
 
     if already_exist:
         if not overwrite_result:
-            logger.info(Fore.GREEN + f"- Files already exist in '{output_dir}'. SKIPPING.")
+            logger.info(Fore.GREEN + f"- Files already exist in '{output_dir}'. SKIPPING...")
             continue
         else:
-            logger.info(Fore.GREEN + f"- Files already exist in '{output_dir}'. OVERWRITING.")
+            logger.info(Fore.GREEN + f"- Files already exist in '{output_dir}'. OVERWRITING...")
 
     # Define result.json path
     result_json_path = os.path.join(dirpath, "result.json") if result_json_path_ == "input" else os.path.join(output_dir, "result.json") if result_json_path_ == "output" else os.path.join(output_dir, "result.json")
@@ -181,7 +181,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
     image_files = [os.path.join(dirpath, f) for f in natsorted(filenames) if f.lower().endswith(image_extensions)]
 
     if not image_files:
-        logger.info(Fore.BLUE + f"- No image in '{dirpath}'. SKIPPING.")
+        logger.info(Fore.BLUE + f"- No image in '{dirpath}'. SKIPPING...")
         continue
 
     images = []
@@ -226,7 +226,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
 
             # detections = detector.batch_threaded("", image_slices, target_sizes=[tile_height, tile_width], log_level=log_level, image_tiled=True)
 
-            logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
+            logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx...")
             detections = []
             for i, slice in enumerate(tqdm(image_slices)):
                 detection = detector.detect_text_areas("", i, slice, target_sizes=[det_target_size, det_target_size], log_level=log_level, image_tiled=True)
@@ -281,21 +281,21 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
                 tile_overlap_px = int(tile_height * tile_overlap)
 
                 if image_width == det_target_size and tile_width == det_target_size:
-                    logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
+                    logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx...")
                     detections = detector.detect_text_areas(image_name, n, image, target_sizes=[det_target_size, det_target_size], log_level=log_level, image_tiled=False)
                 else:
                     image_slices = slice_image_in_tiles([image, image_width, image_height], tile_height, tile_width, det_target_size, tile_overlap_px, n, output_dir, log_level)
 
                     # detections = detector.batch_threaded(image_name,image_slices, target_sizes=[tile_height, tile_width], log_level=log_level, image_tiled=True)
 
-                    logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx.")
+                    logger.info(f"\nDetecting text areas with ogkalu/comic-text-and-bubble-detector.onnx...")
                     detections = []
                     for i, slice in enumerate(tqdm(image_slices)):
                         detection = detector.detect_text_areas(image_name, i, slice, target_sizes=[det_target_size, det_target_size], log_level=log_level, image_tiled=True)
                         detections.extend(detection)
 
                 if not detections:
-                    logger.warning(Fore.YELLOW + "NO DETECTION! SKIPPING.")
+                    logger.warning(Fore.YELLOW + "NO DETECTION! SKIPPING...")
                     continue
 
                 # Merge overlapping boxes by the specified number of times because 1x isn't enough to merge all of them
@@ -353,7 +353,7 @@ for dirpath, dirnames, filenames in natsorted(os.walk(input_path)):
     # --- Stage 6/4: Whiten Text Areas & Overlay Translated Texts to Split Images ---
     overlay_translated_texts(image_chunks, merge_images, translated_text_data, [box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness], [use_inpainting, simple_lama], [font_min, font_max, font_color, font_path], common_original_extension, [source_language, lang_code_jp], output_dir, log_level)
 
-logger.info(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_path}'.")
+logger.success(Style.BRIGHT + Fore.GREEN + f"\nAll translated images saved to '{output_path}'.")
 
 # --- End of Execution ---
 end_time = time.perf_counter()

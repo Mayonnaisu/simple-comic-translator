@@ -23,7 +23,7 @@ def translate_texts_and_build_glossary(text_info_list: list[dict], languages: li
     provider, model, base_url, temperature, top_p, max_out_tokens, timeout = translator
     tm, overwrite_memory = memory
 
-    logger.info(f"\nTranslating texts to ({target_lang.upper()}) with {provider.upper()}.")
+    logger.info(f"\nTranslating texts to ({target_lang.upper()}) with {provider.upper()}...")
 
     # Define placeholder to prevent error when logging exception
     data_dict = "data_dict"

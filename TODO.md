@@ -1,6 +1,7 @@
 # TODO
 
 - [x] Add manga support
+- [ ] Add proper text segementer
 - [x] Upgrade PaddleOCR to support PP-OCRv5 model
 - [ ] Improve error handling
 - [ ] Improve logging

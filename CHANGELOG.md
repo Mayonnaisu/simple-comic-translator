@@ -1,6 +1,12 @@
 # CHANGELOG
 
 ## v0.5.6
+20/2/2026
+
+28. Update `protobuf` & `pillow` for patching vulnerabilities
+29. Fix vertical text rendering
+
+## v0.5.6
 21/1/2026
 
 27. Add [LiteLLM](https://github.com/BerriAI/litellm)

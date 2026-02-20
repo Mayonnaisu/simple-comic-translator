@@ -5,7 +5,7 @@ from loguru import logger
 from colorama import Fore, Style, init
 from PIL import Image, ImageDraw, ImageFont
 
-from app.core.detection import get_bbox_coords
+from app.core.detection import get_bbox_coords, get_bbox_orientation
 from app.core.inpainting import inpaint_image_with_lama
 
 init(autoreset=True)
@@ -18,7 +18,14 @@ init(autoreset=True)
 #     return False
 
 
-def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_size: int, max_size: int, font_path: int):
+def get_fitted_font_and_text(
+    text: str,
+    max_width: int,
+    max_height: int,
+    min_size: int,
+    max_size: int,
+    font_path: int,
+):
     """
     Finds the largest font size and the corresponding wrapped text that fits within the specified max_width and max_height.
     """
@@ -29,7 +36,7 @@ def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_siz
         try:
             font = ImageFont.truetype(font_path, size)
         except IOError:
-            logger.info(f"Font file {font_path} not found. Using default font.")
+            logger.info(f"Font file {font_path} not found. Using default font...")
             font = ImageFont.load_default()
 
         # Determine how many characters per line are needed for this font size
@@ -41,7 +48,9 @@ def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_siz
         chars_per_line = int(max_width / avg_char_width) if avg_char_width > 0 else 1
 
         # Wrap text based on calculated characters per line
-        wrapped_text_list = textwrap.wrap(text, width=chars_per_line if chars_per_line > 0 else 1)
+        wrapped_text_list = textwrap.wrap(
+            text, width=chars_per_line if chars_per_line > 0 else 1
+        )
         wrapped_text = "\n".join(wrapped_text_list)
 
         # Measure the total size of the wrapped text using ImageDraw.multiline_textbbox
@@ -65,14 +74,32 @@ def get_fitted_font_and_text(text: str, max_width: int, max_height: int, min_siz
     return fitted_size, best_wrapped_text
 
 
-def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_results: list[dict], box: list[int | str | tuple], inpainting: list[bool|object], font: list[int | str], image_extension: str, source_language: str, output_path: str, log_level: str):
+def overlay_translated_texts(
+    images: list[dict],
+    images_merged: bool,
+    all_ocr_results: list[dict],
+    box: list[int | str | tuple],
+    inpainting: list[bool | object],
+    font: list[int | str],
+    image_extension: str,
+    source_language: str,
+    output_path: str,
+    log_level: str,
+):
     """Overlays the detected text boxes and translated texts onto the corresponding safely-splitted images and saves them."""
 
-    logger.info("\nOverlaying translated texts.")
+    logger.info("\nOverlaying translated texts...")
 
-    if not os.path.exists(output_path): os.makedirs(output_path)
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
 
-    box_offset, box_padding, box_fill_color, box_outline_color, box_outline_thickness = box
+    (
+        box_offset,
+        box_padding,
+        box_fill_color,
+        box_outline_color,
+        box_outline_thickness,
+    ) = box
     inpaint, inpainter = inpainting
     font_min, font_max, font_color, font_path = font
 
@@ -89,29 +116,29 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
     #     filter_path = "filters/manhua.txt"
 
     for i, image_info in enumerate(images):
-        image_name = f"image_{i:02d}"
+        image = image_info["image"]
+        image_copy = image.copy()
+        draw = ImageDraw.Draw(image)
 
         if images_merged:
-            image_slice = image_info['image'].copy()
-            slice_top = image_info['top_offset']
-            image = image_slice
+            image_name = f"image_{i:02d}"
+            slice_top = image_info["top_offset"]
 
             results_for_this_slice = []
             for res in all_ocr_results:
-                s_min_y, s_max_y = np.min(np.array(res['box'])[:, 1]), np.max(np.array(res['box'])[:, 1])
-                if max(slice_top, s_min_y) < min(slice_top + image_slice.size[1], s_max_y):
-                     results_for_this_slice.append(res)
+                s_min_y, s_max_y = np.min(np.array(res["box"])[:, 1]), np.max(
+                    np.array(res["box"])[:, 1]
+                )
+                if max(slice_top, s_min_y) < min(slice_top + image.size[1], s_max_y):
+                    results_for_this_slice.append(res)
         else:
-            image = image_info['image'].copy()
-            image_name = image_info['image_name']
+            image_name = image_info["image_name"]
             slice_top = 0
 
             results_for_this_slice = []
             for res in all_ocr_results:
                 if res["image_name"] == image_name:
                     results_for_this_slice.append(res)
-
-        draw = ImageDraw.Draw(image)
 
         for item in results_for_this_slice:
             original_points = item["box"]
@@ -141,8 +168,9 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             new_xmax = rel_xmax + box_offset
             new_ymax = rel_ymax + box_offset
 
-            box_width = new_xmax - new_xmin
-            box_height = new_ymax - new_ymin
+            box_orientation, box_width, box_height = get_bbox_orientation(
+                new_xmin, new_ymin, new_xmax, new_ymax, 0.5
+            )
 
             # Use textwrap as a safety measure to prevent spilling
             optimal_size, wrapped_text = get_fitted_font_and_text(
@@ -159,7 +187,11 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
             text_height = bbox[3] - bbox[1]
 
             # Center the text within the target box region
-            target_box_x1, target_box_y1 = (new_xmin, new_ymin)
+            if box_orientation == "vertical":
+                target_box_x1, target_box_y1 = (0, 0)
+            else:
+                target_box_x1, target_box_y1 = (new_xmin, new_ymin)
+
             target_box_center_x = target_box_x1 + box_width // 2
             target_box_center_y = target_box_y1 + box_height // 2
 
@@ -168,30 +200,62 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
 
             # Inpaint or overlay the target bounding box
             if inpaint:
-                image = inpaint_image_with_lama(inpainter, image, [rel_xmin, rel_ymin, rel_xmax, rel_ymax],output_path, i, log_level)
+                image = inpaint_image_with_lama(
+                    inpainter,
+                    image,
+                    [rel_xmin, rel_ymin, rel_xmax, rel_ymax],
+                    output_path,
+                    i,
+                    log_level,
+                )
 
                 draw = ImageDraw.Draw(image)
             else:
-                draw.rectangle(
-                    (target_box_x1, target_box_y1, target_box_x1 + box_width, target_box_y1 + box_height),
-                    fill=box_fill_color,
-                    outline=box_outline_color,
-                    width=box_outline_thickness
-                )
+                if box_orientation == "horizontal":
+                    draw.rectangle(
+                        (
+                            target_box_x1,
+                            target_box_y1,
+                            target_box_x1 + box_width,
+                            target_box_y1 + box_height,
+                        ),
+                        fill=box_fill_color,
+                        outline=box_outline_color,
+                        width=box_outline_thickness,
+                    )
 
             # Draw the text
-            text_position = (text_x, text_y-box_padding)
-            draw.multiline_text(
-                text_position,
-                wrapped_text,
-                align="center",
-                font=final_font,
-                fill=font_color
-            )
+            text_position = (text_x, text_y - box_padding)
+            if box_orientation == "horizontal":
+                draw.multiline_text(
+                    text_position,
+                    wrapped_text,
+                    align="center",
+                    font=final_font,
+                    fill=font_color,
+                )
+            elif box_orientation == "vertical":
+                # Create a transparent image for the text
+                txt_img = Image.new(
+                    "RGBA", (box_width, box_height), (255, 255, 255, 255)
+                )
+                # Draw text horizontally
+                d = ImageDraw.Draw(txt_img)
+                d.multiline_text(
+                    text_position,
+                    wrapped_text,
+                    align="center",
+                    font=final_font,
+                    fill=font_color,
+                )
+                # Rotate text image 90 degrees clockwise
+                rotated_txt = txt_img.rotate(-90, expand=True)
+                # Paste onto original image
+                image.paste(rotated_txt, (new_xmin, new_ymin), rotated_txt)
 
             # Annotate image in debug mode
             if log_level == "TRACE":
-                annotate = ImageDraw.Draw(image_info['image'])
+                annotate = ImageDraw.Draw(image_copy)
 
                 try:
                     font = ImageFont.truetype(font_path, 30)
@@ -199,9 +263,7 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
                     font = ImageFont.load_default()
 
                 annotate.rectangle(
-                    (rel_xmin, rel_ymin, rel_xmax, rel_ymax),
-                    outline="red",
-                    width=2
+                    (rel_xmin, rel_ymin, rel_xmax, rel_ymax), outline="red", width=2
                 )
                 annotate.text(
                     (rel_xmin, rel_ymin - 35),
@@ -217,11 +279,11 @@ def overlay_translated_texts(images: list[dict], images_merged: bool, all_ocr_re
 
         # Save the annotated image in debug mode
         if log_level == "TRACE":
-            full_output_path = f'{output_path}/debug/annotation'
+            full_output_path = f"{output_path}/debug/annotation"
             os.makedirs(full_output_path, exist_ok=True)
-            annotation_image = image_info['image']
+            annotation_image = image_copy
             annotation_name = f"annotated_{i:02d}.jpg"
-            annotation_image.save(f'{full_output_path}/{annotation_name}', quality=100)
+            annotation_image.save(f"{full_output_path}/{annotation_name}", quality=100)
             logger.success(f"Saved {annotation_name}.")
             annotation_image.close()
 
